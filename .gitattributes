@@ -1,5 +1,5 @@
 *.ipynb linguist-vendored
 *.log linguist-generated
 *.xml linguist-generated
-*.cpy linguist-language=C++
+*.cc.cpy linguist-language=C++
 
