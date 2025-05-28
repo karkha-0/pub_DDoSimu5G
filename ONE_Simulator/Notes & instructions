@@ -1,0 +1,10 @@
+To compile the code there are 3 compile files under the project
+- compile.bat  -> original 
+- compile_new.bat -> modified by me (look at change history to understand the changes)
+- compile_withWarning.bat -> compiles while ignoring warnings (look at change history to understand the changes)
+
+To run you need to use:
+- ./one.sh sim_Scenario/D2D_pro_sim.txt (the simulaiton configuration can be any file you create)
+
+To run without GUI:
+The script is ONE_Simulator/the-one-1.6.0/one_noGUI.sh

@@ -1,0 +1,430 @@
+/* 
+ * Copyright 2010 Aalto University, ComNet
+ * Released under GPLv3. See LICENSE.txt for details. 
+ */
+package movement;
+
+import input.WKTReader;
+import java.io.File;
+import java.util.LinkedList;
+import java.util.List;
+
+import movement.map.DijkstraPathFinder;
+import movement.map.MapNode;
+import movement.map.SimMap;
+import core.Coord;
+import core.Settings;
+import core.SimClock;
+
+/**
+ * A Class to model movement when people are out shopping or doing other 
+ * activities with friends. If the node happens to be at some other location 
+ * than the place where the shopping starts (where it meets its friends), it 
+ * first travels to the destination along the shortest path.
+ * 
+ * @author Frans Ekman
+ */
+public class EveningActivityMovement extends MapBasedMovement 
+	implements SwitchableMovement {
+
+	private static final int WALKING_TO_MEETING_SPOT_MODE = 0;
+	private static final int EVENING_ACTIVITY_MODE = 1;
+	
+	public static final String NR_OF_MEETING_SPOTS_SETTING = "nrOfMeetingSpots";
+	public static final String EVENING_ACTIVITY_CONTROL_SYSTEM_NR_SETTING = 
+		"shoppingControlSystemNr";
+	
+	public static final String MEETING_SPOTS_FILE_SETTING = "meetingSpotsFile";
+	
+	public static final String MIN_GROUP_SIZE_SETTING = "minGroupSize";
+	public static final String MAX_GROUP_SIZE_SETTING = "maxGroupSize";
+	
+	public static final String MIN_WAIT_TIME_SETTING = 
+		"minAfterShoppingStopTime";
+	public static final String MAX_WAIT_TIME_SETTING = 
+		"maxAfterShoppingStopTime";
+	
+	private static int nrOfMeetingSpots;
+	
+	private int mode;
+	private boolean ready;
+	private DijkstraPathFinder pathFinder;
+	
+	private Coord lastWaypoint;
+	private Coord startAtLocation;
+
+	//Lund adde this
+	private Coord originalWaypoint;
+	
+	private EveningActivityControlSystem scs;
+	private EveningTrip trip;
+	
+	private boolean readyToShop;
+	
+	private int id;
+	
+	private static int nextID = 0;
+	
+	private int minGroupSize;
+	private int maxGroupSize;
+	
+	/**
+	 * Creates a new instance of EveningActivityMovement
+	 * @param settings
+	 */
+	public EveningActivityMovement(Settings settings) {
+		super(settings);
+		super.backAllowed = false;
+		pathFinder = new DijkstraPathFinder(null);
+		mode = WALKING_TO_MEETING_SPOT_MODE;
+		
+		nrOfMeetingSpots = settings.getInt(NR_OF_MEETING_SPOTS_SETTING);
+
+		// Lund added this 
+		System.out.println("nrOfMeetingSpots" + nrOfMeetingSpots);
+		
+		minGroupSize = settings.getInt(MIN_GROUP_SIZE_SETTING);
+		maxGroupSize = settings.getInt(MAX_GROUP_SIZE_SETTING);
+		
+		MapNode[] mapNodes = (MapNode[])getMap().getNodes().
+			toArray(new MapNode[0]);
+		
+		String shoppingSpotsFile = null;
+		try {
+			shoppingSpotsFile = settings.getSetting(MEETING_SPOTS_FILE_SETTING);
+		} catch (Throwable t) {
+			// Do nothing;
+		}
+		
+		List<Coord> meetingSpotLocations = null;
+		
+		if (shoppingSpotsFile == null) {
+			meetingSpotLocations = new LinkedList<Coord>();
+			for (int i=0; i<mapNodes.length; i++) {
+				if ((i % (mapNodes.length/nrOfMeetingSpots)) == 0) {
+					startAtLocation = mapNodes[i].getLocation().clone();
+					meetingSpotLocations.add(startAtLocation.clone());
+				}	
+			}
+		} else {
+			try {
+				meetingSpotLocations = new LinkedList<Coord>();
+				List<Coord> locationsRead = (new WKTReader()).readPoints(
+						new File(shoppingSpotsFile));
+
+				// Lund added tjis 
+				System.out.println("DEBUG: Successfully read " + locationsRead.size() + " locations.");
+				for (Coord c : locationsRead) {
+					System.out.println("DEBUG: Meeting spot at " + c);
+				}
+				// Lund End
+
+				// Lund commented this 
+				/*for (Coord coord : locationsRead) {
+					SimMap map = getMap();
+					Coord offset = map.getOffset();
+					// mirror points if map data is mirrored
+					if (map.isMirrored()) { 
+						coord.setLocation(coord.getX(), -coord.getY()); 
+					}
+					coord.translate(offset.getX(), offset.getY());
+					meetingSpotLocations.add(coord);
+
+				}*/
+				// Lund added this 
+				for (Coord coord : locationsRead) {
+					SimMap map = getMap();
+					//Coord offset = map.getOffset();
+					//coord.translate(offset.getX(), offset.getY());
+					meetingSpotLocations.add(coord);
+				}
+				//Lund end 
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+
+		// Lund added this 
+		System.out.println("startAtLocation1:" + startAtLocation);
+
+		this.id = nextID++;
+		
+		int scsID = settings.getInt(EVENING_ACTIVITY_CONTROL_SYSTEM_NR_SETTING);
+		
+		scs = EveningActivityControlSystem.getEveningActivityControlSystem(scsID);
+		scs.setRandomNumberGenerator(rng);
+		scs.addEveningActivityNode(this);
+		scs.setMeetingSpots(meetingSpotLocations);
+		
+		maxPathLength = 100;
+		minPathLength = 10;
+		
+		maxWaitTime = settings.getInt(MAX_WAIT_TIME_SETTING);
+		minWaitTime = settings.getInt(MIN_WAIT_TIME_SETTING);
+	}
+	
+	/**
+	 * Creates a new instance of EveningActivityMovement from a prototype
+	 * @param proto
+	 */
+	public EveningActivityMovement(EveningActivityMovement proto) {
+		super(proto);
+		this.pathFinder = proto.pathFinder;
+		this.mode = proto.mode;
+		this.id = nextID++;
+		scs = proto.scs;
+		scs.addEveningActivityNode(this);
+		this.setMinGroupSize(proto.getMinGroupSize());
+		this.setMaxGroupSize(proto.getMaxGroupSize());
+
+		// Lund added this
+		getShoppingLocationAndGetReady();
+
+		//System.out.println("DEBUG1: Node " + id + " now assigned to walk to " + startAtLocation);
+
+		if (startAtLocation != null) {
+			startAtLocation = startAtLocation.clone();
+			//System.out.println("Here");
+			//System.out.println("DEBUG2: Node " + id + " now assigned to walk to " + startAtLocation);
+		} else {
+			//System.err.println("WARNING: startAtLocation is NULL in prototype, assigning default location.");
+			// Pick a valid random location from the map
+			MapNode[] mapNodes = getMap().getNodes().toArray(new MapNode[0]);
+			startAtLocation = mapNodes[rng.nextInt(mapNodes.length)].getLocation().clone();
+			//System.out.println("OR Here");
+			//System.out.println("DEBUG: Node " + id + " now assigned to walk to " + startAtLocation);
+		}
+		// Lund end 
+	}
+	
+	/**
+	 * @return Unique ID of the shopper
+	 */
+	public int getID() {
+		return this.id;
+	}
+	
+	@Override
+	public Coord getInitialLocation() {
+		
+		MapNode[] mapNodes = (MapNode[])getMap().getNodes().
+			toArray(new MapNode[0]);
+		int index = rng.nextInt(mapNodes.length - 1);
+		lastWaypoint = mapNodes[index].getLocation().clone();
+
+		// Lund added this
+		this.originalWaypoint = lastWaypoint.clone();
+		
+		return lastWaypoint.clone();
+	}
+
+	@Override
+	public Path getPath() {
+
+		 // Lund added this
+	    /*System.out.println("DEBUG: Entering getPath() for Node " + id);
+	    System.out.println("DEBUG: Current mode: " + mode);
+	    System.out.println("DEBUG: startAtLocation BEFORE processing: " + startAtLocation);
+		*/
+		System.out.println("DEBUG: lastWaypoint BEFORE processing: " + lastWaypoint);
+		
+		// Lund end
+
+		if (mode == WALKING_TO_MEETING_SPOT_MODE) {
+
+			// Lund added this
+			System.out.println("DEBUG: Node " + id + " walking to meeting spot: " + startAtLocation);
+
+
+			// Try to find to the shopping center
+			SimMap map = super.getMap();
+			if (map == null) {
+				return null;
+			}
+			MapNode thisNode = map.getNodeByCoord(lastWaypoint);
+			MapNode destinationNode = map.getNodeByCoord(startAtLocation);
+
+			//Lund added this
+			System.out.println("DEBUG: >>>>>>>>thisNode (start point): " + thisNode);
+			System.out.println("DEBUG: >>>>>>>>destinationNode (end point): " + destinationNode);
+			// Lund end 
+
+			List<MapNode> nodes = pathFinder.getShortestPath(thisNode, 
+					destinationNode);
+			Path path = new Path(generateSpeed());
+			for (MapNode node : nodes) {
+				path.addWaypoint(node.getLocation());
+			}
+
+			//Lund added this
+			//System.out.println("DEBUG: Final path for Node " + id + ": " + path.getCoords());
+
+			//Lund added this
+			//Coord temp = startAtLocation.clone(); // Swap start and destination
+			//startAtLocation = lastWaypoint.clone();
+			//lastWaypoint = temp.clone();
+			// Lund end
+
+			//Lund commented this
+			lastWaypoint = startAtLocation.clone();
+			//
+			
+			mode = EVENING_ACTIVITY_MODE;
+			return path;
+		} else if (mode == EVENING_ACTIVITY_MODE) {
+			readyToShop = true;
+
+			// Lund added this 
+			System.out.println("DEBUG: Node " + id + " is at the meeting spot, waiting. at time " + SimClock.getTime()) ;
+
+			if (trip.allMembersPresent()) {
+
+				System.out.println("DEBUG: allMembersPresent at time " + SimClock.getTime() + "<<<<<<<<<<<<<<") ;
+
+				Path path = trip.getPath();
+				if (path == null) {
+					super.lastMapNode = super.getMap().
+						getNodeByCoord(lastWaypoint);
+					path = super.getPath(); // TODO Create levy walk path
+					lastWaypoint = super.lastMapNode.getLocation();
+					trip.setPath(path);
+					double waitTimeAtEnd = (maxWaitTime - minWaitTime) * 
+						rng.nextDouble() + minWaitTime;
+
+					//System.out.println(">>>>>>waitTimeAtEnd" + waitTimeAtEnd);
+					trip.setWaitTimeAtEnd(waitTimeAtEnd);
+					
+					// Lund commented this 
+					//trip.setDestination(lastWaypoint);
+
+					//Lund added this
+					trip.setDestination(originalWaypoint);
+
+					// Lund added this 
+					System.out.println("DEBUG: Node " + id + " waiting for " + (waitTimeAtEnd / 60) + " minutes. at time" +  SimClock.getTime());
+				} 
+				// Lund commented this 
+				//lastWaypoint = trip.getDestination();
+				lastWaypoint = startAtLocation.clone();
+
+				System.out.println("DEBUG: Node " + id + " returning to original location: " + this.lastWaypoint);
+
+				ready = true;
+
+				// Lund added this 
+				// **NEW: After waiting, reverse the trip**
+				mode = WALKING_TO_MEETING_SPOT_MODE; // Go back
+				startAtLocation = this.originalWaypoint.clone(); 
+				System.out.println("DEBUG: Node " + id + " returning to original location: " + this.originalWaypoint);
+
+				return path;
+			}
+			else {
+				System.out.println("not all allMembersPresent>>>>>>");
+
+			}
+		}
+		
+		return null;
+	}
+
+	@Override
+	protected double generateWaitTime() {
+		if (ready) {
+			double wait = trip.getWaitTimeAtEnd();
+
+			System.out.println("DEBUG: Node " + id + " waiting for " + (wait / 60) + " minutes.");
+
+			return wait;
+		} else {
+			return 0;
+		}
+	}
+	
+	@Override
+	public MapBasedMovement replicate() {
+		return new EveningActivityMovement(this);
+	}
+
+	/**
+	 * @see SwitchableMovement
+	 */
+	public Coord getLastLocation() {
+		return lastWaypoint.clone();
+	}
+
+	/**
+	 * @see SwitchableMovement
+	 */
+	public boolean isReady() {
+		return ready;
+	}
+
+	/**
+	 * @see SwitchableMovement
+	 */
+	public void setLocation(Coord lastWaypoint) {
+		this.lastWaypoint = lastWaypoint.clone();
+		ready = false;
+		mode = WALKING_TO_MEETING_SPOT_MODE;
+	}
+	
+	/**
+	 * Sets the node ready to start a shopping trip.
+	 * @return The coordinate of the place where the shopping trip starts
+	 */
+	public Coord getShoppingLocationAndGetReady() {
+		readyToShop = false; // New shopping round starts
+		trip = scs.getEveningInstructions(id);
+
+		//Lund commneted this
+		//startAtLocation = trip.getLocation().clone();
+
+		// Lund added this
+		System.out.println("DEBUG: trip for Node " + id + " = " + trip);
+		if (trip != null) {
+			startAtLocation = trip.getLocation().clone();
+			System.out.println("DEBUG: Node " + id + " should walk to " + startAtLocation);
+		} else {
+			System.err.println("ERROR: trip is NULL for Node " + id);
+		}
+		// Lund end
+
+		return startAtLocation.clone();
+	}
+	
+	public Coord getShoppingLocation() {
+		return scs.getMeetingSpotForID(id).clone();
+	}
+	
+	
+	/**
+	 * Checks if a node is at the correct place where the shopping begins
+	 * @return true if node is ready and waiting for the rest of the group to
+	 *  arrive
+	 */
+	public boolean isReadyToShop() {
+		return readyToShop;
+	}
+
+	public static void reset() {
+		nextID = 0;
+	}
+
+	public int getMinGroupSize() {
+		return minGroupSize;
+	}
+
+	public void setMinGroupSize(int minGroupSize) {
+		this.minGroupSize = minGroupSize;
+	}
+
+	public int getMaxGroupSize() {
+		return maxGroupSize;
+	}
+
+	public void setMaxGroupSize(int maxGroupSize) {
+		this.maxGroupSize = maxGroupSize;
+	}
+	
+}

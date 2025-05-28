@@ -1,0 +1,99 @@
+.
+├── background
+├── modifiedExternalFiles
+│   ├── inet4.5
+│   │   └── src
+│   │       └── inet
+│   │           ├── applications
+│   │           └── transportlayer
+│   └── Simu5G
+│       └── src
+│           ├── apps
+│           │   ├── cbr
+│           │   └── voip
+│           ├── common
+│           │   └── binder
+│           └── stack
+│               └── phy
+├── ONE_Simulator
+│   └── the-one-1.6.0
+│       ├── applications
+│       ├── core
+│       ├── data
+│       │   ├── cluster
+│       │   ├── HelsinkiMedium
+│       │   └── Manhattan
+│       ├── doc
+│       ├── ee
+│       ├── example_settings
+│       ├── gui
+│       │   ├── buttonGraphics
+│       │   ├── nodefilter
+│       │   └── playfield
+│       ├── input
+│       ├── interfaces
+│       ├── lib
+│       ├── movement
+│       │   └── map
+│       ├── report
+│       ├── reports
+│       │   └── Test-case-001_1h_D2D_MalwarePropagation_RWP_1-5ms
+│       ├── routing
+│       │   ├── maxprop
+│       │   ├── schedule
+│       │   └── util
+│       ├── sim_Scenario
+│       │   ├── CaseIDs
+│       │   │   ├── MalwareInfection-CaseIDs
+│       │   │   ├── Mobility-CaseIDs
+│       │   │   └── Test
+│       │   ├── plotting_results_MalwareInfection
+│       │   │   └── Plots
+│       │   └── simulation_results_MalwareInfection
+│       │       ├── D2D_GAM_inDDoSimu5GPaper
+│       │       └── D2D_RWP_inDDoSimu5GPaper
+│       ├── test
+│       ├── toolkit
+│       │   └── dtnsim2patches
+│       ├── ui
+│       ├── util
+│       └── wdm_settings
+├── out
+│   ├── clang-debug
+│   ├── clang-release
+│   │   └── src
+│   └── gcc-release
+│       ├── ONE_Simulator
+│       │   └── the-one-1.6.0
+│       │       └── sim_Scenario
+│       └── src
+│           └── ddosim5g
+│               ├── apps
+│               ├── simcommands
+│               └── trafficcontroller
+├── results
+│   └── Test-Cases-001
+│       └── plotting
+│           ├── raw_data
+│           └── Test_cases_plots
+├── simulations
+│   └── CaseID
+│       ├── anomilies
+│       │   └── mobilityAnomilies
+│       ├── config
+│       │   └── infectionTraces
+│       │       └── Test-cases-001_1h_D2D_MalwarePropagation_RWP_1-5ms
+│       ├── networks
+│       ├── script
+│       │   ├── mob_tracesConversionPy
+│       │   │   └── fromONEtoSimu5G
+│       │   └── simRun_logs
+│       └── Test-cases-001
+│           └── results
+└── src
+    └── ddosim5g
+        ├── apps
+        ├── simcommands
+        └── trafficcontroller
+
+96 directories

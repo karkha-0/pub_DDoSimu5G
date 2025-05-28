@@ -1,0 +1,74 @@
+######################## Base Configuration #############################
+## Simulation-specific settings
+Scenario.name = MobilitySim
+Scenario.simulateConnections = true
+Scenario.updateInterval = 5
+## Simulatio endTime is seconds 
+Scenario.endTime = 540000
+Scenario.nrofHostGroups = 1
+
+###########################################################################################
+
+######################## D2D (Device-to-Device) Communication #############################
+Group.groupID = mobility
+Group.nrofInterfaces = 1
+Group.interface1 = d2dInterface
+d2dInterface.type = SimpleBroadcastInterface
+d2dInterface.transmitRange = 150
+## Data transmission rate of 1 Kilobytes per second (Kbps)
+d2dInterface.transmitSpeed = 100000
+
+Events.nrof = 0
+
+#################################################################################
+
+######################## Nodes ##################################################
+## number of UEs
+Group.nrofHosts = 1000
+MovementModel.rngSeed = 10101010   
+
+######################## Mobility ################################################
+## Movement model settings
+MovementModel.worldSize = 6000, 6000
+
+############ WorkingdayMovement 
+Group.movementModel = WorkingDayMovement
+# 50% of nodes own a car
+Group.ownCarProb = 1
+# go shopping after work
+Group.probGoShoppingAfterWork = 0
+# Movement speed range (m/s)
+Group.speed = 4.0,4.0   
+Group.busControlSystemNr = 0
+Group.homeLocation = 0,0
+#Group.workLocation = 500,500
+Group.workDayLength = 28800 
+Group.nrOfOffices = 8
+Group.officeSize = 50
+Group.officeWaitTimeParetoCoeff = 0
+Group.officeMinWaitTime = 0
+Group.officeMaxWaitTime = 0
+Group.timeDiffSTD = 0
+Group.nrOfMeetingSpots = 1
+Group.minGroupSize = 2
+Group.maxGroupSize = 10
+
+Group.shoppingControlSystemNr = 1
+Group.minAfterShoppingStopTime = 0
+Group.maxAfterShoppingStopTime = 0
+
+################################################################################################
+
+####################################3## Reports (basic setup, can be extended)################################
+Optimization.cellSizeMult = 5
+Optimization.randomizeUpdateOrder = true
+
+## Reports
+Report.nrofReports = 1
+Report.reportDir = reports/MobilitySim/wp_runsWith1000SectorSizeAndInMins/10
+## logging UE mobility traces every 60 seconds
+Report.intervalMobilityLog = 60.0
+## How often do mobility traces written to file. Needed for performace and I/O interactions
+Report.sizebufferMobilityLog = 100
+Report.report1 = SectorMobilityReport
+Report.sectorSize = 1000

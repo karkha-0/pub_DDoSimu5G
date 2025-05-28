@@ -1,0 +1,354 @@
+/* 
+ * Copyright 2024, Lund Univeristy, EIT, Security and Networks group
+ * Released under GPLv3. See LICENSE.txt for details. 
+ */
+
+package routing;
+
+import java.util.HashSet;
+import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.LinkedHashMap;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import core.Connection;
+import core.Coord;
+import core.DTNHost;
+import core.Message;
+import core.Settings;
+import core.SimClock;
+
+
+/**
+ * The InfectionRouter class extends DirectDeliveryRouter to simulate the behavior 
+ * of a node in a network infected by malware. The class introduces delays for 
+ * installation and propagation of malware messages and logs the infection status 
+ * of each node. It tracks message transfers and spatial data of infected nodes.
+ */
+
+public class InfectionRouter extends DirectDeliveryRouter{
+
+    private boolean isInfected = false;   // Indicates whether the node is infected
+    private int installationTime;         // Time required for malware to be installed on the node
+    private double malwareRecvTime = -1;  // Time when the malware was received
+    private double malwareSendTime = -1; // Time when the malware was sent
+    public static final String INSTALLATION_TIME_S = "installationTime";
+    
+    // Store the list of infected nodes
+    private static Set<Integer> infectedNodesSet = new HashSet<>(); // Tracks all infected nodes
+     
+    // JSON arrays for logging infection and malware propagation data
+    private static JSONArray infectionDataArray = new JSONArray(); // For infection data
+    private static JSONArray malwarePropagationDataArray = new JSONArray();
+    
+    // Track connection start times
+    private Map<String, Double> connectionStartTimes = new HashMap<>();
+    private Map<String, Boolean> isTransferInProgress = new HashMap<>();
+
+    private DTNHost srcMalwareNode;  // Stores the node that infected this node
+
+    private double appHandshakeDelay; // Delay for handshake process between nodes
+    private double malwarePrepDelay;  // Time required to prepare the malware message for transfer
+    private int malwareSizeKB;        // Size of the malware message in kilobytes
+    private int transmitSpeedKbps;    // Transmission speed in kilobits per second
+
+    /**
+     * Constructor that initializes the InfectionRouter with the simulation settings.
+     * 
+     * @param s The simulation settings object
+     */
+    public InfectionRouter(Settings s) {
+        super(s);
+        initializeSettings(s);  
+    }
+
+    /**
+     * Updates the state of the node during the simulation, including infection status.
+     * Handles message delivery and checks whether malware installation time has passed.
+     */
+    @Override
+    public void update() {
+        super.update();
+
+        // If the node is not infected yet, check if the installation time has passed
+        if (!isInfected && malwareRecvTime > 0 && 
+            SimClock.getTime() - malwareRecvTime >= installationTime) {
+            isInfected = true;
+            //System.out.println("Malware installation time: " + installationTime);
+            System.out.println("Node " + getHost().getAddress() + " is now infected. At " + SimClock.getTime());
+
+            // Add this infected node to the HashSet (no duplicates)
+            infectedNodesSet.add(getHost().getAddress());
+            //System.out.println("Updated infected nodes: " + infectedNodesSet);
+
+            // Log infection event
+            JSONObject infectionData = new JSONObject(new LinkedHashMap<>());
+            infectionData.put("node_id", getHost().getAddress());
+            infectionData.put("infected_by", srcMalwareNode.getAddress());
+            infectionData.put("malware_active_time", SimClock.getTime());
+            infectionData.put("infection_status", "Infected Active");
+            infectionDataArray.put(infectionData);
+            }
+/* 
+        // Return early if the node is not infected
+        if (!isInfected) {
+            return;
+        }
+    
+        // Check if a transfer can start
+        if (isTransferring() || !canStartTransfer()) {
+            return;
+        } 
+               
+        // Attempt to deliver the message to the final recipient
+        if (exchangeDeliverableMessages() != null) {
+            return;
+        }
+*/
+    }
+
+    @Override
+    public void changedConnection(Connection con) {
+        if (con.isUp()) { // Only handle new connections
+            DTNHost otherNode = con.getOtherNode(getHost());
+            if (isInfected) {
+                String connectionKey = getHost().getAddress() + "-" + otherNode.getAddress();
+                if (!isTransferInProgress.containsKey(connectionKey)) {
+                    double currentSimTime = SimClock.getTime();
+                    connectionStartTimes.put(connectionKey, currentSimTime);
+                    isTransferInProgress.put(connectionKey, true);
+    
+                    // Log connection initiation
+                    System.out.println("New connection between " + getHost().getAddress() + " and " + otherNode.getAddress() + " at " + currentSimTime);
+    
+                    // Dynamically create malware message for the new connection
+                    createAndSendMalware(otherNode, con, connectionKey);
+                }
+            }
+        }
+    }
+
+    private void createAndSendMalware(DTNHost targetNode, Connection con, String connectionKey) {
+        double currentSimTime = SimClock.getTime();
+
+        // Simulate handshake delay
+        if (currentSimTime - connectionStartTimes.get(connectionKey) < appHandshakeDelay) {
+            return; // Handshake not yet complete
+        }
+
+        // Simulate preparation delay
+        if (currentSimTime - connectionStartTimes.get(connectionKey) < appHandshakeDelay + malwarePrepDelay) {
+            return; // Still preparing malware package
+        }
+
+        // Create malware message and send it
+        Message malwareMessage = new Message(getHost(), targetNode, "Malware" + getHost().getAddress(), malwareSizeKB);
+        startTransfer(malwareMessage, con);
+
+        // Log the malware transmission
+        System.out.println("Malware message created and sent to node " + targetNode.getAddress() + " at time " + SimClock.getTime());
+    }
+
+    /**
+     * Starts the transfer of a message from the current node to another node.
+     * 
+     * @param m The message to be transferred
+     * @param con The connection through which the message will be transferred
+     * @return The result of the message transfer
+    */
+    @Override
+    protected int startTransfer(Message m, Connection con) {
+        // Simulate transmission delay
+        double transmissionDelay = (malwareSizeKB * 8.0) / transmitSpeedKbps;
+        double currentSimTime = SimClock.getTime();
+        String connectionKey = con.getOtherNode(getHost()).getAddress() + "-" + getHost().getAddress();
+
+        // Ensure the connection start time is tracked
+        if (!connectionStartTimes.containsKey(connectionKey)) {
+            connectionStartTimes.put(connectionKey, currentSimTime);
+        }
+
+        if (currentSimTime - connectionStartTimes.get(connectionKey) < transmissionDelay) {
+            return TRY_LATER_BUSY; // Still transferring the malware
+        }
+
+        // Complete transfer
+        connectionStartTimes.remove(connectionKey);
+        isTransferInProgress.remove(connectionKey);
+        return super.startTransfer(m, con);
+        
+        //return super.startTransfer(m, con);
+    }
+
+    /**
+     * Receives a message and determines whether the current node is the final recipient.
+     * Logs the message details and infection status if the message is received by a non-infected node.
+     * 
+     * @param m The message being received
+     * @param from The node from which the message was sent
+     * @return The result of the message reception process
+     */
+    @Override
+    public int receiveMessage(Message m, DTNHost from) {
+        // Check if this node is the intended recipient (final destination) for the message
+        if (m.getTo().equals(this.getHost())) {
+    
+            // Now, check if the message is delivered to non infected Nodes only
+            if (!isInfected) {
+                int result = super.receiveMessage(m, from);
+        
+                // Log the successful reception of the message
+                if (result == RCV_OK){
+                    System.out.println("Message " + m.getId() + " was successfully accepted for delivery to node " 
+                        + this.getHost().getAddress() + " from node " + from.getAddress() + "at " + SimClock.getTime());
+                }
+                return result;
+            }
+            else {
+                return DENIED_OLD;
+            }
+        }
+        // If this node is not the intended recipient, discard the message
+        return DENIED_POLICY;
+    }
+
+    /**
+     * Handles the event when a message is fully transferred and delivered to this node.
+     * Logs the message transfer and initiates the infection process if the node is not yet infected.
+     * 
+     * @param id The ID of the message that was transferred
+     * @param from The node that transferred the message
+     * @return The message after being processed
+     */
+    @Override
+    public Message messageTransferred(String id, DTNHost from) {
+        Message m = super.messageTransferred(id, from); 
+
+        // If the message is fully delivered to this host as final recipient
+        if (isDeliveredMessage(m)) {
+            System.out.println("Message " + m.getId() + " was fully received and delivered to node "
+                + this.getHost().getAddress() + " from node " + from.getAddress() + "at " + SimClock.getTime());
+
+            // If the receiving node is not infected, start the infection process
+            if (!isInfected) {
+                srcMalwareNode = from;                
+                malwareRecvTime = SimClock.getTime(); // Log infection start time
+
+                // Log message propgation data for sender and receiver
+                logMalwarePropData(from, this.getHost(), malwareRecvTime);
+            }
+        }
+        return m; // Return the message after processing
+    }
+
+    /**
+     * Replicates the InfectionRouter for use in another node with the same behavior.
+     * 
+     * @return A new instance of InfectionRouter with the same settings
+     */
+    @Override
+    public InfectionRouter replicate() {
+        return new InfectionRouter(this);
+    }
+
+    /**
+     * Copy constructor to replicate the infection status and settings of the router.
+     * 
+     * @param r The InfectionRouter object to be replicated
+     */
+    protected InfectionRouter(InfectionRouter r) {
+        super(r);
+        this.isInfected = r.isInfected;
+
+        this.malwareRecvTime = r.malwareRecvTime;
+        this.srcMalwareNode = r.srcMalwareNode;
+        
+        this.installationTime = r.installationTime;
+        this.appHandshakeDelay = r.appHandshakeDelay;
+        this.malwarePrepDelay = r.malwarePrepDelay;
+        this.malwareSizeKB = r.malwareSizeKB;
+        this.transmitSpeedKbps = r.transmitSpeedKbps;
+    }
+
+    /**
+     * Initializes the settings of the InfectionRouter, including installation time, 
+     * handshake delay, malware preparation time, malware size, and transmission speed.
+     * 
+     * @param s The settings object from which the configuration is read
+     */
+    private void initializeSettings(Settings s) {
+        this.installationTime = s.getInt("installationTime",10); // Default to 10 second
+        this.appHandshakeDelay = s.getDouble("AppHandshakeTime", 1); // Default to 1 second
+        this.malwarePrepDelay = s.getDouble("MalwarepPeparationTime", 2); // Default to 2 seconds
+        this.malwareSizeKB = s.getInt("malwareSize", 500); // Default 500kB
+        this.transmitSpeedKbps = s.getInt("transmitSpeed", 1024); // Default 1Mbps (1024kbps)
+    }
+
+    /**
+     * Retrieves the set of infected nodes.
+     * 
+     * @return A set of node IDs representing infected nodes
+     */
+    public static Set<Integer> getInfectedNodesSet() {
+        return infectedNodesSet;
+    }
+
+    /**
+     * Generates a JSON report with infection data and malware propagation data.
+     * 
+     * @return A JSONObject containing the infection and propagation reports
+     */
+    public static JSONObject getInfectionReportArray() {
+        JSONObject reportData = new JSONObject();
+        reportData.put("infectionData", infectionDataArray);
+        reportData.put("malwarePropagationData", malwarePropagationDataArray);
+        return reportData;
+    }
+
+    /**
+     * Logs Malware propgation data
+     * Logs spatial data (x, y coordinates) for both the sender and receiver during the message exchange.
+     * @param from The sending node
+     * @param to The receiving node
+     * @param malwareRecvTime The time of malware received
+     */
+    public void logMalwarePropData(DTNHost from, DTNHost to, double malwareRecvTime) {
+        Coord fromPos = from.getLocation();
+        Coord toPos = to.getLocation();
+
+        double distance = fromPos.distance(toPos);
+        
+        JSONObject malwarePropagationData = new JSONObject(new LinkedHashMap<>());
+        malwarePropagationData.put("from_node", from.getAddress());
+        malwarePropagationData.put("from_node_position", fromPos.toString());
+        malwarePropagationData.put("to_node", to.getAddress());
+        malwarePropagationData.put("to_node_position", toPos.toString());
+        malwarePropagationData.put("distance_between_nodes", distance);  // Distance between nodes
+        malwarePropagationData.put("malware_recv_time", malwareRecvTime);
+        malwarePropagationData.put("infection_status", "Infected InActive");
+
+        // Add to infection report
+        malwarePropagationDataArray.put(malwarePropagationData);
+    }
+
+    /**
+     * Retrieves the connection object corresponding to the given connection key.
+     * 
+     * @param connectionKey The key representing the connection
+     * @return The Connection object, or null if not found
+     */
+    private Connection getConnectionByKey(String connectionKey) {
+        // Iterate over active connections to find the matching one
+        for (Connection con : getConnections()) {
+            String key = con.getOtherNode(getHost()).getAddress() + "-" + getHost().getAddress();
+            if (key.equals(connectionKey)) {
+                return con;
+            }
+        }
+        return null;
+    }
+    
+}

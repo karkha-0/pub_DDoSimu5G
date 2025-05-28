@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<internetCloud symmetric="true">
+    <parameters>
+	<traffic src="internetCloud" dest="upf" delay="10ms + truncnormal(100ms, 10ms)" datarate="uniform(100Mbps, 250Mbps)" drop="uniform(0,1) &lt; 0.01"  />
+	<traffic src="upf" dest="internetCloud" delay="10ms + truncnormal(100ms, 10ms)" datarate="uniform(100Mbps, 250Mbps)" drop="uniform(0,1) &lt; 0.01"  />
+	
+	<traffic src="localRouter" dest="upf" delay="10ms + truncnormal(100ms, 10ms)" datarate="uniform(100Mbps, 250Mbps)" drop="uniform(0,1) &lt; 0.01"  />
+	<traffic src="upf" dest="localRouter" delay="10ms + truncnormal(100ms, 10ms)" datarate="uniform(100Mbps, 250Mbps)" drop="uniform(0,1) &lt; 0.01"  />
+	
+	<traffic src="videoRouter" dest="upf" delay="10ms + truncnormal(100ms, 10ms)" datarate="uniform(100Mbps, 250Mbps)" drop="uniform(0,1) &lt; 0.01"  />
+	<traffic src="upf" dest="videoRouter" delay="10ms + truncnormal(100ms, 10ms)" datarate="uniform(100Mbps, 250Mbps)" drop="uniform(0,1) &lt; 0.01"  />
+	
+	<traffic src="localRouter" dest="internetCloud" delay="10ms + truncnormal(100ms, 10ms)" datarate="uniform(100Mbps, 250Mbps)" drop="uniform(0,1) &lt; 0.01"  />
+	<traffic src="internetCloud" dest="localRouter" delay="10ms + truncnormal(100ms, 10ms)" datarate="uniform(100Mbps, 250Mbps)" drop="uniform(0,1) &lt; 0.01"  />
+	
+	<traffic src="videoRouter" dest="internetCloud" delay="10ms + truncnormal(100ms, 10ms)" datarate="uniform(100Mbps, 250Mbps)" drop="uniform(0,1) &lt; 0.01"  />
+	<traffic src="internetCloud" dest="videoRouter" delay="10ms + truncnormal(100ms, 10ms)" datarate="uniform(100Mbps, 250Mbps)" drop="uniform(0,1) &lt; 0.01"  />
+	
+	<traffic src="localRouter" dest="remoteServer" delay="10ms + truncnormal(100ms, 10ms)" datarate="uniform(100Mbps, 250Mbps)" drop="uniform(0,1) &lt; 0.01"  />
+	<traffic src="remoteServer" dest="localRouter" delay="10ms + truncnormal(100ms, 10ms)" datarate="uniform(100Mbps, 250Mbps)" drop="uniform(0,1) &lt; 0.01"  />
+		
+	<traffic src="videoRouter" dest="videoServer" delay="10ms + truncnormal(100ms, 10ms)" datarate="uniform(100Mbps, 250Mbps)" drop="uniform(0,1) &lt; 0.01"  />
+	<traffic src="videoServer" dest="videoRouter" delay="10ms + truncnormal(100ms, 10ms)" datarate="uniform(100Mbps, 250Mbps)" drop="uniform(0,1) &lt; 0.01"  />
+    </parameters>
+</internetCloud>

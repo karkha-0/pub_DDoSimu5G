@@ -1,0 +1,166 @@
+## Simulation-specific settings
+Scenario.name = MiraiMalwarePropagationD2D
+Scenario.simulateConnections = true
+Scenario.updateInterval = 0.5
+## Simulatio endTime is seconds 
+Scenario.endTime = 8000
+Scenario.nrofHostGroups = 1
+
+## D2D (Device-to-Device) Communication
+d2dInterface.type = SimpleBroadcastInterface
+d2dInterface.transmitRange = 150
+## Data transmission rate of 1 Kilobytes per second (Kbps)
+d2dInterface.transmitSpeed = 100000
+
+######################## Nodes ##################################################
+## number of UEs
+Group.nrofHosts = 100
+## Random seed for mobility
+MovementModel.rngSeed = 123
+
+######################## Mobility ################################################
+######### RandomWaypoint
+#Group.movementModel = RandomWaypoint
+# 1m/s -> Slow walking speed, 1.4m/s Average walking speed (pedestrian), 2m/s Brisk walking or slow jogging, 5m/s Moderate cycling speed or fast jogging
+# Group mobility Speeds (between 1 and 5 m/sec) 
+#Group.speed = 0.0, 5.0
+######################################
+############ WorkingdayMovement 
+#Group.movementModel = WorkingDayMovement
+## 50% of nodes own a car
+#Group.ownCarProb = 1
+## go shopping after work
+#Group.probGoShoppingAfterWork = 0.5
+## Movement speed range (m/s)
+#Group.speed = 1.0, 5.0  
+#Group.busControlSystemNr = 0
+#Group.homeLocation = 0,0
+#Group.workLocation = 500,500
+#Group.workDayLength = 28800 
+#Group.nrOfOffices = 10
+#Group.officeSize = 300
+#Group.officeWaitTimeParetoCoeff = 2  
+#Group.officeMinWaitTime = 3600
+#Group.officeMaxWaitTime = 7200
+#Group.timeDiffSTD = 3600
+#Group.nrOfMeetingSpots = 7 
+#Group.minGroupSize = 2
+#Group.maxGroupSize = 10
+
+#Group.shoppingControlSystemNr = 1
+#Group.minAfterShoppingStopTime = 1800
+#Group.maxAfterShoppingStopTime = 3600
+#Group.nrOfShoppingSpots = 3
+#Group.shoppingSpot1 = 600,600
+#Group.shoppingSpot2 = 800,800
+#Group.shoppingSpot3 = 1000,1000
+###################################
+##########Jumping Nodes
+#Group.movementModel = JumpMovement
+Group.speed = 1.0, 5.0
+
+## Number of jump locations
+#JumpMovement.nrOfLocations = 5
+
+## Coordinates of jump locations
+#JumpMovement.locationsFile = sim_Scenario/traces/jump_locations.txt
+
+## Time interval between jumps (in seconds)
+## 5 minutes
+#JumpMovement.jumpInterval = 300  
+
+## Stay duration at each location (in seconds)
+## 10 minutes
+#JumpMovement.stayDuration = 600  
+
+###################################
+##########EveningActivityMovement
+#Group.movementModel = EveningActivityMovement
+
+#Group.nrOfMeetingSpots = 20
+##Group.meetingSpotsFile = sim_Scenario/traces/meeting_spots.txt  
+
+#Group.meetingProbability = 1
+#Group.minGroupSize = 1
+#Group.maxGroupSize = 1
+
+##Group.minWaitTime = 1500
+##Group.maxWaitTime = 2400
+
+##Group.timeDiffSTD = 1800
+#Group.timeDiffSTD = 0
+#Group.speed = 4.0, 4.0
+
+#Group.shoppingControlSystemNr = 1
+#Group.minAfterShoppingStopTime = 900
+#Group.maxAfterShoppingStopTime = 900
+##################################
+##########GenericActivityMovement
+Group.movementModel = GenericActivityMovement
+
+GenericActivityMovement.numStops = 5
+GenericActivityMovement.roundTrip = true
+GenericActivityMovement.minMoveDelay = 0.0
+GenericActivityMovement.maxMoveDelay = 0.0
+GenericActivityMovement.minWaitTime = 1800.0
+GenericActivityMovement.maxWaitTime = 2700.0
+#GenericMobilityMovement.stopsFile = 
+
+################################################################################################
+
+#Group.router = EpidemicRouter
+#Group.router = InfectionRouter
+Group.router = D2DRouter
+## Installation time (seconds) before the infected device becomes active for propagation
+Group.installationTime = 20
+## Time in seconds for application handshake
+Group.AppHandshakeTime = 1  
+## Time in seconds to prepare the malware for transmission
+Group.MalwarePreparationTime = 3  
+Group.bufferSize = 5M
+Group.nrofInterfaces = 1
+Group.interface1 = d2dInterface
+
+Group.groupID = d2dDevice
+## This is important to have low event time so that the update call for tranmssion to be called frequently. This is necassory for the different tranmssion delays
+Group.transmitInterval = 1
+Group.malwareSize = 500
+## Intial infected nodes range - need to be sequential 
+Group.infectedNodesRange = 0, 5
+Group.messageTTL = 300
+
+Events.nrof = 0
+#Events1.class = MessageEventGenerator
+## I belive that the event interval need to be the same as tranmission interval to sync the message events in MessageEventGenerator
+#Events1.interval = 1, 2
+## Mirai malware size (0.5MB )
+#Events1.size = 0.5M
+#Events1.hosts = 0,99
+#Events1.tohosts = 0,99
+#Events1.prefix = MiraiMalware
+#Events1.msgTTL = 300
+#Events1.nrofCopies = 1
+
+## Movement model settings
+#MovementModel.worldSize = 2000, 2000
+#MovementModel.worldSize = 3000, 3000
+
+## Reports (basic setup, can be extended)
+Optimization.cellSizeMult = 5
+Optimization.randomizeUpdateOrder = true
+
+## Reports
+Report.nrofReports = 0
+Report.reportDir = reports/D2D_MalwarePropagation
+## logging UE mobility traces every 60 seconds
+Report.intervalMobilityLog = 60.0
+## How often do mobility traces written to file. Needed for performace and I/O interactions
+Report.sizebufferMobilityLig = 100
+Report.report1 = MalwarePropagationReport
+Report.report2 = MobilityLoggerReport
+#Report.report2 = ConnectivityONEReport
+#Report.report3 = DetailedMessageTransferReport
+#Report.report4 = EventLogReport
+#Report.report5 = ContactTimesReport
+#Report.report6 = MessageDeliveryReport
+#Report.report7 = MessageStatsReport

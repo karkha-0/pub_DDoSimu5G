@@ -1,0 +1,134 @@
+
+######################## Base Configuration #############################
+## Simulation-specific settings
+Scenario.name = MobilitySim
+Scenario.simulateConnections = true
+Scenario.updateInterval = 5
+## Simulatio endTime is seconds 
+Scenario.endTime = 540000
+Scenario.nrofHostGroups = 1
+
+###########################################################################################
+
+######################## D2D (Device-to-Device) Communication #############################
+Group.groupID = mobility
+Group.nrofInterfaces = 1
+Group.interface1 = d2dInterface
+d2dInterface.type = SimpleBroadcastInterface
+d2dInterface.transmitRange = 150
+## Data transmission rate of 1 Kilobytes per second (Kbps)
+d2dInterface.transmitSpeed = 100000
+
+#Group.router = EpidemicRouter
+#Group.router = InfectionRouter
+#Group.router = D2DRouter
+## Installation time (seconds) before the infected device becomes active for propagation
+#Group.installationTime = 20
+## Time in seconds for application handshake
+#Group.AppHandshakeTime = 1  
+## Time in seconds to prepare the malware for transmission
+#Group.MalwarePreparationTime = 3  
+#Group.bufferSize = 5M
+
+## This is important to have low event time so that the update call for tranmssion to be called frequently. This is necassory for the different tranmssion delays
+#Group.transmitInterval = 1
+#Group.malwareSize = 500
+## Intial infected nodes range - need to be sequential 
+#Group.infectedNodesRange = 0, 5
+#Group.messageTTL = 300
+
+Events.nrof = 0
+
+#################################################################################
+
+######################## Nodes ##################################################
+## number of UEs
+Group.nrofHosts = 1000
+MovementModel.rngSeed = 16161616
+
+######################## Mobility ################################################
+## Movement model settings
+#MovementModel.worldSize = 2000, 2000
+MovementModel.worldSize = 5000, 5000
+
+######### RandomWaypoint
+#Group.movementModel = RandomWaypoint
+## 1m/s -> Slow walking speed, 1.4m/s Average walking speed (pedestrian), 2m/s Brisk walking or slow jogging, 5m/s Moderate cycling speed or fast jogging
+## Group mobility Speeds (between 1 and 5 m/sec) 
+#Group.speed = 0.0, 5.0
+######################################
+############ WorkingdayMovement 
+Group.movementModel = WorkingDayMovement
+# 50% of nodes own a car
+Group.ownCarProb = 1
+# go shopping after work
+Group.probGoShoppingAfterWork = 0
+# Movement speed range (m/s)
+Group.speed = 4.0,4.0   
+Group.busControlSystemNr = 0
+Group.homeLocation = 0,0
+Group.workLocation = 500,500
+Group.workDayLength = 28800 
+Group.nrOfOffices = 8
+Group.officeSize = 50
+Group.officeWaitTimeParetoCoeff = 0
+Group.officeMinWaitTime = 0
+Group.officeMaxWaitTime = 0
+Group.timeDiffSTD = 0
+Group.nrOfMeetingSpots = 1
+Group.minGroupSize = 2
+Group.maxGroupSize = 10
+
+Group.shoppingControlSystemNr = 1
+Group.minAfterShoppingStopTime = 0
+Group.maxAfterShoppingStopTime = 0
+#Group.nrOfShoppingSpots = 3
+#Group.shoppingSpot1 = 600,600
+#Group.shoppingSpot2 = 800,800
+#Group.shoppingSpot3 = 1000,1000
+###################################
+##########Jumping Nodes
+#Group.movementModel = JumpMovement
+#JumpMovement.startLocation = 100,100
+
+## Number of jump locations
+#JumpMovement.nrOfLocations = 10
+
+## Coordinates of jump locations
+#JumpMovement.locationsFile = sim_Scenario/traces/jump_locations.txt
+
+## Time interval between jumps (in seconds)
+## 5 minutes
+#JumpMovement.jumpInterval = 300  
+
+## Stay duration at each location (in seconds)
+## 10 minutes
+#JumpMovement.stayDuration = 600  
+##################################
+##########Instant Jump Mobility Nodes
+#Group.movementModel = InstantJumpMovement
+# Time in seconds before teleporting (default 1 minutes)
+#InstantJumpMovement.stayDuration = 60
+# Delay before appearing at the new location (0 = instant)
+#InstantJumpMovement.teleportDelay = 0   
+#Group.speed = 1000.0,1000.0
+
+##########################
+
+################################################################################################
+
+####################################3## Reports (basic setup, can be extended)################################
+Optimization.cellSizeMult = 5
+Optimization.randomizeUpdateOrder = true
+
+## Reports
+Report.nrofReports = 1
+Report.reportDir = reports/MobilitySim/6
+## logging UE mobility traces every 5 seconds
+Report.intervalMobilityLog = 120.0
+## How often do mobility traces written to file. Needed for performace and I/O interactions
+Report.sizebufferMobilityLog = 100
+#Report.report1 = MalwarePropagationReport
+#Report.report1 = MobilityLoggerReport
+Report.report1 = SectorMobilityReport
+Report.sectorSize = 400
