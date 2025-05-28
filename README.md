@@ -26,6 +26,8 @@ If you use DDoSimu5G in your research, please cite the repository
 
 - Run simulation from scripts:
   ++++++++++++++++++++++++++++++++++++++++
+ - Before running Simu5G, Omnet++, and inet, you need to copy the modified src files under modifiedExternalFiles/ to the respective src files as indicated in the path and rebuild. 
+
   - under /simulations/CaseID/script, there are two shell files (need to be adjusted)
 
 - Convert D2D Model mobility traces from ONE to Simu5G:
