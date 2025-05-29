@@ -1,6 +1,0 @@
-<!-- This file was done for intial testing -->
-<internetCloud symmetric="true">
-  <parameters>
-    <traffic src="*" dest="*" delay="20ms + truncnormal(100ms, 20ms)" datarate="uniform(10Mbps, 100Mbps)" drop="uniform(0,1) &lt; 0.01"  />
-  </parameters>
-</internetCloud>
