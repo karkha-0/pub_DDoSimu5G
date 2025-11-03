@@ -236,6 +236,15 @@ build_inet_and_simu5g(){
   if [ -d "$WORKDIR/inet4.5" ]; then
     info "Building INET in $WORKDIR/inet4.5"
     pushd "$WORKDIR/inet4.5" >/dev/null
+    
+    # Source INET's setenv if it exists
+    if [ -f "setenv" ]; then
+      # shellcheck disable=SC1091
+      set +u
+      source setenv
+      set -u
+    fi
+    
     make makefiles
     make -j"$(nproc)" || warn "INET make failed"
     popd >/dev/null
@@ -246,6 +255,15 @@ build_inet_and_simu5g(){
   if [ -d "$WORKDIR/Simu5G" ]; then
     info "Building Simu5G in $WORKDIR/Simu5G"
     pushd "$WORKDIR/Simu5G" >/dev/null
+    
+    # Source Simu5G's setenv if it exists
+    if [ -f "setenv" ]; then
+      # shellcheck disable=SC1091
+      set +u
+      source setenv
+      set -u
+    fi
+    
     make makefiles
     make -j"$(nproc)" || warn "Simu5G make failed"
     popd >/dev/null
