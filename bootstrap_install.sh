@@ -225,7 +225,10 @@ build_inet_and_simu5g(){
   fi
   if [ -f "$OMNET_DIR/setenv" ]; then
     # shellcheck disable=SC1090
+    # Temporarily disable -u to avoid unbound variable errors in setenv
+    set +u
     source "$OMNET_DIR/setenv"
+    set -u
   else
     warn "OMNeT++ setenv not found at $OMNET_DIR/setenv; ensure OMNeT++ is installed and source its setenv manually before building."
   fi
@@ -275,7 +278,10 @@ setup_python_venv_and_requirements(){
 build_project(){
   if [ -f "$OMNET_DIR/setenv" ]; then
     # shellcheck disable=SC1090
+    # Temporarily disable -u to avoid unbound variable errors in setenv
+    set +u
     source "$OMNET_DIR/setenv"
+    set -u
   fi
   info "Building pub_DDoSimu5G project"
   pushd "$REPO_ROOT" >/dev/null
@@ -320,9 +326,9 @@ setup_one(){
       done
       
       # Compile ONE simulator using compile_new.bat (compatible with Java 21+)
-      if [ -f "compile_new.bat" ]; then
+      if [ -f "compile_withWarning.bat" ]; then
         info "Compiling ONE simulator with Java $(java -version 2>&1 | awk -F '"' '/version/ {print $2}')..."
-        ./compile_new.bat
+        ./compile_withWarning.bat
         
         if [ $? -eq 0 ]; then
           info "✓ ONE simulator compiled successfully"
@@ -439,7 +445,10 @@ main(){
   info "Validating environment setup..."
   if [ -f "$OMNET_DIR/setenv" ]; then
     # shellcheck disable=SC1090
+    # Temporarily disable -u to avoid unbound variable errors in setenv
+    set +u
     source "$OMNET_DIR/setenv"
+    set -u
     info "✓ Successfully sourced OMNeT++ environment"
   else
     warn "Could not source OMNeT++ environment from $OMNET_DIR/setenv"
