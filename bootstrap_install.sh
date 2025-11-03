@@ -143,11 +143,12 @@ install_omnetpp(){
   fi
 
   mkdir -p "$target_dir"
-  # Try GitHub release for OMNeT++
+  # Use official OMNeT++ download URL
   if [ "$version" = "${OMNET_DEFAULT_VERSION}" ]; then
-    url="https://github.com/omnetpp/omnetpp/releases/download/omnetpp-6.0.1/omnetpp-6.0.1-src.tgz"
+    url="https://github.com/omnetpp/omnetpp/releases/download/omnetpp-${version}/omnetpp-${version}-src-linux.tgz"
   else
-    url="https://github.com/omnetpp/omnetpp/archive/refs/tags/${version}.tar.gz"
+    warn "Custom version specified. Attempting GitHub tags URL..."
+    url="https://github.com/omnetpp/omnetpp/archive/refs/tags/omnetpp-${version}.tar.gz"
   fi
 
   download_and_extract "$url" "$target_dir"
