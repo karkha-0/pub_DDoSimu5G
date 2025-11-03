@@ -11,9 +11,9 @@ MODIFIED_DIR="$REPO_ROOT/modifiedExternalFiles"
 
 # Defaults kept in deps.json (if present)
 DEPS_FILE="$REPO_ROOT/deps.json"
-OMNET_DEFAULT_VERSION="6.0.1"
-INET_DEFAULT_REF="inet4.5"
-SIMU5G_DEFAULT_REF="Simu5G-1.2.2"
+OMNET_DEFAULT_VERSION="6.1.0"
+INET_DEFAULT_REF="v4.5.4"  # Latest stable INET version
+SIMU5G_DEFAULT_REF="Simu5G-1.3.0"
 ONE_DEFAULT_REF="the-one-1.6.0"
 JDK_DEFAULT="11"
 
@@ -143,12 +143,12 @@ install_omnetpp(){
   fi
 
   mkdir -p "$target_dir"
-  # Use official OMNeT++ download URL from omnetpp.org
+  # Use official OMNeT++ download URL from GitHub releases
   if [ "$version" = "${OMNET_DEFAULT_VERSION}" ]; then
-    url="https://omnetpp.org/download/release/omnetpp-${version}-src-linux.tgz"
+    url="https://github.com/omnetpp/omnetpp/releases/download/omnetpp-${version}/omnetpp-${version}-linux-x86_64.tgz"
   else
-    warn "Custom version specified. Attempting alternative download..."
-    url="https://omnetpp.org/download/release/omnetpp-${version}-src-linux.tgz"
+    warn "Custom version specified. Attempting GitHub releases URL..."
+    url="https://github.com/omnetpp/omnetpp/releases/download/omnetpp-${version}/omnetpp-${version}-linux-x86_64.tgz"
   fi
 
   download_and_extract "$url" "$target_dir"
@@ -410,10 +410,16 @@ main(){
     fi
   fi
 
-  info "Cloning INET and Simu5G into $WORKDIR"
+  info "Setting up INET and Simu5G in $WORKDIR"
   mkdir -p "$WORKDIR"
-  clone_repo "https://github.com/inet-framework/inet.git" "$WORKDIR/inet4.5" "$INET_REF"
-  clone_repo "https://github.com/inet-framework/Simu5G.git" "$WORKDIR/Simu5G" "$SIMU5G_REF"
+  
+  # Download INET from release
+  info "Downloading INET ${INET_REF}"
+  inet_url="https://github.com/inet-framework/inet/releases/download/${INET_REF}/inet-${INET_REF#v}-src.tgz"
+  download_and_extract "$inet_url" "$WORKDIR/inet4.5"
+  
+  # Clone Simu5G from Unipisa repository
+  clone_repo "https://github.com/Unipisa/Simu5G.git" "$WORKDIR/Simu5G" "$SIMU5G_REF"
 
   setup_one
 

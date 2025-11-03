@@ -1,7 +1,7 @@
 {
-  "omnet": "6.0.1",
-  "inet": "inet4.5",
-  "simu5g": "Simu5G-1.2.2",
+  "omnet": "6.1.0",
+  "inet": "v4.5.4",
+  "simu5g": "Simu5G-1.3.0",
   "one": "the-one-1.6.0",
   "jdk": "11"
 }
