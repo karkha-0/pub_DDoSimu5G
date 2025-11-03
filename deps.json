@@ -1,0 +1,7 @@
+{
+  "omnet": "6.0.1",
+  "inet": "inet4.5",
+  "simu5g": "Simu5G-1.2.2",
+  "one": "the-one-1.6.0",
+  "jdk": "11"
+}
