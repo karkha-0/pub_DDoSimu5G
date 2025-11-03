@@ -223,19 +223,18 @@ build_inet_and_simu5g(){
     warn "OMNET_DIR not set; cannot source OMNeT++ setenv. Skipping build of INET/Simu5G."
     return
   fi
-  if [ -f "$OMNET_DIR/setenv" ]; then
-    # shellcheck disable=SC1090
-    # Temporarily disable -u to avoid unbound variable errors in setenv
-    set +u
-    source "$OMNET_DIR/setenv"
-    set -u
-  else
-    warn "OMNeT++ setenv not found at $OMNET_DIR/setenv; ensure OMNeT++ is installed and source its setenv manually before building."
-  fi
-
+  
   if [ -d "$WORKDIR/inet4.5" ]; then
     info "Building INET in $WORKDIR/inet4.5"
     pushd "$WORKDIR/inet4.5" >/dev/null
+    
+    # Source OMNeT++ setenv first to get opp_* tools in PATH
+    if [ -f "$OMNET_DIR/setenv" ]; then
+      # shellcheck disable=SC1090
+      set +u
+      source "$OMNET_DIR/setenv"
+      set -u
+    fi
     
     # Source INET's setenv if it exists
     if [ -f "setenv" ]; then
@@ -255,6 +254,14 @@ build_inet_and_simu5g(){
   if [ -d "$WORKDIR/Simu5G" ]; then
     info "Building Simu5G in $WORKDIR/Simu5G"
     pushd "$WORKDIR/Simu5G" >/dev/null
+    
+    # Source OMNeT++ setenv first to get opp_* tools in PATH
+    if [ -f "$OMNET_DIR/setenv" ]; then
+      # shellcheck disable=SC1090
+      set +u
+      source "$OMNET_DIR/setenv"
+      set -u
+    fi
     
     # Source Simu5G's setenv if it exists
     if [ -f "setenv" ]; then
@@ -343,10 +350,10 @@ setup_one(){
         fi
       done
       
-      # Compile ONE simulator using compile_new.bat (compatible with Java 21+)
-      if [ -f "compile_withWarning.bat" ]; then
+      # Compile ONE simulator using compile_new.bat (compatible with Java 21+, no warnings)
+      if [ -f "compile_new.bat" ]; then
         info "Compiling ONE simulator with Java $(java -version 2>&1 | awk -F '"' '/version/ {print $2}')..."
-        ./compile_withWarning.bat
+        ./compile_new.bat
         
         if [ $? -eq 0 ]; then
           info "✓ ONE simulator compiled successfully"
@@ -354,6 +361,9 @@ setup_one(){
           warn "ONE simulator compilation failed. This is non-fatal - mobility traces are pre-generated."
           info "You can manually compile later or use the pre-generated traces."
         fi
+      elif [ -f "compile_withWarning.bat" ]; then
+        info "Using compile_withWarning.bat (will show deprecation warnings)..."
+        ./compile_withWarning.bat
       elif [ -f "compile.bat" ]; then
         warn "Only compile.bat found (uses deprecated -extdirs). Please use compile_new.bat for Java 21+."
       else
