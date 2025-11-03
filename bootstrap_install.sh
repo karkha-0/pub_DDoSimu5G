@@ -319,17 +319,21 @@ setup_one(){
         fi
       done
       
-      # Try compilation
-      if [ -f "compile.bat" ]; then
-        info "Compiling ONE simulator..."
-        ./compile.bat
+      # Compile ONE simulator using compile_new.bat (compatible with Java 21+)
+      if [ -f "compile_new.bat" ]; then
+        info "Compiling ONE simulator with Java $(java -version 2>&1 | awk -F '"' '/version/ {print $2}')..."
+        ./compile_new.bat
+        
         if [ $? -eq 0 ]; then
           info "✓ ONE simulator compiled successfully"
         else
-          warn "ONE simulator compilation failed"
+          warn "ONE simulator compilation failed. This is non-fatal - mobility traces are pre-generated."
+          info "You can manually compile later or use the pre-generated traces."
         fi
+      elif [ -f "compile.bat" ]; then
+        warn "Only compile.bat found (uses deprecated -extdirs). Please use compile_new.bat for Java 21+."
       else
-        warn "ONE simulator compile.bat not found"
+        warn "ONE simulator compile scripts not found"
       fi
       
       popd >/dev/null
