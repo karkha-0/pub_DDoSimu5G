@@ -275,10 +275,10 @@ copy_modified_files(){
       mkdir -p "$(dirname "$target_file")"
       cp "$file" "$target_file"
       info "  Applied: $rel_path -> $target_rel_path"
-      ((cpy_count++))
+      cpy_count=$((cpy_count + 1))
     done < <(find "$src" -type f -name "*.cpy" -print0)
     
-    if [ $cpy_count -gt 0 ]; then
+    if [ "$cpy_count" -gt 0 ]; then
       info "✓ Applied $cpy_count modified files (.cpy → original extension)"
     fi
     
