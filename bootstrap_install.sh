@@ -153,14 +153,24 @@ install_omnetpp(){
 
   download_and_extract "$url" "$target_dir"
 
-  info "Building OMNeT++ in $target_dir (this may take several minutes)."
-  pushd "$target_dir" >/dev/null
-  # Try to run configure non-interactively where possible
-  if [ -x ./configure ]; then
-    ./configure || true
+  info "OMNeT++ pre-built package extracted to $target_dir"
+  info "Verifying OMNeT++ installation..."
+  
+  # Check if bin directory has executables
+  if [ -f "$target_dir/bin/opp_featuretool" ]; then
+    info "✓ OMNeT++ pre-built binaries found"
+  else
+    warn "Pre-built binaries not found. Building OMNeT++ from source (this may take several minutes)..."
+    pushd "$target_dir" >/dev/null
+    if [ -x ./configure ]; then
+      ./configure
+      make -j"$(nproc)"
+      info "✓ OMNeT++ built successfully"
+    else
+      err "OMNeT++ configure script not found. Installation may be incomplete."
+    fi
+    popd >/dev/null
   fi
-  make -j"$(nproc)" || true
-  popd >/dev/null
 }
 
 clone_repo(){
