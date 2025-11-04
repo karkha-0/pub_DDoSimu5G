@@ -185,6 +185,14 @@ install_omnetpp(){
       python3 -m pip install -r ./python/requirements.txt || warn "Failed to install Python requirements"
     fi
     
+    # Create configure.user to disable optional features
+    info "Creating configure.user to disable OpenSceneGraph and osgEarth (not needed for simulations)"
+    cat > configure.user << 'EOF'
+# Disable 3D visualization features (not needed for simulations)
+WITH_OSG=no
+WITH_OSGEARTH=no
+EOF
+    
     if [ -x ./configure ]; then
       ./configure
       make -j"$(nproc)"
