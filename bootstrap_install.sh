@@ -501,7 +501,7 @@ build_project(){
       -I. -I\$\(INET4_5_PROJ\)/src -I\$\(SIMU5G_PROJ\)/src \
       -L\$\(INET4_5_PROJ\)/src -L\$\(SIMU5G_PROJ\)/src -Lout/\$\(CONFIGNAME\)/src \
       -lINET\$\(D\) -lsimu5g\$\(D\) \
-      -d src -XONE_Simulator || warn "opp_makemake failed"
+      -d src -XONE_Simulator -X../inet4.5 -X../Simu5G -X../omnetpp-6.2.0 || warn "opp_makemake failed"
   else
     warn "INET or Simu5G not found, using existing Makefile"
   fi
