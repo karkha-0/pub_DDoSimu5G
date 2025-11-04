@@ -267,6 +267,21 @@ copy_modified_files(){
       target_rel_path="${rel_path%.cpy}"
       target_file="$dst/$target_rel_path"
       
+      # VALIDATION: Check if target file exists in destination
+      # If it doesn't exist, the directory structure may have changed in the new version
+      if [ ! -f "$target_file" ]; then
+        err "VALIDATION FAILED: Target file does not exist: $target_file"
+        err "This likely means the directory structure changed between versions."
+        err "Expected location: $target_rel_path"
+        err "Source .cpy file: $rel_path"
+        err ""
+        err "To fix this:"
+        err "1. Find where the file moved to in the new version"
+        err "2. Update the directory structure in modifiedExternalFiles/ to match"
+        err "3. Or use the exact version specified in deps.json"
+        exit 1
+      fi
+      
       # Create backup of original file if it exists
       if [ -f "$target_file" ]; then
         backup_file="${target_file}.orig.$(date +%s)"
