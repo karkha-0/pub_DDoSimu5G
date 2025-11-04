@@ -259,10 +259,27 @@ copy_modified_files(){
   if [ -d "$MODIFIED_DIR/inet4.5" ]; then
     info "Applying INET modifications"
     do_copy "$MODIFIED_DIR/inet4.5" "$inet_target"
+    
+    # Validate INET modifications
+    info "Validating INET modifications..."
+    modified_files=$(find "$MODIFIED_DIR/inet4.5" -type f ! -path '*/\.*' 2>/dev/null | wc -l)
+    info "✓ Applied $modified_files modified files to INET"
   fi
+  
   if [ -d "$MODIFIED_DIR/Simu5G" ]; then
     info "Applying Simu5G modifications"
     do_copy "$MODIFIED_DIR/Simu5G" "$simu5g_target"
+    
+    # Validate Simu5G modifications
+    info "Validating Simu5G modifications..."
+    modified_files=$(find "$MODIFIED_DIR/Simu5G" -type f ! -path '*/\.*' 2>/dev/null | wc -l)
+    info "✓ Applied $modified_files modified files to Simu5G"
+    
+    # Check for backup files to confirm rsync worked
+    backup_count=$(find "$simu5g_target" -name "*.orig.*" 2>/dev/null | wc -l)
+    if [ "$backup_count" -gt 0 ]; then
+      info "  - Created $backup_count backup files (.orig.*)"
+    fi
   fi
 }
 
@@ -308,6 +325,21 @@ build_inet_and_simu5g(){
       
       make makefiles
       make -j"$(nproc)" || warn "INET make failed"
+      
+      # Validate INET build
+      info "Validating INET build..."
+      if [ -f "src/libINET.so" ] || [ -f "src/INET" ]; then
+        info "✓ INET library built successfully"
+        info "  - Library: $(ls -lh src/libINET*.so 2>/dev/null | awk '{print $9, $5}' || echo 'N/A')"
+        info "  - Executable: $(ls -lh src/INET 2>/dev/null | awk '{print $9, $5}' || echo 'N/A')"
+      else
+        warn "✗ INET build may have failed - no library or executable found"
+      fi
+      
+      # Check NED files
+      ned_count=$(find src -name "*.ned" 2>/dev/null | wc -l)
+      info "  - NED files: $ned_count files"
+      
       popd >/dev/null
     fi
   else
@@ -369,6 +401,23 @@ build_inet_and_simu5g(){
       
       make makefiles
       make -j"$(nproc)" || warn "Simu5G make failed"
+      
+      # Validate Simu5G build
+      info "Validating Simu5G build..."
+      if [ -f "src/libsimu5g.so" ] || [ -f "src/simu5g" ]; then
+        info "✓ Simu5G library built successfully"
+        info "  - Library: $(ls -lh src/libsimu5g*.so 2>/dev/null | awk '{print $9, $5}' || echo 'N/A')"
+        info "  - Executable: $(ls -lh src/simu5g 2>/dev/null | awk '{print $9, $5}' || echo 'N/A')"
+      else
+        warn "✗ Simu5G build may have failed - no library or executable found"
+      fi
+      
+      # Check for common build artifacts
+      if [ -d "out" ]; then
+        info "  - Build artifacts found in out/ directory"
+        info "  - Object files: $(find out -name '*.o' 2>/dev/null | wc -l) files"
+      fi
+      
       popd >/dev/null
     fi
   else
@@ -426,6 +475,42 @@ build_project(){
   info "Building pub_DDoSimu5G project"
   pushd "$REPO_ROOT" >/dev/null
   make -j"$(nproc)" || warn "Project make failed"
+  
+  # Validate project build
+  info "Validating pub_DDoSimu5G project build..."
+  build_success=false
+  
+  # Check for various possible build outputs
+  if [ -f "src/ddosim5g" ]; then
+    info "✓ Project executable built: src/ddosim5g"
+    info "  - Size: $(ls -lh src/ddosim5g | awk '{print $5}')"
+    build_success=true
+  fi
+  
+  if [ -f "src/libddosim5g.so" ]; then
+    info "✓ Project library built: src/libddosim5g.so"
+    info "  - Size: $(ls -lh src/libddosim5g.so | awk '{print $5}')"
+    build_success=true
+  fi
+  
+  if [ -d "out/gcc-release/src" ]; then
+    exe_count=$(find out/gcc-release/src -type f -executable 2>/dev/null | wc -l)
+    if [ "$exe_count" -gt 0 ]; then
+      info "✓ Build artifacts in out/gcc-release/src ($exe_count executables)"
+      build_success=true
+    fi
+  fi
+  
+  # Check for NED and .msg files
+  ned_count=$(find src -name "*.ned" 2>/dev/null | wc -l)
+  msg_count=$(find src -name "*.msg" 2>/dev/null | wc -l)
+  info "  - NED files: $ned_count"
+  info "  - MSG files: $msg_count"
+  
+  if [ "$build_success" = false ]; then
+    warn "✗ Project build verification failed - no executables or libraries found"
+  fi
+  
   popd >/dev/null
 }
 
@@ -578,40 +663,153 @@ main(){
   # Clone Simu5G from Unipisa repository
   clone_repo "https://github.com/Unipisa/Simu5G.git" "$WORKDIR/Simu5G" "$SIMU5G_REF"
 
-  setup_one
-
-  copy_modified_files
-
+  # Build vanilla INET and Simu5G first
+  info "Building vanilla INET and Simu5G (before modifications)"
   build_inet_and_simu5g
+
+  # Now apply project-specific modifications
+  info "Applying project-specific modifications to INET and Simu5G"
+  copy_modified_files
+  
+  # Rebuild INET and Simu5G with modifications
+  info "Rebuilding INET and Simu5G with modifications"
+  # Force rebuild by temporarily removing build artifacts check
+  if [ -f "$WORKDIR/inet4.5/src/libINET.so" ]; then
+    info "Cleaning INET build to apply modifications..."
+    pushd "$WORKDIR/inet4.5" >/dev/null
+    make clean 2>/dev/null || true
+    popd >/dev/null
+  fi
+  
+  if [ -f "$WORKDIR/Simu5G/src/libsimu5g.so" ]; then
+    info "Cleaning Simu5G build to apply modifications..."
+    pushd "$WORKDIR/Simu5G" >/dev/null
+    make clean 2>/dev/null || true
+    popd >/dev/null
+  fi
+  
+  build_inet_and_simu5g
+
+  setup_one
 
   build_project
 
   # Validate environment setup
-  info "Validating environment setup..."
+  info ""
+  info "=========================================="
+  info "Bootstrap Installation Summary"
+  info "=========================================="
+  
+  # Check Python venv (built first, before OMNeT++)
+  if [ -d "$REPO_ROOT/tf_env" ]; then
+    # shellcheck disable=SC1090
+    source "$REPO_ROOT/tf_env/bin/activate" 2>/dev/null || true
+    info "✓ Python Virtual Environment"
+    info "  - Location: $REPO_ROOT/tf_env"
+    
+    # Verify key packages
+    pkg_status=""
+    if python3 -c "import numpy" 2>/dev/null; then
+      numpy_ver=$(python3 -c "import numpy; print(numpy.__version__)" 2>/dev/null)
+      pkg_status="${pkg_status}numpy($numpy_ver) "
+    fi
+    if python3 -c "import pandas" 2>/dev/null; then
+      pandas_ver=$(python3 -c "import pandas; print(pandas.__version__)" 2>/dev/null)
+      pkg_status="${pkg_status}pandas($pandas_ver) "
+    fi
+    if python3 -c "import tensorflow" 2>/dev/null; then
+      pkg_status="${pkg_status}tensorflow "
+    fi
+    
+    if [ -n "$pkg_status" ]; then
+      info "  - Packages: $pkg_status"
+    else
+      warn "  - No Python packages verified"
+    fi
+  else
+    warn "✗ Python virtual environment not found at $REPO_ROOT/tf_env"
+  fi
+  
+  # Check OMNeT++
   if [ -f "$OMNET_DIR/setenv" ]; then
     # shellcheck disable=SC1090
     # Temporarily disable -u to avoid unbound variable errors in setenv
     set +u
     source "$OMNET_DIR/setenv"
     set -u
-    info "✓ Successfully sourced OMNeT++ environment"
-  else
-    warn "Could not source OMNeT++ environment from $OMNET_DIR/setenv"
-  fi
-
-  if [ -d "$REPO_ROOT/tf_env" ]; then
-    # shellcheck disable=SC1090
-    source "$REPO_ROOT/tf_env/bin/activate"
-    info "✓ Successfully activated Python virtual environment"
     
-    # Verify numpy installation
-    if python3 -c "import numpy; print('✓ NumPy version:', numpy.__version__)" 2>/dev/null; then
-      info "✓ Successfully verified NumPy installation"
+    if [ -f "$OMNET_DIR/bin/opp_run" ]; then
+      omnet_version=$("$OMNET_DIR/bin/opp_run" -v 2>&1 | head -1 || echo "unknown")
+      info "✓ OMNeT++: $omnet_version"
+      info "  - Location: $OMNET_DIR"
+      info "  - Tools: $(ls "$OMNET_DIR/bin" | wc -l) binaries"
     else
-      warn "Could not verify NumPy installation"
+      warn "✗ OMNeT++ installation incomplete"
     fi
   else
-    warn "Python virtual environment not found at $REPO_ROOT/tf_env"
+    warn "✗ Could not source OMNeT++ environment from $OMNET_DIR/setenv"
+  fi
+  
+  # Check INET
+  if [ -f "$WORKDIR/inet4.5/src/libINET.so" ] || [ -f "$WORKDIR/inet4.5/src/INET" ]; then
+    info "✓ INET: Built successfully"
+    info "  - Location: $WORKDIR/inet4.5"
+    lib_size=$(ls -lh "$WORKDIR/inet4.5/src/libINET.so" 2>/dev/null | awk '{print $5}' || echo "N/A")
+    info "  - Library size: $lib_size"
+  else
+    warn "✗ INET build incomplete or failed"
+  fi
+  
+  # Check Simu5G
+  if [ -f "$WORKDIR/Simu5G/src/libsimu5g.so" ] || [ -f "$WORKDIR/Simu5G/src/simu5g" ]; then
+    info "✓ Simu5G: Built successfully"
+    info "  - Location: $WORKDIR/Simu5G"
+    lib_size=$(ls -lh "$WORKDIR/Simu5G/src/libsimu5g.so" 2>/dev/null | awk '{print $5}' || echo "N/A")
+    info "  - Library size: $lib_size"
+  else
+    warn "✗ Simu5G build incomplete or failed"
+  fi
+  
+  # Check Project
+  project_built=false
+  if [ -f "$REPO_ROOT/src/ddosim5g" ] || [ -f "$REPO_ROOT/src/libddosim5g.so" ]; then
+    info "✓ pub_DDoSimu5G Project: Built successfully"
+    project_built=true
+  elif [ -d "$REPO_ROOT/out/gcc-release/src" ]; then
+    exe_count=$(find "$REPO_ROOT/out/gcc-release/src" -type f -executable 2>/dev/null | wc -l)
+    if [ "$exe_count" -gt 0 ]; then
+      info "✓ pub_DDoSimu5G Project: Built successfully"
+      info "  - Build artifacts: $exe_count executables"
+      project_built=true
+    fi
+  fi
+  
+  if [ "$project_built" = false ]; then
+    warn "✗ pub_DDoSimu5G Project build incomplete or failed"
+  fi
+  
+  # Check ONE Simulator
+  if [ -f "$REPO_ROOT/ONE_Simulator/the-one-1.6.0/one.jar" ]; then
+    info "✓ ONE Simulator: Compiled"
+    jar_size=$(ls -lh "$REPO_ROOT/ONE_Simulator/the-one-1.6.0/one.jar" | awk '{print $5}')
+    info "  - JAR size: $jar_size"
+  elif [ -d "$REPO_ROOT/ONE_Simulator/the-one-1.6.0" ]; then
+    info "⚠ ONE Simulator: Source present but JAR not built"
+  fi
+  
+  info "=========================================="
+  info ""
+  
+  # Final status
+  if [ "$project_built" = true ] && [ -f "$OMNET_DIR/bin/opp_run" ]; then
+    info "✓ Bootstrap installation completed successfully!"
+    info ""
+    info "Next steps:"
+    info "  1. Source OMNeT++ environment: source $OMNET_DIR/setenv"
+    info "  2. Activate Python venv: source $REPO_ROOT/tf_env/bin/activate"
+    info "  3. Run simulations from: $REPO_ROOT/simulations/"
+  else
+    warn "Bootstrap completed with warnings. Please review the output above."
   fi
 
   info "Bootstrap finished. If any step failed, review output and rerun with --force to overwrite targets where appropriate."
