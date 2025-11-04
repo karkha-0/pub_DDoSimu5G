@@ -99,16 +99,16 @@ install_system_packages(){
   if [ "$mgr" = "apt" ]; then
     sudo apt-get update
     sudo apt-get install -y build-essential git wget curl unzip python3 python3-venv python3-pip default-jdk rsync dos2unix \
-      qtbase5-dev qtchooser qt5-qmake libqt5opengl5-dev libxml2-dev zlib1g-dev bison flex nlohmann-json3-dev pkg-config
+      qt6-base-dev qt6-tools-dev qt6-tools-dev-tools libxml2-dev zlib1g-dev bison flex nlohmann-json3-dev pkg-config
   elif [ "$mgr" = "dnf" ]; then
     sudo dnf install -y @development-tools git wget curl unzip python3 python3-venv python3-pip java-11-openjdk rsync \
-      qt5-qtbase-devel libxml2-devel zlib-devel bison flex nlohmann-json-devel pkgconfig || true
+      qt6-qtbase-devel qt6-qttools-devel libxml2-devel zlib-devel bison flex nlohmann-json-devel pkgconfig || true
   elif [ "$mgr" = "yum" ]; then
     sudo yum groupinstall -y 'Development Tools' || true
     sudo yum install -y git wget curl unzip python3 python3-venv python3-pip java-11-openjdk rsync \
-      qt5-qtbase-devel libxml2-devel zlib-devel bison flex nlohmann-json-devel pkgconfig || true
+      qt6-qtbase-devel qt6-qttools-devel libxml2-devel zlib-devel bison flex nlohmann-json-devel pkgconfig || true
   else
-    warn "No supported package manager found. Please install required packages manually: build tools, git, wget, python3, python3-venv, python3-pip, java (JDK), rsync, Qt dev packages, pkg-config"
+    warn "No supported package manager found. Please install required packages manually: build tools, git, wget, python3, python3-venv, python3-pip, java (JDK), rsync, Qt6 dev packages, pkg-config"
   fi
 }
 
