@@ -233,8 +233,11 @@ clone_repo(){
 }
 
 copy_modified_files(){
-  if [ ! -d "$MODIFIED_DIR" ]; then
-    warn "No $MODIFIED_DIR directory found — skipping copy of modified external files."
+  # After copying project to samples/DDoSimu5G, use that location for modified files
+  modified_source="$WORKDIR/DDoSimu5G/modifiedExternalFiles"
+  
+  if [ ! -d "$modified_source" ]; then
+    warn "No $modified_source directory found — skipping copy of modified external files."
     return
   fi
 
@@ -286,14 +289,24 @@ copy_modified_files(){
     rsync -av --backup --suffix=".orig.$(date +%s)" --exclude='.git' --exclude='*.cpy' "$src/" "$dst/" >/dev/null 2>&1 || true
   }
 
-  if [ -d "$MODIFIED_DIR/inet4.5" ]; then
+  if [ -d "$modified_source/inet4.5" ]; then
     info "Applying INET modifications"
-    do_copy "$MODIFIED_DIR/inet4.5" "$inet_target"
+    do_copy "$modified_source/inet4.5" "$inet_target"
+    # Force rebuild after modifications
+    if [ -f "$inet_target/src/libINET.so" ]; then
+      info "  Removing old INET library to force rebuild with modifications"
+      rm -f "$inet_target/src/libINET.so" "$inet_target/src/INET"
+    fi
   fi
   
-  if [ -d "$MODIFIED_DIR/Simu5G" ]; then
+  if [ -d "$modified_source/Simu5G" ]; then
     info "Applying Simu5G modifications"
-    do_copy "$MODIFIED_DIR/Simu5G" "$simu5g_target"
+    do_copy "$modified_source/Simu5G" "$simu5g_target"
+    # Force rebuild after modifications
+    if [ -f "$simu5g_target/src/libsimu5g.so" ]; then
+      info "  Removing old Simu5G library to force rebuild with modifications"
+      rm -f "$simu5g_target/src/libsimu5g.so" "$simu5g_target/src/simu5g"
+    fi
   fi
 }
 
@@ -381,6 +394,10 @@ build_inet_and_simu5g(){
       fi
       
       # Source INET setenv to get INET paths (required for Simu5G)
+      # Set INET_ROOT explicitly first (required by Simu5G's Makefile generation)
+      export INET_ROOT="$WORKDIR/inet4.5"
+      info "Set INET_ROOT=$INET_ROOT"
+      
       if [ -f "$WORKDIR/inet4.5/setenv" ]; then
         info "Sourcing INET environment from $WORKDIR/inet4.5/setenv"
         # shellcheck disable=SC1090
@@ -389,15 +406,9 @@ build_inet_and_simu5g(){
         . setenv -f 2>/dev/null || source setenv 2>/dev/null || warn "INET setenv failed"
         popd >/dev/null
         set -u
-        info "✓ INET environment sourced (INET_ROOT: ${INET_ROOT:-NOT SET})"
+        info "✓ INET environment sourced (INET_ROOT: ${INET_ROOT})"
       else
-        warn "INET setenv not found - Simu5G build may fail"
-      fi
-      
-      # Explicitly set INET_ROOT if not set by setenv
-      if [ -z "${INET_ROOT:-}" ]; then
-        export INET_ROOT="$WORKDIR/inet4.5"
-        info "Manually set INET_ROOT=$INET_ROOT"
+        warn "INET setenv not found at $WORKDIR/inet4.5/setenv"
       fi
       
       # Source Simu5G's setenv if it exists
@@ -420,21 +431,30 @@ build_inet_and_simu5g(){
       fi
       
       # Regenerate makefiles using opp_makemake with proper options from .oppbuildspec
-      info "Regenerating Simu5G makefiles..."
+      info "Regenerating Simu5G makefiles with INET_ROOT=$INET_ROOT..."
       if [ -f ".oppbuildspec" ]; then
+        # Verify INET_ROOT is set
+        if [ -z "${INET_ROOT:-}" ]; then
+          err "INET_ROOT is not set! Cannot build Simu5G."
+        fi
         # Use make makefiles which reads .oppbuildspec
+        info "Running: make makefiles"
         make makefiles || warn "Failed to generate makefiles"
+        
+        # Verify the generated Makefile has correct INET path
+        if [ -f "src/Makefile" ]; then
+          inet_path=$(grep "INET_PROJ=" src/Makefile | head -1)
+          info "Generated Makefile INET path: $inet_path"
+        fi
       else
         # Fallback: manually run opp_makemake
         warn "No .oppbuildspec found, using manual makefile generation"
         cd src
         opp_makemake --make-so --deep -o simu5g -O out -I. \
-          -KINET_PROJ="$WORKDIR/inet4.5" -DINET_IMPORT \
+          -KINET_PROJ="$INET_ROOT" -DINET_IMPORT \
           -I'$(INET_PROJ)/src' -L'$(INET_PROJ)/src' -lINET'$(D)' || warn "opp_makemake failed"
         cd ..
       fi
-      
-      make -j"$(nproc)" || warn "Simu5G make failed"
       
       # Validate Simu5G build
       info "Validating Simu5G build..."
@@ -493,8 +513,16 @@ setup_python_venv_and_requirements(){
 }
 
 build_project(){
+  project_dir="$WORKDIR/DDoSimu5G"
+  
+  # Check if project directory exists
+  if [ ! -d "$project_dir" ]; then
+    warn "Project directory $project_dir not found - skipping build"
+    return
+  fi
+  
   # Check if project is already built
-  if [ -f "$REPO_ROOT/src/ddosim5g" ] || [ -f "$REPO_ROOT/src/libddosim5g.so" ] || [ -f "$REPO_ROOT/out/gcc-release/src/ddosim5g" ]; then
+  if [ -f "$project_dir/src/ddosim5g" ] || [ -f "$project_dir/src/libddosim5g.so" ] || [ -f "$project_dir/out/gcc-release/src/ddosim5g" ]; then
     info "✓ Project already built (skipping)"
     return
   fi
@@ -507,8 +535,8 @@ build_project(){
     set -u
   fi
   
-  info "Building pub_DDoSimu5G project"
-  pushd "$REPO_ROOT" >/dev/null
+  info "Building DDoSimu5G project at $project_dir"
+  pushd "$project_dir" >/dev/null
   
   # Clean old build artifacts
   info "Cleaning old build artifacts..."
@@ -730,6 +758,25 @@ main(){
   info "Downloading Simu5G ${SIMU5G_REF}"
   simu5g_url="https://github.com/Unipisa/Simu5G/archive/refs/tags/${SIMU5G_REF}.tar.gz"
   download_and_extract "$simu5g_url" "$WORKDIR/Simu5G"
+
+  # Copy pub_DDoSimu5G project into samples/DDoSimu5G
+  info "Setting up DDoSimu5G project in $WORKDIR/DDoSimu5G"
+  if [ ! -d "$WORKDIR/DDoSimu5G" ]; then
+    mkdir -p "$WORKDIR/DDoSimu5G"
+    info "Copying project files from $REPO_ROOT to $WORKDIR/DDoSimu5G"
+    # Copy everything EXCEPT installation artifacts (omnetpp-*, tf_env, .git, bootstrap files)
+    rsync -av \
+      --exclude='omnetpp-*/' \
+      --exclude='tf_env/' \
+      --exclude='.git/' \
+      --exclude='bootstrap_install.sh' \
+      --exclude='deps.json' \
+      --exclude='BOOTSTRAP.md' \
+      "$REPO_ROOT/" "$WORKDIR/DDoSimu5G/" >/dev/null
+    info "✓ DDoSimu5G project copied to samples directory"
+  else
+    info "✓ DDoSimu5G already exists at $WORKDIR/DDoSimu5G"
+  fi
 
   # Apply project-specific modifications BEFORE building
   info "Applying project-specific modifications to INET and Simu5G"
