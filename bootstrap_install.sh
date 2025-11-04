@@ -289,6 +289,21 @@ copy_modified_files(){
           else
             info "  Path adjusted for Simu5G >= 1.4.0: $rel_path -> $target_rel_path"
           fi
+          
+          # Handle filename renames in v1.4.0+
+          # Extract filename from path
+          filename=$(basename "$target_rel_path")
+          dirname=$(dirname "$target_rel_path")
+          
+          # Apply filename mappings
+          case "$filename" in
+            "VoIPReceiver.ned") filename="VoipReceiver.ned" ;;
+            "NRUe.ned") filename="NrPhyUe.ned" ;;
+            "NRPhyUe.cc") filename="NrPhyUe.cc" ;;
+          esac
+          
+          # Reconstruct path with new filename
+          target_rel_path="$dirname/$filename"
         fi
       fi
       
