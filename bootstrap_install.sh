@@ -389,9 +389,15 @@ build_inet_and_simu5g(){
         . setenv -f 2>/dev/null || source setenv 2>/dev/null || warn "INET setenv failed"
         popd >/dev/null
         set -u
-        info "✓ INET environment sourced (INET path: ${INET_ROOT:-NOT SET})"
+        info "✓ INET environment sourced (INET_ROOT: ${INET_ROOT:-NOT SET})"
       else
         warn "INET setenv not found - Simu5G build may fail"
+      fi
+      
+      # Explicitly set INET_ROOT if not set by setenv
+      if [ -z "${INET_ROOT:-}" ]; then
+        export INET_ROOT="$WORKDIR/inet4.5"
+        info "Manually set INET_ROOT=$INET_ROOT"
       fi
       
       # Source Simu5G's setenv if it exists
@@ -413,7 +419,21 @@ build_inet_and_simu5g(){
         opp_featuretool enable VoIPStream 2>/dev/null || true
       fi
       
-      make makefiles
+      # Regenerate makefiles using opp_makemake with proper options from .oppbuildspec
+      info "Regenerating Simu5G makefiles..."
+      if [ -f ".oppbuildspec" ]; then
+        # Use make makefiles which reads .oppbuildspec
+        make makefiles || warn "Failed to generate makefiles"
+      else
+        # Fallback: manually run opp_makemake
+        warn "No .oppbuildspec found, using manual makefile generation"
+        cd src
+        opp_makemake --make-so --deep -o simu5g -O out -I. \
+          -KINET_PROJ="$WORKDIR/inet4.5" -DINET_IMPORT \
+          -I'$(INET_PROJ)/src' -L'$(INET_PROJ)/src' -lINET'$(D)' || warn "opp_makemake failed"
+        cd ..
+      fi
+      
       make -j"$(nproc)" || warn "Simu5G make failed"
       
       # Validate Simu5G build
