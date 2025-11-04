@@ -490,26 +490,25 @@ build_project(){
   info "Building pub_DDoSimu5G project"
   pushd "$REPO_ROOT" >/dev/null
   
-  # Clean old build artifacts and Makefile
+  # Clean old build artifacts
   info "Cleaning old build artifacts..."
-  rm -f Makefile
   rm -rf out/
-  rm -f src/Makefile
   
-  # Regenerate Makefile with correct paths to INET and Simu5G  
-  info "Regenerating Makefile with correct INET/Simu5G paths..."
+  # Update Makefile variables to point to correct INET/Simu5G locations
+  info "Updating Makefile paths for INET and Simu5G..."
   if [ -d "$WORKDIR/inet4.5" ] && [ -d "$WORKDIR/Simu5G" ]; then
-    info "Creating Makefile for INET at ../inet4.5 and Simu5G at ../Simu5G (relative to project root)"
-    opp_makemake -f --deep -O out -e cc \
-      -KINET4_5_PROJ=../inet4.5 \
-      -KSIMU5G_PROJ=../Simu5G \
-      -DINET_IMPORT \
-      -I. -I\$\(INET4_5_PROJ\)/src -I\$\(SIMU5G_PROJ\)/src \
-      -L\$\(INET4_5_PROJ\)/src -L\$\(SIMU5G_PROJ\)/src -Lout/\$\(CONFIGNAME\)/src \
-      -lINET\$\(D\) -lsimu5g\$\(D\) \
-      -d src -XONE_Simulator -X$WORKDIR/inet4.5 -X$WORKDIR/Simu5G -X$WORKDIR/omnetpp-6.2.0 || warn "opp_makemake failed"
+    # Update INET4_5_PROJ variable
+    sed -i "s|^INET4_5_PROJ=.*|INET4_5_PROJ=../inet4.5|g" Makefile
+    # Update SIMU5G variable (old Makefile uses SIMU5G_1_2_2_PROJ, update to SIMU5G_PROJ)
+    if grep -q "SIMU5G_1_2_2_PROJ" Makefile; then
+      sed -i "s|SIMU5G_1_2_2_PROJ|SIMU5G_PROJ|g" Makefile
+      sed -i "s|^SIMU5G_PROJ=.*|SIMU5G_PROJ=../Simu5G|g" Makefile
+    else
+      sed -i "s|^SIMU5G_PROJ=.*|SIMU5G_PROJ=../Simu5G|g" Makefile
+    fi
+    info "✓ Updated Makefile to use ../inet4.5 and ../Simu5G"
   else
-    warn "INET or Simu5G not found, using existing Makefile"
+    warn "INET or Simu5G not found, using existing Makefile paths"
   fi
   
   make -j"$(nproc)" || warn "Project make failed"
@@ -688,6 +687,15 @@ main(){
     else
       warn "Skipping OMNeT++ install."
     fi
+  fi
+
+  # Update WORKDIR to use OMNeT++ samples directory (OMNeT++ convention)
+  # This keeps all projects isolated under omnetpp/samples/
+  if [ -d "$OMNET_DIR/samples" ]; then
+    WORKDIR="$OMNET_DIR/samples"
+    info "Using OMNeT++ samples directory: $WORKDIR"
+  else
+    warn "OMNeT++ samples directory not found, using original WORKDIR: $WORKDIR"
   fi
 
   info "Setting up INET and Simu5G in $WORKDIR"
