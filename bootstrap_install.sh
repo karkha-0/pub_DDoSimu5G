@@ -252,34 +252,48 @@ copy_modified_files(){
       warn "Destination $dst does not exist — skipping"
       return
     fi
-    info "Copying $src -> $dst (rsync, creating backups)"
-    rsync -av --backup --suffix=".orig.$(date +%s)" --exclude='.git' "$src/" "$dst/"
+    
+    info "Copying modified files from $src -> $dst"
+    
+    # Find all .cpy files and copy them with .cpy extension removed
+    cpy_count=0
+    while IFS= read -r -d '' file; do
+      # Get relative path from source directory
+      rel_path="${file#$src/}"
+      # Remove .cpy extension
+      target_rel_path="${rel_path%.cpy}"
+      target_file="$dst/$target_rel_path"
+      
+      # Create backup of original file if it exists
+      if [ -f "$target_file" ]; then
+        backup_file="${target_file}.orig.$(date +%s)"
+        cp "$target_file" "$backup_file"
+        info "  Backup: $target_rel_path -> ${target_rel_path}.orig.*"
+      fi
+      
+      # Copy the .cpy file to its destination without the .cpy extension
+      mkdir -p "$(dirname "$target_file")"
+      cp "$file" "$target_file"
+      info "  Applied: $rel_path -> $target_rel_path"
+      ((cpy_count++))
+    done < <(find "$src" -type f -name "*.cpy" -print0)
+    
+    if [ $cpy_count -gt 0 ]; then
+      info "✓ Applied $cpy_count modified files (.cpy → original extension)"
+    fi
+    
+    # Also copy any non-.cpy files (if they exist)
+    rsync -av --backup --suffix=".orig.$(date +%s)" --exclude='.git' --exclude='*.cpy' "$src/" "$dst/" >/dev/null 2>&1 || true
   }
 
   if [ -d "$MODIFIED_DIR/inet4.5" ]; then
     info "Applying INET modifications"
     do_copy "$MODIFIED_DIR/inet4.5" "$inet_target"
-    
-    # Validate INET modifications
-    info "Validating INET modifications..."
-    modified_files=$(find "$MODIFIED_DIR/inet4.5" -type f ! -path '*/\.*' 2>/dev/null | wc -l)
-    info "✓ Applied $modified_files modified files to INET"
   fi
   
   if [ -d "$MODIFIED_DIR/Simu5G" ]; then
     info "Applying Simu5G modifications"
     do_copy "$MODIFIED_DIR/Simu5G" "$simu5g_target"
-    
-    # Validate Simu5G modifications
-    info "Validating Simu5G modifications..."
-    modified_files=$(find "$MODIFIED_DIR/Simu5G" -type f ! -path '*/\.*' 2>/dev/null | wc -l)
-    info "✓ Applied $modified_files modified files to Simu5G"
-    
-    # Check for backup files to confirm rsync worked
-    backup_count=$(find "$simu5g_target" -name "*.orig.*" 2>/dev/null | wc -l)
-    if [ "$backup_count" -gt 0 ]; then
-      info "  - Created $backup_count backup files (.orig.*)"
-    fi
   fi
 }
 
@@ -479,10 +493,10 @@ build_project(){
   # Regenerate Makefile with correct paths to INET and Simu5G
   info "Regenerating Makefile with correct INET/Simu5G paths..."
   if [ -d "$WORKDIR/inet4.5" ] && [ -d "$WORKDIR/Simu5G" ]; then
-    info "Creating Makefile for INET at $WORKDIR/inet4.5 and Simu5G at $WORKDIR/Simu5G"
+    info "Creating Makefile for INET at ../inet4.5 and Simu5G at ../Simu5G (relative to project root)"
     opp_makemake -f --deep -O out \
-      -KINET4_5_PROJ=$WORKDIR/inet4.5 \
-      -KSIMU5G_PROJ=$WORKDIR/Simu5G \
+      -KINET4_5_PROJ=../inet4.5 \
+      -KSIMU5G_PROJ=../Simu5G \
       -DINET_IMPORT \
       -I. -I\$\(INET4_5_PROJ\)/src -I\$\(SIMU5G_PROJ\)/src \
       -L\$\(INET4_5_PROJ\)/src -L\$\(SIMU5G_PROJ\)/src -Lout/\$\(CONFIGNAME\)/src \
