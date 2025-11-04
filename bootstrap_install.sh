@@ -569,6 +569,11 @@ setup_python_venv_and_requirements(){
   fi
   pip_exec="$venv_default/bin/pip"
   "$pip_exec" install --upgrade pip setuptools wheel
+  
+  # Install posix_ipc required by OMNeT++ IDE
+  info "Installing posix_ipc (required by OMNeT++ IDE)"
+  "$pip_exec" install posix_ipc || warn "Failed to install posix_ipc"
+  
   if [ ${#reqfiles[@]} -gt 0 ]; then
     for rf in "${reqfiles[@]}"; do
       info "Installing $rf into $venv_default"
