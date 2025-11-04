@@ -243,10 +243,19 @@ copy_modified_files(){
 
   inet_target="$WORKDIR/inet4.5"
   simu5g_target="$WORKDIR/Simu5G"
+  
+  # Detect if Simu5G >= 1.4.0 which has src/simu5g/ subdirectory structure
+  simu5g_needs_subdir=false
+  if [ -d "$simu5g_target/src/simu5g" ]; then
+    info "Detected Simu5G >= 1.4.0 with src/simu5g/ subdirectory structure"
+    simu5g_needs_subdir=true
+  fi
 
   do_copy(){
     src="$1"
     dst="$2"
+    is_simu5g="$3"  # Pass flag if this is Simu5G copy
+    
     if [ ! -d "$src" ]; then
       warn "Source $src does not exist — skipping"
       return
@@ -265,6 +274,16 @@ copy_modified_files(){
       rel_path="${file#$src/}"
       # Remove .cpy extension
       target_rel_path="${rel_path%.cpy}"
+      
+      # Adjust path for Simu5G >= 1.4.0 (src/ -> src/simu5g/)
+      if [ "$is_simu5g" = "true" ] && [ "$simu5g_needs_subdir" = "true" ]; then
+        if [[ "$target_rel_path" == src/* ]]; then
+          # Insert simu5g/ after src/
+          target_rel_path="${target_rel_path/src\//src/simu5g/}"
+          info "  Path adjusted for Simu5G >= 1.4.0: $rel_path -> $target_rel_path"
+        fi
+      fi
+      
       target_file="$dst/$target_rel_path"
       
       # VALIDATION: Check if target file exists in destination
@@ -306,7 +325,7 @@ copy_modified_files(){
 
   if [ -d "$modified_source/inet4.5" ]; then
     info "Applying INET modifications"
-    do_copy "$modified_source/inet4.5" "$inet_target"
+    do_copy "$modified_source/inet4.5" "$inet_target" "false"
     # Force rebuild after modifications
     if [ -f "$inet_target/src/libINET.so" ]; then
       info "  Removing old INET library to force rebuild with modifications"
@@ -316,7 +335,7 @@ copy_modified_files(){
   
   if [ -d "$modified_source/Simu5G" ]; then
     info "Applying Simu5G modifications"
-    do_copy "$modified_source/Simu5G" "$simu5g_target"
+    do_copy "$modified_source/Simu5G" "$simu5g_target" "true"
     # Force rebuild after modifications
     if [ -f "$simu5g_target/src/libsimu5g.so" ]; then
       info "  Removing old Simu5G library to force rebuild with modifications"
