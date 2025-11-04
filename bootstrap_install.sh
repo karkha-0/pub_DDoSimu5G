@@ -162,6 +162,14 @@ install_omnetpp(){
   else
     warn "Pre-built binaries not found. Building OMNeT++ from source (this may take several minutes)..."
     pushd "$target_dir" >/dev/null
+    
+    # Source setenv before configure (required by OMNeT++)
+    if [ -f ./setenv ]; then
+      set +u
+      source ./setenv
+      set -u
+    fi
+    
     if [ -x ./configure ]; then
       ./configure
       make -j"$(nproc)"
