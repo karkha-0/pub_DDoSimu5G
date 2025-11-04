@@ -471,6 +471,10 @@ build_inet_and_simu5g(){
         cd ..
       fi
       
+      # Build Simu5G
+      info "Building Simu5G with make -j$(nproc)..."
+      make -j"$(nproc)" || warn "Simu5G make failed"
+      
       # Validate Simu5G build
       info "Validating Simu5G build..."
       if [ -f "src/libsimu5g.so" ] || [ -f "src/simu5g" ]; then
@@ -779,7 +783,12 @@ main(){
   if [ ! -d "$WORKDIR/DDoSimu5G" ]; then
     mkdir -p "$WORKDIR/DDoSimu5G"
     info "Copying project files from $REPO_ROOT to $WORKDIR/DDoSimu5G"
-    # Copy everything EXCEPT installation artifacts (omnetpp-*, tf_env, .git, bootstrap files)
+    # Copy everything EXCEPT:
+    # - Installation artifacts (omnetpp-*, tf_env)
+    # - Bootstrap/config files (bootstrap_install.sh, deps.json, BOOTSTRAP.md)
+    # - Documentation that stays in repo root (README.md, project_packages.txt, repo_structure.txt)
+    # - Profiling data (perf.data)
+    # - Git metadata (.git)
     rsync -av \
       --exclude='omnetpp-*/' \
       --exclude='tf_env/' \
@@ -787,6 +796,10 @@ main(){
       --exclude='bootstrap_install.sh' \
       --exclude='deps.json' \
       --exclude='BOOTSTRAP.md' \
+      --exclude='README.md' \
+      --exclude='project_packages.txt' \
+      --exclude='repo_structure.txt' \
+      --exclude='perf.data' \
       "$REPO_ROOT/" "$WORKDIR/DDoSimu5G/" >/dev/null
     info "✓ DDoSimu5G project copied to samples directory"
   else
