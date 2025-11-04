@@ -334,6 +334,20 @@ build_inet_and_simu5g(){
         warn "OMNeT++ setenv not found at $OMNET_DIR/setenv"
       fi
       
+      # Source INET setenv to get INET paths (required for Simu5G)
+      if [ -f "$WORKDIR/inet4.5/setenv" ]; then
+        info "Sourcing INET environment from $WORKDIR/inet4.5/setenv"
+        # shellcheck disable=SC1090
+        set +u
+        pushd "$WORKDIR/inet4.5" >/dev/null
+        . setenv -f 2>/dev/null || source setenv 2>/dev/null || warn "INET setenv failed"
+        popd >/dev/null
+        set -u
+        info "✓ INET environment sourced (INET path: ${INET_ROOT:-NOT SET})"
+      else
+        warn "INET setenv not found - Simu5G build may fail"
+      fi
+      
       # Source Simu5G's setenv if it exists
       if [ -f "setenv" ]; then
         info "Sourcing Simu5G environment from setenv"
@@ -345,6 +359,12 @@ build_inet_and_simu5g(){
         info "✓ Simu5G environment sourced"
       else
         info "No Simu5G setenv found (not required)"
+      fi
+      
+      # Create .oppfeaturestate if needed to link INET
+      if [ ! -f ".oppfeaturestate" ] && [ -d "$WORKDIR/inet4.5" ]; then
+        info "Configuring Simu5G to use INET from $WORKDIR/inet4.5"
+        opp_featuretool enable VoIPStream 2>/dev/null || true
       fi
       
       make makefiles
