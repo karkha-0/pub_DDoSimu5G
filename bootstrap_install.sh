@@ -137,8 +137,15 @@ install_omnetpp(){
   if [ -z "$target_dir" ]; then
     err "install_omnetpp requires a target directory"
   fi
+  
+  # Check if OMNeT++ is already installed and built
+  if [ -f "$target_dir/bin/opp_featuretool" ] && [ -f "$target_dir/bin/opp_run" ]; then
+    info "✓ OMNeT++ already installed and built at $target_dir (skipping)"
+    return
+  fi
+  
   if [ -d "$target_dir" ] && [ "$FORCE" != true ]; then
-    warn "Target directory $target_dir already exists. Use --force to overwrite or set a different --omnet-dir. Skipping OMNeT++ install."
+    warn "Target directory $target_dir exists but not fully built. Use --force to overwrite or set a different --omnet-dir. Skipping OMNeT++ install."
     return
   fi
 
@@ -266,68 +273,84 @@ build_inet_and_simu5g(){
   fi
   
   if [ -d "$WORKDIR/inet4.5" ]; then
-    info "Building INET in $WORKDIR/inet4.5"
-    pushd "$WORKDIR/inet4.5" >/dev/null
-    
-    # Source OMNeT++ setenv first to get opp_* tools in PATH
-    if [ -f "$OMNET_DIR/setenv" ]; then
-      info "Sourcing OMNeT++ environment from $OMNET_DIR/setenv"
-      # shellcheck disable=SC1090
-      set +u
-      source "$OMNET_DIR/setenv"
-      set -u
-      info "✓ OMNeT++ environment sourced. PATH includes: $(echo $PATH | grep -o '[^:]*omnetpp[^:]*' || echo 'NOT FOUND')"
-      info "✓ Checking opp_featuretool: $(command -v opp_featuretool || echo 'NOT FOUND')"
+    # Check if INET is already built
+    if [ -f "$WORKDIR/inet4.5/src/INET" ] || [ -f "$WORKDIR/inet4.5/src/libINET.so" ]; then
+      info "✓ INET already built at $WORKDIR/inet4.5 (skipping build)"
     else
-      warn "OMNeT++ setenv not found at $OMNET_DIR/setenv"
+      info "Building INET in $WORKDIR/inet4.5"
+      pushd "$WORKDIR/inet4.5" >/dev/null
+      
+      # Source OMNeT++ setenv first to get opp_* tools in PATH
+      if [ -f "$OMNET_DIR/setenv" ]; then
+        info "Sourcing OMNeT++ environment from $OMNET_DIR/setenv"
+        # shellcheck disable=SC1090
+        set +u
+        source "$OMNET_DIR/setenv"
+        set -u
+        info "✓ OMNeT++ environment sourced. PATH includes: $(echo $PATH | grep -o '[^:]*omnetpp[^:]*' || echo 'NOT FOUND')"
+        info "✓ Checking opp_featuretool: $(command -v opp_featuretool || echo 'NOT FOUND')"
+      else
+        warn "OMNeT++ setenv not found at $OMNET_DIR/setenv"
+      fi
+      
+      # Source INET's setenv if it exists
+      if [ -f "setenv" ]; then
+        info "Sourcing INET environment from setenv"
+        # shellcheck disable=SC1091
+        set +u
+        # Use -f flag to allow sourcing from non-interactive scripts
+        . setenv -f 2>/dev/null || source setenv 2>/dev/null || warn "INET setenv failed (this is usually safe to ignore)"
+        set -u
+        info "✓ INET environment sourced"
+      else
+        info "No INET setenv found (not required)"
+      fi
+      
+      make makefiles
+      make -j"$(nproc)" || warn "INET make failed"
+      popd >/dev/null
     fi
-    
-    # Source INET's setenv if it exists
-    if [ -f "setenv" ]; then
-      info "Sourcing INET environment from setenv"
-      # shellcheck disable=SC1091
-      set +u
-      source setenv
-      set -u
-      info "✓ INET environment sourced"
-    fi
-    
-    make makefiles
-    make -j"$(nproc)" || warn "INET make failed"
-    popd >/dev/null
   else
     warn "INET not found at $WORKDIR/inet4.5 — skipping"
   fi
 
   if [ -d "$WORKDIR/Simu5G" ]; then
-    info "Building Simu5G in $WORKDIR/Simu5G"
-    pushd "$WORKDIR/Simu5G" >/dev/null
-    
-    # Source OMNeT++ setenv first to get opp_* tools in PATH
-    if [ -f "$OMNET_DIR/setenv" ]; then
-      info "Sourcing OMNeT++ environment from $OMNET_DIR/setenv"
-      # shellcheck disable=SC1090
-      set +u
-      source "$OMNET_DIR/setenv"
-      set -u
-      info "✓ OMNeT++ environment sourced"
+    # Check if Simu5G is already built
+    if [ -f "$WORKDIR/Simu5G/src/simu5g" ] || [ -f "$WORKDIR/Simu5G/src/libsimu5g.so" ]; then
+      info "✓ Simu5G already built at $WORKDIR/Simu5G (skipping build)"
     else
-      warn "OMNeT++ setenv not found at $OMNET_DIR/setenv"
+      info "Building Simu5G in $WORKDIR/Simu5G"
+      pushd "$WORKDIR/Simu5G" >/dev/null
+      
+      # Source OMNeT++ setenv first to get opp_* tools in PATH
+      if [ -f "$OMNET_DIR/setenv" ]; then
+        info "Sourcing OMNeT++ environment from $OMNET_DIR/setenv"
+        # shellcheck disable=SC1090
+        set +u
+        source "$OMNET_DIR/setenv"
+        set -u
+        info "✓ OMNeT++ environment sourced"
+      else
+        warn "OMNeT++ setenv not found at $OMNET_DIR/setenv"
+      fi
+      
+      # Source Simu5G's setenv if it exists
+      if [ -f "setenv" ]; then
+        info "Sourcing Simu5G environment from setenv"
+        # shellcheck disable=SC1091
+        set +u
+        # Use -f flag to allow sourcing from non-interactive scripts
+        . setenv -f 2>/dev/null || source setenv 2>/dev/null || warn "Simu5G setenv failed (this is usually safe to ignore)"
+        set -u
+        info "✓ Simu5G environment sourced"
+      else
+        info "No Simu5G setenv found (not required)"
+      fi
+      
+      make makefiles
+      make -j"$(nproc)" || warn "Simu5G make failed"
+      popd >/dev/null
     fi
-    
-    # Source Simu5G's setenv if it exists
-    if [ -f "setenv" ]; then
-      info "Sourcing Simu5G environment from setenv"
-      # shellcheck disable=SC1091
-      set +u
-      source setenv
-      set -u
-      info "✓ Simu5G environment sourced"
-    fi
-    
-    make makefiles
-    make -j"$(nproc)" || warn "Simu5G make failed"
-    popd >/dev/null
   else
     warn "Simu5G not found at $WORKDIR/Simu5G — skipping"
   fi
@@ -335,8 +358,20 @@ build_inet_and_simu5g(){
 
 setup_python_venv_and_requirements(){
   info "Setting up Python virtual environment and requirements"
-  mapfile -t reqfiles < <(find "$REPO_ROOT" -type f -name requirements.txt || true)
   venv_default="$REPO_ROOT/tf_env"
+  
+  # Check if venv already exists and has packages
+  if [ -d "$venv_default" ] && [ -f "$venv_default/bin/python" ]; then
+    # Check if key packages are already installed
+    if "$venv_default/bin/python" -c "import numpy, scipy, pandas, matplotlib" 2>/dev/null; then
+      info "✓ Python venv already exists with required packages (skipping package installation)"
+      return
+    else
+      info "Python venv exists but missing some packages, will install..."
+    fi
+  fi
+  
+  mapfile -t reqfiles < <(find "$REPO_ROOT" -type f -name requirements.txt || true)
   if [ ! -d "$venv_default" ]; then
     info "Creating python venv at $venv_default"
     python3 -m venv "$venv_default"
@@ -355,6 +390,12 @@ setup_python_venv_and_requirements(){
 }
 
 build_project(){
+  # Check if project is already built
+  if [ -f "$REPO_ROOT/src/ddosim5g" ] || [ -f "$REPO_ROOT/src/libddosim5g.so" ] || [ -f "$REPO_ROOT/out/gcc-release/src/ddosim5g" ]; then
+    info "✓ Project already built (skipping)"
+    return
+  fi
+  
   if [ -f "$OMNET_DIR/setenv" ]; then
     # shellcheck disable=SC1090
     # Temporarily disable -u to avoid unbound variable errors in setenv
