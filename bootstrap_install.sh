@@ -472,8 +472,26 @@ build_project(){
     source "$OMNET_DIR/setenv"
     set -u
   fi
+  
   info "Building pub_DDoSimu5G project"
   pushd "$REPO_ROOT" >/dev/null
+  
+  # Regenerate Makefile with correct paths to INET and Simu5G
+  info "Regenerating Makefile with correct INET/Simu5G paths..."
+  if [ -d "$WORKDIR/inet4.5" ] && [ -d "$WORKDIR/Simu5G" ]; then
+    info "Creating Makefile for INET at $WORKDIR/inet4.5 and Simu5G at $WORKDIR/Simu5G"
+    opp_makemake -f --deep -O out \
+      -KINET4_5_PROJ=$WORKDIR/inet4.5 \
+      -KSIMU5G_PROJ=$WORKDIR/Simu5G \
+      -DINET_IMPORT \
+      -I. -I\$\(INET4_5_PROJ\)/src -I\$\(SIMU5G_PROJ\)/src \
+      -L\$\(INET4_5_PROJ\)/src -L\$\(SIMU5G_PROJ\)/src -Lout/\$\(CONFIGNAME\)/src \
+      -lINET\$\(D\) -lsimu5g\$\(D\) \
+      -d src -XONE_Simulator || warn "opp_makemake failed"
+  else
+    warn "INET or Simu5G not found, using existing Makefile"
+  fi
+  
   make -j"$(nproc)" || warn "Project make failed"
   
   # Validate project build
