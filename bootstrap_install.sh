@@ -496,7 +496,7 @@ build_project(){
   rm -rf out/
   rm -f src/Makefile
   
-  # Regenerate Makefile with correct paths to INET and Simu5G
+  # Regenerate Makefile with correct paths to INET and Simu5G  
   info "Regenerating Makefile with correct INET/Simu5G paths..."
   if [ -d "$WORKDIR/inet4.5" ] && [ -d "$WORKDIR/Simu5G" ]; then
     info "Creating Makefile for INET at ../inet4.5 and Simu5G at ../Simu5G (relative to project root)"
@@ -507,7 +507,7 @@ build_project(){
       -I. -I\$\(INET4_5_PROJ\)/src -I\$\(SIMU5G_PROJ\)/src \
       -L\$\(INET4_5_PROJ\)/src -L\$\(SIMU5G_PROJ\)/src -Lout/\$\(CONFIGNAME\)/src \
       -lINET\$\(D\) -lsimu5g\$\(D\) \
-      -d src -XONE_Simulator -X../inet4.5 -X../Simu5G -X../omnetpp-6.2.0 || warn "opp_makemake failed"
+      -d src -XONE_Simulator -X$WORKDIR/inet4.5 -X$WORKDIR/Simu5G -X$WORKDIR/omnetpp-6.2.0 || warn "opp_makemake failed"
   else
     warn "INET or Simu5G not found, using existing Makefile"
   fi
