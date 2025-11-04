@@ -490,6 +490,12 @@ build_project(){
   info "Building pub_DDoSimu5G project"
   pushd "$REPO_ROOT" >/dev/null
   
+  # Clean old build artifacts and Makefile
+  info "Cleaning old build artifacts..."
+  rm -f Makefile
+  rm -rf out/
+  rm -f src/Makefile
+  
   # Regenerate Makefile with correct paths to INET and Simu5G
   info "Regenerating Makefile with correct INET/Simu5G paths..."
   if [ -d "$WORKDIR/inet4.5" ] && [ -d "$WORKDIR/Simu5G" ]; then
@@ -697,31 +703,12 @@ main(){
   simu5g_url="https://github.com/Unipisa/Simu5G/archive/refs/tags/${SIMU5G_REF}.tar.gz"
   download_and_extract "$simu5g_url" "$WORKDIR/Simu5G"
 
-  # Build vanilla INET and Simu5G first
-  info "Building vanilla INET and Simu5G (before modifications)"
-  build_inet_and_simu5g
-
-  # Now apply project-specific modifications
+  # Apply project-specific modifications BEFORE building
   info "Applying project-specific modifications to INET and Simu5G"
   copy_modified_files
   
-  # Rebuild INET and Simu5G with modifications
-  info "Rebuilding INET and Simu5G with modifications"
-  # Force rebuild by temporarily removing build artifacts check
-  if [ -f "$WORKDIR/inet4.5/src/libINET.so" ]; then
-    info "Cleaning INET build to apply modifications..."
-    pushd "$WORKDIR/inet4.5" >/dev/null
-    make clean 2>/dev/null || true
-    popd >/dev/null
-  fi
-  
-  if [ -f "$WORKDIR/Simu5G/src/libsimu5g.so" ]; then
-    info "Cleaning Simu5G build to apply modifications..."
-    pushd "$WORKDIR/Simu5G" >/dev/null
-    make clean 2>/dev/null || true
-    popd >/dev/null
-  fi
-  
+  # Build INET and Simu5G with modifications already applied
+  info "Building INET and Simu5G (with modifications)"
   build_inet_and_simu5g
 
   setup_one
