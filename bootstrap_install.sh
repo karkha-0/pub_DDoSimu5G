@@ -11,9 +11,9 @@ MODIFIED_DIR="$REPO_ROOT/modifiedExternalFiles"
 
 # Defaults kept in deps.json (if present)
 DEPS_FILE="$REPO_ROOT/deps.json"
-OMNET_DEFAULT_VERSION="6.1.0"
-INET_DEFAULT_REF="v4.5.4"  # Latest stable INET version
-SIMU5G_DEFAULT_REF="Simu5G-1.3.0"
+OMNET_DEFAULT_VERSION="6.2.0"
+INET_DEFAULT_REF="v4.5.4"  # INET 4.5.4 for OMNeT++ 6.2.0
+SIMU5G_DEFAULT_REF="v1.4.1"
 ONE_DEFAULT_REF="the-one-1.6.0"
 JDK_DEFAULT="11"
 
@@ -678,8 +678,10 @@ main(){
   inet_url="https://github.com/inet-framework/inet/releases/download/${INET_REF}/inet-${INET_REF#v}-src.tgz"
   download_and_extract "$inet_url" "$WORKDIR/inet4.5"
   
-  # Clone Simu5G from Unipisa repository
-  clone_repo "https://github.com/Unipisa/Simu5G.git" "$WORKDIR/Simu5G" "$SIMU5G_REF"
+  # Download Simu5G from release (not git clone to get exact version)
+  info "Downloading Simu5G ${SIMU5G_REF}"
+  simu5g_url="https://github.com/Unipisa/Simu5G/archive/refs/tags/${SIMU5G_REF}.tar.gz"
+  download_and_extract "$simu5g_url" "$WORKDIR/Simu5G"
 
   # Build vanilla INET and Simu5G first
   info "Building vanilla INET and Simu5G (before modifications)"
