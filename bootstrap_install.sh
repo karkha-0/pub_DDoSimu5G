@@ -161,6 +161,15 @@ install_omnetpp(){
     info "✓ OMNeT++ pre-built binaries found"
   else
     warn "Pre-built binaries not found. Building OMNeT++ from source (this may take several minutes)..."
+    
+    # OMNeT++ requires Python packages - install them in the project venv if it exists
+    if [ -d "$REPO_ROOT/tf_env/bin" ]; then
+      info "Using project Python venv for OMNeT++ build"
+      export PATH="$REPO_ROOT/tf_env/bin:$PATH"
+    else
+      warn "Project Python venv not found. OMNeT++ may require system Python packages."
+    fi
+    
     pushd "$target_dir" >/dev/null
     
     # Source setenv before configure (required by OMNeT++)
@@ -168,6 +177,12 @@ install_omnetpp(){
       set +u
       source ./setenv
       set -u
+    fi
+    
+    # Install Python requirements if they exist
+    if [ -f ./python/requirements.txt ]; then
+      info "Installing OMNeT++ Python requirements..."
+      python3 -m pip install -r ./python/requirements.txt || warn "Failed to install Python requirements"
     fi
     
     if [ -x ./configure ]; then
@@ -466,6 +481,10 @@ main(){
     info "Skipping OMNeT++ install as requested (--skip-omnet)"
   fi
 
+  # Create Python venv early so OMNeT++ can use it during configure
+  info "Setting up Python virtual environment before building OMNeT++"
+  setup_python_venv_and_requirements
+
   # Default OMNET_DIR if not provided: use working dir
   if [ -z "$OMNET_DIR" ]; then
     OMNET_DIR="$WORKDIR/omnetpp-${OMNET_VER}"
@@ -495,8 +514,6 @@ main(){
   copy_modified_files
 
   build_inet_and_simu5g
-
-  setup_python_venv_and_requirements
 
   build_project
 
