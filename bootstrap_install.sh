@@ -230,18 +230,25 @@ build_inet_and_simu5g(){
     
     # Source OMNeT++ setenv first to get opp_* tools in PATH
     if [ -f "$OMNET_DIR/setenv" ]; then
+      info "Sourcing OMNeT++ environment from $OMNET_DIR/setenv"
       # shellcheck disable=SC1090
       set +u
       source "$OMNET_DIR/setenv"
       set -u
+      info "✓ OMNeT++ environment sourced. PATH includes: $(echo $PATH | grep -o '[^:]*omnetpp[^:]*' || echo 'NOT FOUND')"
+      info "✓ Checking opp_featuretool: $(command -v opp_featuretool || echo 'NOT FOUND')"
+    else
+      warn "OMNeT++ setenv not found at $OMNET_DIR/setenv"
     fi
     
     # Source INET's setenv if it exists
     if [ -f "setenv" ]; then
+      info "Sourcing INET environment from setenv"
       # shellcheck disable=SC1091
       set +u
       source setenv
       set -u
+      info "✓ INET environment sourced"
     fi
     
     make makefiles
@@ -257,18 +264,24 @@ build_inet_and_simu5g(){
     
     # Source OMNeT++ setenv first to get opp_* tools in PATH
     if [ -f "$OMNET_DIR/setenv" ]; then
+      info "Sourcing OMNeT++ environment from $OMNET_DIR/setenv"
       # shellcheck disable=SC1090
       set +u
       source "$OMNET_DIR/setenv"
       set -u
+      info "✓ OMNeT++ environment sourced"
+    else
+      warn "OMNeT++ setenv not found at $OMNET_DIR/setenv"
     fi
     
     # Source Simu5G's setenv if it exists
     if [ -f "setenv" ]; then
+      info "Sourcing Simu5G environment from setenv"
       # shellcheck disable=SC1091
       set +u
       source setenv
       set -u
+      info "✓ Simu5G environment sourced"
     fi
     
     make makefiles
