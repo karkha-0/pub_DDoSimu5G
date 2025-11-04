@@ -29,6 +29,7 @@ ONE_JAR=""
 SKIP_OMNET=false
 ANALYSIS_ONLY=false
 FORCE=false
+CONFIG_FILE=""  # Which deps config to use
 
 info(){ printf "[INFO] %s\n" "$*"; }
 warn(){ printf "[WARN] %s\n" "$*"; }
@@ -48,6 +49,7 @@ confirm(){
 print_help(){
   echo "Usage: $0 [options]"
   echo "  -y, --yes                Assume yes to prompts (non-interactive)"
+  echo "      --config CONFIG      Use specific deps config: stable, latest, or path to .json file (default: deps.json)"
   echo "      --omnet-dir DIR       OMNeT++ install directory (default: PWD/omnetpp-<ver>)"
   echo "      --omnet-ver VER       OMNeT++ version/tag to download (default: ${OMNET_DEFAULT_VERSION})"
   echo "      --workdir DIR         Directory to clone/build INET/Simu5G/ONE (default: current working directory)"
@@ -59,12 +61,17 @@ print_help(){
   echo "      --analysis-only       Only setup Python environment and data analysis packages (skip OMNeT++/INET/Simu5G)"
   echo "      --force               Overwrite existing targets (use with care)"
   echo "  -h, --help               Show help"
+  echo ""
+  echo "Config presets:"
+  echo "  --config stable         Use deps.stable.json (OMNeT++ 6.0.1, INET 4.5.0, Simu5G 1.2.2)"
+  echo "  --config latest         Use deps.latest.json (OMNeT++ 6.2.0, INET 4.5.4, Simu5G 1.4.1)"
 }
 
 parse_args(){
   while [ $# -gt 0 ]; do
     case "$1" in
       -y|--yes) ASSUME_YES=true; shift ;;
+      --config) CONFIG_FILE="$2"; shift 2 ;;
       --omnet-dir) OMNET_DIR="$2"; shift 2 ;;
       --omnet-ver) OMNET_VER="$2"; shift 2 ;;
       --workdir) WORKDIR="$2"; shift 2 ;;
@@ -744,17 +751,47 @@ setup_one(){
 }
 
 load_deps_from_file(){
-  if [ -f "$DEPS_FILE" ]; then
-    info "Loading dependency defaults from $DEPS_FILE"
+  # Determine which deps file to use
+  local deps_to_load="$DEPS_FILE"
+  
+  if [ -n "$CONFIG_FILE" ]; then
+    case "$CONFIG_FILE" in
+      stable)
+        deps_to_load="$REPO_ROOT/deps.stable.json"
+        info "Using stable configuration"
+        ;;
+      latest)
+        deps_to_load="$REPO_ROOT/deps.latest.json"
+        info "Using latest configuration"
+        ;;
+      *)
+        # Assume it's a path to a custom config file
+        if [ -f "$CONFIG_FILE" ]; then
+          deps_to_load="$CONFIG_FILE"
+          info "Using custom configuration: $CONFIG_FILE"
+        else
+          err "Config file not found: $CONFIG_FILE"
+        fi
+        ;;
+    esac
+  fi
+  
+  if [ -f "$deps_to_load" ]; then
+    info "Loading dependency versions from $deps_to_load"
     # minimal JSON parsing without jq
-    OMNET_VER_CFG=$(grep -o '"omnet": *"[^"]*"' "$DEPS_FILE" | sed 's/"omnet": *"\([^"]*\)"/\1/') || true
-    INET_REF_CFG=$(grep -o '"inet": *"[^"]*"' "$DEPS_FILE" | sed 's/"inet": *"\([^"]*\)"/\1/') || true
-    SIMU5G_REF_CFG=$(grep -o '"simu5g": *"[^"]*"' "$DEPS_FILE" | sed 's/"simu5g": *"\([^"]*\)"/\1/') || true
-    ONE_REF_CFG=$(grep -o '"one": *"[^"]*"' "$DEPS_FILE" | sed 's/"one": *"\([^"]*\)"/\1/') || true
+    OMNET_VER_CFG=$(grep -o '"omnet": *"[^"]*"' "$deps_to_load" | sed 's/"omnet": *"\([^"]*\)"/\1/') || true
+    INET_REF_CFG=$(grep -o '"inet": *"[^"]*"' "$deps_to_load" | sed 's/"inet": *"\([^"]*\)"/\1/') || true
+    SIMU5G_REF_CFG=$(grep -o '"simu5g": *"[^"]*"' "$deps_to_load" | sed 's/"simu5g": *"\([^"]*\)"/\1/') || true
+    ONE_REF_CFG=$(grep -o '"one": *"[^"]*"' "$deps_to_load" | sed 's/"one": *"\([^"]*\)"/\1/') || true
     if [ -n "$OMNET_VER_CFG" ]; then OMNET_VER="$OMNET_VER_CFG"; fi
     if [ -n "$INET_REF_CFG" ]; then INET_REF="$INET_REF_CFG"; fi
     if [ -n "$SIMU5G_REF_CFG" ]; then SIMU5G_REF="$SIMU5G_REF_CFG"; fi
     if [ -n "$ONE_REF_CFG" ]; then ONE_DEFAULT_REF="$ONE_REF_CFG"; fi
+    
+    info "  OMNeT++: $OMNET_VER"
+    info "  INET: $INET_REF"
+    info "  Simu5G: $SIMU5G_REF"
+    info "  ONE: $ONE_DEFAULT_REF"
   fi
 }
 
