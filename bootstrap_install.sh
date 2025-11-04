@@ -494,7 +494,7 @@ build_project(){
   info "Regenerating Makefile with correct INET/Simu5G paths..."
   if [ -d "$WORKDIR/inet4.5" ] && [ -d "$WORKDIR/Simu5G" ]; then
     info "Creating Makefile for INET at ../inet4.5 and Simu5G at ../Simu5G (relative to project root)"
-    opp_makemake -f --deep -O out \
+    opp_makemake -f --deep -O out -e cc \
       -KINET4_5_PROJ=../inet4.5 \
       -KSIMU5G_PROJ=../Simu5G \
       -DINET_IMPORT \
