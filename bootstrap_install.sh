@@ -404,6 +404,13 @@ build_inet_and_simu5g(){
         set +u
         source "$OMNET_DIR/setenv"
         set -u
+        
+        # Explicitly add OMNeT++ bin to PATH if not already there
+        if [[ ":$PATH:" != *":$OMNET_DIR/bin:"* ]]; then
+          export PATH="$OMNET_DIR/bin:$PATH"
+          info "Added $OMNET_DIR/bin to PATH"
+        fi
+        
         info "✓ OMNeT++ environment sourced. PATH includes: $(echo $PATH | grep -o '[^:]*omnetpp[^:]*' || echo 'NOT FOUND')"
         info "✓ Checking opp_featuretool: $(command -v opp_featuretool || echo 'NOT FOUND')"
       else
@@ -461,6 +468,13 @@ build_inet_and_simu5g(){
         set +u
         source "$OMNET_DIR/setenv"
         set -u
+        
+        # Explicitly add OMNeT++ bin to PATH if not already there
+        if [[ ":$PATH:" != *":$OMNET_DIR/bin:"* ]]; then
+          export PATH="$OMNET_DIR/bin:$PATH"
+          info "Added $OMNET_DIR/bin to PATH"
+        fi
+        
         info "✓ OMNeT++ environment sourced"
       else
         warn "OMNeT++ setenv not found at $OMNET_DIR/setenv"
