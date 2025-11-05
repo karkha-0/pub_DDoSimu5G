@@ -219,9 +219,12 @@ install_omnetpp(){
       "$REPO_ROOT/tf_env/bin/python3" -m pip install -r ./python/requirements.txt || warn "Failed to install Python requirements"
     fi
     
-    # Create configure.user to disable optional features
-    info "Creating configure.user to disable OpenSceneGraph and osgEarth (not needed for simulations)"
+    # Create configure.user to configure features
+    info "Creating configure.user with required simulation features"
     cat > configure.user << 'EOF'
+# Enable NED file loading (required for running simulations)
+WITH_NETBUILDER=yes
+
 # Disable 3D visualization features (not needed for simulations)
 WITH_OSG=no
 WITH_OSGEARTH=no
