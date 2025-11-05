@@ -3,6 +3,19 @@
 ## Note:
 # To run this script you need to change the mobility and the infections paths in the ini and the ned file
 
+# Source OMNeT++ environment
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+OMNET_DIR="$SCRIPT_DIR/../../../omnetpp-6.0.1"
+
+if [ -f "$OMNET_DIR/setenv" ]; then
+    echo "Sourcing OMNeT++ environment from $OMNET_DIR/setenv"
+    source "$OMNET_DIR/setenv"
+else
+    echo "ERROR: Cannot find OMNeT++ setenv at $OMNET_DIR/setenv"
+    echo "Please ensure OMNeT++ is installed correctly"
+    exit 1
+fi
+
 # Ask user for DDoS flag (0 = disabled, 1 = enabled)
 read -p "Enable DDoS traffic? Enter 0 (false) or 1 (true): " DDOS_FLAG
 
