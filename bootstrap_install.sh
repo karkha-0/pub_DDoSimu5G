@@ -654,10 +654,6 @@ build_project(){
   info "Building DDoSimu5G project at $project_dir"
   pushd "$project_dir" >/dev/null
   
-  # Clean old build artifacts
-  info "Cleaning old build artifacts..."
-  rm -rf out/
-  
   # Update Makefile variables to point to correct INET/Simu5G locations
   info "Updating Makefile paths for INET and Simu5G..."
   if [ -d "$WORKDIR/inet4.5" ] && [ -d "$WORKDIR/Simu5G" ]; then
@@ -674,6 +670,13 @@ build_project(){
   else
     warn "INET or Simu5G not found, using existing Makefile paths"
   fi
+  
+  # Clean old build artifacts BEFORE generating new makefiles
+  info "Cleaning old build artifacts..."
+  rm -rf out/
+  find . -name "*.o" -delete
+  find . -name "*.so" -delete
+  find . -name "*.a" -delete
   
   # Generate makefiles using opp_makemake
   info "Generating project makefiles..."
