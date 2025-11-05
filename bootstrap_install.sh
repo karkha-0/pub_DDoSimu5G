@@ -641,7 +641,7 @@ build_project(){
   fi
   
   # Check if project is already built
-  if [ -f "$project_dir/src/ddosim5g" ] || [ -f "$project_dir/src/libddosim5g.so" ] || [ -f "$project_dir/out/gcc-release/src/ddosim5g" ]; then
+  if [ -f "$project_dir/src/libDDoSim5G.so" ] || [ -f "$project_dir/src/libddosim5g.so" ] || [ -f "$project_dir/out/gcc-release/src/libDDoSim5G.so" ]; then
     info "✓ Project already built (skipping)"
     return
   fi
@@ -677,11 +677,11 @@ build_project(){
   # Clean old build artifacts BEFORE generating new makefiles
   info "Cleaning old build artifacts..."
   rm -rf out/
-  # Also clean any ddosim5g directory that might exist
-  find . -type d -name "ddosim5g" -exec rm -rf {} + 2>/dev/null || true
+  # Clean only build artifacts, NOT source directories
   find . -name "*.o" -delete
-  find . -name "*.so" -delete
+  find . -name "*.so" -not -path "*/src/ddosim5g/*" -delete
   find . -name "*.a" -delete
+  find . -name "Makefile" -not -path "*/src/Makefile" -delete 2>/dev/null || true
   
   # Generate makefiles using opp_makemake
   info "Generating project makefiles..."
@@ -692,7 +692,8 @@ build_project(){
     info "No .oppbuildspec found, running opp_makemake manually"
     # Run from src/ subdirectory since sources are under src/ddosim5g/
     cd src
-    opp_makemake -f --deep -o ddosim5g -O ../out \
+    # Build as a shared library, not an executable
+    opp_makemake -f --make-so --deep -o DDoSim5G -O ../out \
       -KINET4_5_PROJ=../../inet4.5 \
       -KSIMU5G_PROJ=../../Simu5G \
       -DINET_IMPORT -I'$(INET4_5_PROJ)/src' -L'$(INET4_5_PROJ)/src' -lINET'$(D)' \
@@ -706,25 +707,23 @@ build_project(){
   info "Validating pub_DDoSimu5G project build..."
   build_success=false
   
-  # Check for various possible build outputs
-  if [ -f "src/ddosim5g" ]; then
-    info "✓ Project executable built: src/ddosim5g"
-    info "  - Size: $(ls -lh src/ddosim5g | awk '{print $5}')"
+  # Check for library in src/ or out/ directory
+  if [ -f "src/libDDoSim5G.so" ]; then
+    info "✓ Project library built: src/libDDoSim5G.so"
+    info "  - Size: $(ls -lh src/libDDoSim5G.so | awk '{print $5}')"
     build_success=true
-  fi
-  
-  if [ -f "src/libddosim5g.so" ]; then
+  elif [ -f "out/gcc-release/src/libDDoSim5G.so" ]; then
+    info "✓ Project library built: out/gcc-release/src/libDDoSim5G.so"
+    info "  - Size: $(ls -lh out/gcc-release/src/libDDoSim5G.so | awk '{print $5}')"
+    build_success=true
+  elif [ -f "src/libddosim5g.so" ]; then
     info "✓ Project library built: src/libddosim5g.so"
     info "  - Size: $(ls -lh src/libddosim5g.so | awk '{print $5}')"
     build_success=true
-  fi
-  
-  if [ -d "out/gcc-release/src" ]; then
-    exe_count=$(find out/gcc-release/src -type f -executable 2>/dev/null | wc -l)
-    if [ "$exe_count" -gt 0 ]; then
-      info "✓ Build artifacts in out/gcc-release/src ($exe_count executables)"
-      build_success=true
-    fi
+  elif [ -f "out/gcc-release/src/libddosim5g.so" ]; then
+    info "✓ Project library built: out/gcc-release/src/libddosim5g.so"
+    info "  - Size: $(ls -lh out/gcc-release/src/libddosim5g.so | awk '{print $5}')"
+    build_success=true
   fi
   
   # Check for NED and .msg files
@@ -734,7 +733,8 @@ build_project(){
   info "  - MSG files: $msg_count"
   
   if [ "$build_success" = false ]; then
-    warn "✗ Project build verification failed - no executables or libraries found"
+    warn "✗ Project build verification failed - no library found"
+    info "Expected library: src/libDDoSim5G.so or out/gcc-release/src/libDDoSim5G.so"
   fi
   
   popd >/dev/null
@@ -1050,18 +1050,21 @@ main(){
   
   # Check Project (built in samples directory)
   project_built=false
-  if [ -f "$WORKDIR/DDoSimu5G/src/ddosim5g" ] || [ -f "$WORKDIR/DDoSimu5G/src/libddosim5g.so" ]; then
+  if [ -f "$WORKDIR/DDoSimu5G/src/libDDoSim5G.so" ]; then
     info "✓ pub_DDoSimu5G Project: Built successfully"
-    exe_size=$(ls -lh "$WORKDIR/DDoSimu5G/src/ddosim5g" 2>/dev/null | awk '{print $5}' || echo "N/A")
-    info "  - Executable: $WORKDIR/DDoSimu5G/src/ddosim5g ($exe_size)"
+    lib_size=$(ls -lh "$WORKDIR/DDoSimu5G/src/libDDoSim5G.so" 2>/dev/null | awk '{print $5}')
+    info "  - Library: $WORKDIR/DDoSimu5G/src/libDDoSim5G.so ($lib_size)"
     project_built=true
-  elif [ -d "$WORKDIR/DDoSimu5G/out/gcc-release/src" ]; then
-    exe_count=$(find "$WORKDIR/DDoSimu5G/out/gcc-release/src" -type f -executable 2>/dev/null | wc -l)
-    if [ "$exe_count" -gt 0 ]; then
-      info "✓ pub_DDoSimu5G Project: Built successfully"
-      info "  - Build artifacts: $exe_count executables in out/gcc-release/src"
-      project_built=true
-    fi
+  elif [ -f "$WORKDIR/DDoSimu5G/src/libddosim5g.so" ]; then
+    info "✓ pub_DDoSimu5G Project: Built successfully"
+    lib_size=$(ls -lh "$WORKDIR/DDoSimu5G/src/libddosim5g.so" 2>/dev/null | awk '{print $5}')
+    info "  - Library: $WORKDIR/DDoSimu5G/src/libddosim5g.so ($lib_size)"
+    project_built=true
+  elif [ -f "$WORKDIR/DDoSimu5G/out/gcc-release/src/libDDoSim5G.so" ]; then
+    info "✓ pub_DDoSimu5G Project: Built successfully"
+    lib_size=$(ls -lh "$WORKDIR/DDoSimu5G/out/gcc-release/src/libDDoSim5G.so" 2>/dev/null | awk '{print $5}')
+    info "  - Library: out/gcc-release/src/libDDoSim5G.so ($lib_size)"
+    project_built=true
   fi
   
   if [ "$project_built" = false ]; then
