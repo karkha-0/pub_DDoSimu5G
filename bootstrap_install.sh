@@ -296,6 +296,14 @@ copy_modified_files(){
             info "  Removed /layer/ subdirectory for v1.4.0+: $target_rel_path"
           fi
           
+          # Remove /NR/ subdirectory for v1.4.0+ - the directory structure changed:
+          # OLD (v1.2.2): src/nodes/NR/NRUe.ned
+          # NEW (v1.4.0+): src/simu5g/nodes/NrUe.ned (no NR/ subdirectory)
+          if [[ "$target_rel_path" == *"/nodes/NR/"* ]]; then
+            target_rel_path="${target_rel_path/\/nodes\/NR\//\/nodes\/}"
+            info "  Removed /NR/ subdirectory for v1.4.0+: $target_rel_path"
+          fi
+          
           info "  Path adjusted for Simu5G >= 1.4.0: $rel_path -> $target_rel_path"
           
           # Handle filename renames in v1.4.0+
@@ -306,7 +314,7 @@ copy_modified_files(){
           # Apply filename mappings
           case "$filename" in
             "VoIPReceiver.ned") filename="VoipReceiver.ned" ;;
-            "NRUe.ned") filename="NrPhyUe.ned" ;;
+            "NRUe.ned") filename="NrUe.ned" ;;  # Fixed: NRUe -> NrUe (not NrPhyUe)
             "NRPhyUe.cc") filename="NrPhyUe.cc" ;;
           esac
           
