@@ -288,10 +288,14 @@ copy_modified_files(){
           # Insert simu5g/ after src/
           target_rel_path="${target_rel_path/src\//src/simu5g/}"
           
-          # NO /layer/ removal for v1.4.0+ - the directory structure is:
-          # OLD (v1.2.2): src/stack/phy/X
-          # NEW (v1.4.0+): src/simu5g/stack/phy/X
-          # Both use the same structure without /layer/ subdirectory
+          # Remove /layer/ subdirectory for v1.4.0+ - the directory structure changed:
+          # OLD (v1.2.2): src/stack/phy/layer/LtePhyUe.cc
+          # NEW (v1.4.0+): src/simu5g/stack/phy/LtePhyUe.cc (no layer/ subdirectory)
+          if [[ "$target_rel_path" == *"/stack/phy/layer/"* ]]; then
+            target_rel_path="${target_rel_path/\/stack\/phy\/layer\//\/stack\/phy\/}"
+            info "  Removed /layer/ subdirectory for v1.4.0+: $target_rel_path"
+          fi
+          
           info "  Path adjusted for Simu5G >= 1.4.0: $rel_path -> $target_rel_path"
           
           # Handle filename renames in v1.4.0+
