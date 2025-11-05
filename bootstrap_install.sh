@@ -674,6 +674,8 @@ build_project(){
   # Clean old build artifacts BEFORE generating new makefiles
   info "Cleaning old build artifacts..."
   rm -rf out/
+  # Also clean any ddosim5g directory that might exist
+  find . -type d -name "ddosim5g" -exec rm -rf {} + 2>/dev/null || true
   find . -name "*.o" -delete
   find . -name "*.so" -delete
   find . -name "*.a" -delete
@@ -685,13 +687,13 @@ build_project(){
     make makefiles || warn "Failed to generate makefiles from .oppbuildspec"
   else
     info "No .oppbuildspec found, running opp_makemake manually"
-    cd src
+    # Run from project root, not src/ subdirectory
     opp_makemake -f --deep -o ddosim5g -O out \
-      -KINET4_5_PROJ=../../inet4.5 \
-      -KSIMU5G_PROJ=../../Simu5G \
+      -KINET4_5_PROJ=../inet4.5 \
+      -KSIMU5G_PROJ=../Simu5G \
       -DINET_IMPORT -I'$(INET4_5_PROJ)/src' -L'$(INET4_5_PROJ)/src' -lINET'$(D)' \
-      -I'$(SIMU5G_PROJ)/src' -L'$(SIMU5G_PROJ)/src' -lsimu5g'$(D)' || warn "opp_makemake failed"
-    cd ..
+      -I'$(SIMU5G_PROJ)/src' -L'$(SIMU5G_PROJ)/src' -lsimu5g'$(D)' \
+      -d src -XONE_Simulator || warn "opp_makemake failed"
   fi
   
   make -j"$(nproc)" || warn "Project make failed"
