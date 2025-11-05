@@ -1065,13 +1065,14 @@ main(){
     warn "✗ pub_DDoSimu5G Project build incomplete or failed"
   fi
   
-  # Check ONE Simulator
-  if [ -f "$REPO_ROOT/ONE_Simulator/the-one-1.6.0/one.jar" ]; then
-    info "✓ ONE Simulator: Compiled"
-    jar_size=$(ls -lh "$REPO_ROOT/ONE_Simulator/the-one-1.6.0/one.jar" | awk '{print $5}')
-    info "  - JAR size: $jar_size"
-  elif [ -d "$REPO_ROOT/ONE_Simulator/the-one-1.6.0" ]; then
-    info "⚠ ONE Simulator: Source present but JAR not built"
+  # Check ONE Simulator (looks for compiled .class files, not JAR)
+  if [ -d "$REPO_ROOT/ONE_Simulator/the-one-1.6.0/core" ]; then
+    class_count=$(find "$REPO_ROOT/ONE_Simulator/the-one-1.6.0" -name "*.class" 2>/dev/null | wc -l)
+    if [ "$class_count" -gt 0 ]; then
+      info "✓ ONE Simulator: Compiled ($class_count .class files)"
+    else
+      info "⚠ ONE Simulator: Source present but not compiled"
+    fi
   fi
   
   info "=========================================="
