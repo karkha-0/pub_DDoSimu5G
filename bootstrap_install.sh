@@ -192,6 +192,13 @@ install_omnetpp(){
     if [ -d "$REPO_ROOT/tf_env/bin" ]; then
       info "Using project Python venv for OMNeT++ build"
       export PATH="$REPO_ROOT/tf_env/bin:$PATH"
+      export VIRTUAL_ENV="$REPO_ROOT/tf_env"
+      
+      # Verify posix_ipc is installed in venv
+      if ! "$REPO_ROOT/tf_env/bin/python3" -c "import posix_ipc" 2>/dev/null; then
+        info "Installing posix_ipc in venv (required by OMNeT++ IDE)"
+        "$REPO_ROOT/tf_env/bin/pip" install posix_ipc || warn "Failed to install posix_ipc"
+      fi
     else
       warn "Project Python venv not found. OMNeT++ may require system Python packages."
     fi
@@ -208,7 +215,7 @@ install_omnetpp(){
     # Install Python requirements if they exist
     if [ -f ./python/requirements.txt ]; then
       info "Installing OMNeT++ Python requirements..."
-      python3 -m pip install -r ./python/requirements.txt || warn "Failed to install Python requirements"
+      "$REPO_ROOT/tf_env/bin/python3" -m pip install -r ./python/requirements.txt || warn "Failed to install Python requirements"
     fi
     
     # Create configure.user to disable optional features
