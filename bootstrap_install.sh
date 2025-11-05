@@ -687,13 +687,14 @@ build_project(){
     make makefiles || warn "Failed to generate makefiles from .oppbuildspec"
   else
     info "No .oppbuildspec found, running opp_makemake manually"
-    # Run from project root, not src/ subdirectory
-    opp_makemake -f --deep -o ddosim5g -O out \
-      -KINET4_5_PROJ=../inet4.5 \
-      -KSIMU5G_PROJ=../Simu5G \
+    # Run from src/ subdirectory since sources are under src/ddosim5g/
+    cd src
+    opp_makemake -f --deep -o ddosim5g -O ../out \
+      -KINET4_5_PROJ=../../inet4.5 \
+      -KSIMU5G_PROJ=../../Simu5G \
       -DINET_IMPORT -I'$(INET4_5_PROJ)/src' -L'$(INET4_5_PROJ)/src' -lINET'$(D)' \
-      -I'$(SIMU5G_PROJ)/src' -L'$(SIMU5G_PROJ)/src' -lsimu5g'$(D)' \
-      -d src -XONE_Simulator || warn "opp_makemake failed"
+      -I'$(SIMU5G_PROJ)/src' -L'$(SIMU5G_PROJ)/src' -lsimu5g'$(D)' || warn "opp_makemake failed"
+    cd ..
   fi
   
   make -j"$(nproc)" || warn "Project make failed"
@@ -928,31 +929,33 @@ main(){
 
   # Copy pub_DDoSimu5G project into samples/DDoSimu5G
   info "Setting up DDoSimu5G project in $WORKDIR/DDoSimu5G"
-  if [ ! -d "$WORKDIR/DDoSimu5G" ]; then
-    mkdir -p "$WORKDIR/DDoSimu5G"
-    info "Copying project files from $REPO_ROOT to $WORKDIR/DDoSimu5G"
-    # Copy everything EXCEPT:
-    # - Installation artifacts (omnetpp-*, tf_env)
-    # - Bootstrap/config files (bootstrap_install.sh, deps.json, BOOTSTRAP.md)
-    # - Documentation that stays in repo root (README.md, project_packages.txt, repo_structure.txt)
-    # - Profiling data (perf.data)
-    # - Git metadata (.git)
-    rsync -av \
-      --exclude='omnetpp-*/' \
-      --exclude='tf_env/' \
-      --exclude='.git/' \
-      --exclude='bootstrap_install.sh' \
-      --exclude='deps.json' \
-      --exclude='BOOTSTRAP.md' \
-      --exclude='README.md' \
-      --exclude='project_packages.txt' \
-      --exclude='repo_structure.txt' \
-      --exclude='perf.data' \
-      "$REPO_ROOT/" "$WORKDIR/DDoSimu5G/" >/dev/null
-    info "✓ DDoSimu5G project copied to samples directory"
-  else
-    info "✓ DDoSimu5G already exists at $WORKDIR/DDoSimu5G"
+  # Always refresh the copy to ensure latest changes are included
+  if [ -d "$WORKDIR/DDoSimu5G" ]; then
+    info "Removing existing DDoSimu5G directory to refresh copy"
+    rm -rf "$WORKDIR/DDoSimu5G"
   fi
+  
+  mkdir -p "$WORKDIR/DDoSimu5G"
+  info "Copying project files from $REPO_ROOT to $WORKDIR/DDoSimu5G"
+  # Copy everything EXCEPT:
+  # - Installation artifacts (omnetpp-*, tf_env)
+  # - Bootstrap/config files (bootstrap_install.sh, deps.json, BOOTSTRAP.md)
+  # - Documentation that stays in repo root (README.md, project_packages.txt, repo_structure.txt)
+  # - Profiling data (perf.data)
+  # - Git metadata (.git)
+  rsync -av \
+    --exclude='omnetpp-*/' \
+    --exclude='tf_env/' \
+    --exclude='.git/' \
+    --exclude='bootstrap_install.sh' \
+    --exclude='deps.json' \
+    --exclude='BOOTSTRAP.md' \
+    --exclude='README.md' \
+    --exclude='project_packages.txt' \
+    --exclude='repo_structure.txt' \
+    --exclude='perf.data' \
+    "$REPO_ROOT/" "$WORKDIR/DDoSimu5G/" >/dev/null
+  info "✓ DDoSimu5G project copied to samples directory"
 
   # Apply project-specific modifications BEFORE building
   info "Applying project-specific modifications to INET and Simu5G"
