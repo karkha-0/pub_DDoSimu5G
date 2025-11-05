@@ -1045,16 +1045,18 @@ main(){
     warn "✗ Simu5G build incomplete or failed"
   fi
   
-  # Check Project
+  # Check Project (built in samples directory)
   project_built=false
-  if [ -f "$REPO_ROOT/src/ddosim5g" ] || [ -f "$REPO_ROOT/src/libddosim5g.so" ]; then
+  if [ -f "$WORKDIR/DDoSimu5G/src/ddosim5g" ] || [ -f "$WORKDIR/DDoSimu5G/src/libddosim5g.so" ]; then
     info "✓ pub_DDoSimu5G Project: Built successfully"
+    exe_size=$(ls -lh "$WORKDIR/DDoSimu5G/src/ddosim5g" 2>/dev/null | awk '{print $5}' || echo "N/A")
+    info "  - Executable: $WORKDIR/DDoSimu5G/src/ddosim5g ($exe_size)"
     project_built=true
-  elif [ -d "$REPO_ROOT/out/gcc-release/src" ]; then
-    exe_count=$(find "$REPO_ROOT/out/gcc-release/src" -type f -executable 2>/dev/null | wc -l)
+  elif [ -d "$WORKDIR/DDoSimu5G/out/gcc-release/src" ]; then
+    exe_count=$(find "$WORKDIR/DDoSimu5G/out/gcc-release/src" -type f -executable 2>/dev/null | wc -l)
     if [ "$exe_count" -gt 0 ]; then
       info "✓ pub_DDoSimu5G Project: Built successfully"
-      info "  - Build artifacts: $exe_count executables"
+      info "  - Build artifacts: $exe_count executables in out/gcc-release/src"
       project_built=true
     fi
   fi
