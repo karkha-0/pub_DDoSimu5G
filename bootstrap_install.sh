@@ -151,30 +151,42 @@ install_omnetpp(){
     return
   fi
   
+  # If directory exists but not built, we need to download and build
+  # Only skip if FORCE is not set AND it's a partial download we don't want to overwrite
   if [ -d "$target_dir" ] && [ "$FORCE" != true ]; then
-    warn "Target directory $target_dir exists but not fully built. Use --force to overwrite or set a different --omnet-dir. Skipping OMNeT++ install."
-    return
+    # Check if it looks like a valid OMNeT++ directory (has configure script)
+    if [ ! -f "$target_dir/configure" ]; then
+      warn "Target directory $target_dir exists but doesn't look like OMNeT++. Use --force to overwrite. Skipping OMNeT++ install."
+      return
+    fi
+    info "OMNeT++ directory exists but not built. Proceeding with build..."
   fi
 
-  mkdir -p "$target_dir"
-  # Use official OMNeT++ download URL from GitHub releases
-  if [ "$version" = "${OMNET_DEFAULT_VERSION}" ]; then
-    url="https://github.com/omnetpp/omnetpp/releases/download/omnetpp-${version}/omnetpp-${version}-linux-x86_64.tgz"
-  else
-    warn "Custom version specified. Attempting GitHub releases URL..."
-    url="https://github.com/omnetpp/omnetpp/releases/download/omnetpp-${version}/omnetpp-${version}-linux-x86_64.tgz"
+  # Download if directory doesn't exist or we're forcing reinstall
+  if [ ! -d "$target_dir" ] || [ "$FORCE" = true ]; then
+    if [ "$FORCE" = true ] && [ -d "$target_dir" ]; then
+      info "Force flag set. Removing existing directory..."
+      rm -rf "$target_dir"
+    fi
+    mkdir -p "$target_dir"
+    # Use official OMNeT++ download URL from GitHub releases
+    if [ "$version" = "${OMNET_DEFAULT_VERSION}" ]; then
+      url="https://github.com/omnetpp/omnetpp/releases/download/omnetpp-${version}/omnetpp-${version}-linux-x86_64.tgz"
+    else
+      warn "Custom version specified. Attempting GitHub releases URL..."
+      url="https://github.com/omnetpp/omnetpp/releases/download/omnetpp-${version}/omnetpp-${version}-linux-x86_64.tgz"
+    fi
+
+    download_and_extract "$url" "$target_dir"
+    info "OMNeT++ package extracted to $target_dir"
   fi
-
-  download_and_extract "$url" "$target_dir"
-
-  info "OMNeT++ pre-built package extracted to $target_dir"
   info "Verifying OMNeT++ installation..."
   
-  # Check if bin directory has executables
+  # Check if bin directory has executables (pre-built binaries)
   if [ -f "$target_dir/bin/opp_featuretool" ]; then
-    info "✓ OMNeT++ pre-built binaries found"
+    info "✓ OMNeT++ pre-built binaries found - no compilation needed"
   else
-    warn "Pre-built binaries not found. Building OMNeT++ from source (this may take several minutes)..."
+    info "Pre-built binaries not found. Building OMNeT++ from source (this may take several minutes)..."
     
     # OMNeT++ requires Python packages - install them in the project venv if it exists
     if [ -d "$REPO_ROOT/tf_env/bin" ]; then
