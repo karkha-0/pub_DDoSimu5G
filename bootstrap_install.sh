@@ -675,6 +675,22 @@ build_project(){
     warn "INET or Simu5G not found, using existing Makefile paths"
   fi
   
+  # Generate makefiles using opp_makemake
+  info "Generating project makefiles..."
+  if [ -f ".oppbuildspec" ]; then
+    info "Using .oppbuildspec configuration"
+    make makefiles || warn "Failed to generate makefiles from .oppbuildspec"
+  else
+    info "No .oppbuildspec found, running opp_makemake manually"
+    cd src
+    opp_makemake -f --deep -o ddosim5g -O out \
+      -KINET4_5_PROJ=../../inet4.5 \
+      -KSIMU5G_PROJ=../../Simu5G \
+      -DINET_IMPORT -I'$(INET4_5_PROJ)/src' -L'$(INET4_5_PROJ)/src' -lINET'$(D)' \
+      -I'$(SIMU5G_PROJ)/src' -L'$(SIMU5G_PROJ)/src' -lsimu5g'$(D)' || warn "opp_makemake failed"
+    cd ..
+  fi
+  
   make -j"$(nproc)" || warn "Project make failed"
   
   # Validate project build
