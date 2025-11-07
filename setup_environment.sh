@@ -296,6 +296,14 @@ build_inet() {
   
   cd "inet${INET_VERSION}"
   
+  # Source INET environment (sets inet_root variable)
+  if [ -f setenv ]; then
+    # shellcheck disable=SC1091
+    set +u
+    source setenv
+    set -u
+  fi
+  
   # Build
   info "Building INET (this may take 15-30 minutes)..."
   make makefiles || die "INET makefile generation failed"
@@ -335,6 +343,14 @@ build_simu5g() {
   git clone --depth 1 --branch "v${SIMU5G_VERSION}" "$SIMU5G_REPO" Simu5G || die "Failed to clone Simu5G"
   
   cd Simu5G
+  
+  # Source INET environment (needed for Simu5G build)
+  if [ -f "$inet_dir/setenv" ]; then
+    # shellcheck disable=SC1091
+    set +u
+    source "$inet_dir/setenv"
+    set -u
+  fi
   
   # Configure Makefile to point to INET
   info "Configuring Simu5G Makefile..."
