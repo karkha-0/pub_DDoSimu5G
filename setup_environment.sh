@@ -360,7 +360,21 @@ build_simu5g() {
   
   # Build
   info "Building Simu5G (this may take 10-20 minutes)..."
-  make makefiles || die "Simu5G makefile generation failed"
+  
+  # Try make makefiles first (uses .oppfeatures)
+  if ! make makefiles 2>/dev/null; then
+    warn "make makefiles failed, trying opp_makemake..."
+    # Fallback: use opp_makemake with explicit INET paths
+    cd src
+    opp_makemake --make-so --deep -o simu5g -O ../out \
+      -KINET_PROJ="$inet_dir" \
+      -DINET_IMPORT \
+      -I"$inet_dir/src" \
+      -L"$inet_dir/src" \
+      -lINET'$(D)' || die "opp_makemake failed"
+    cd ..
+  fi
+  
   make -j"$(nproc)" MODE=release || die "Simu5G build failed"
   
   info "✓ Simu5G ${SIMU5G_VERSION} built successfully"
