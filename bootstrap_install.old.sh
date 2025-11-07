@@ -219,12 +219,9 @@ install_omnetpp(){
       "$REPO_ROOT/tf_env/bin/python3" -m pip install -r ./python/requirements.txt || warn "Failed to install Python requirements"
     fi
     
-    # Create configure.user to configure features
-    info "Creating configure.user with required simulation features"
+    # Create configure.user to disable optional features
+    info "Creating configure.user to disable OpenSceneGraph and osgEarth (not needed for simulations)"
     cat > configure.user << 'EOF'
-# Enable NED file loading (required for running simulations)
-WITH_NETBUILDER=yes
-
 # Disable 3D visualization features (not needed for simulations)
 WITH_OSG=no
 WITH_OSGEARTH=no
@@ -641,7 +638,7 @@ build_project(){
   fi
   
   # Check if project is already built
-  if [ -f "$project_dir/src/libDDoSim5G.so" ] || [ -f "$project_dir/src/libddosim5g.so" ] || [ -f "$project_dir/out/gcc-release/src/libDDoSim5G.so" ]; then
+  if [ -f "$project_dir/src/ddosim5g" ] || [ -f "$project_dir/src/libddosim5g.so" ] || [ -f "$project_dir/out/gcc-release/src/ddosim5g" ]; then
     info "✓ Project already built (skipping)"
     return
   fi
@@ -677,11 +674,9 @@ build_project(){
   # Clean old build artifacts BEFORE generating new makefiles
   info "Cleaning old build artifacts..."
   rm -rf out/
-  # Clean only build artifacts, NOT source directories
   find . -name "*.o" -delete
-  find . -name "*.so" -not -path "*/src/ddosim5g/*" -delete
+  find . -name "*.so" -delete
   find . -name "*.a" -delete
-  find . -name "Makefile" -not -path "*/src/Makefile" -delete 2>/dev/null || true
   
   # Generate makefiles using opp_makemake
   info "Generating project makefiles..."
@@ -690,10 +685,8 @@ build_project(){
     make makefiles || warn "Failed to generate makefiles from .oppbuildspec"
   else
     info "No .oppbuildspec found, running opp_makemake manually"
-    # Run from src/ subdirectory since sources are under src/ddosim5g/
     cd src
-    # Build as a shared library, not an executable
-    opp_makemake -f --make-so --deep -o DDoSim5G -O ../out \
+    opp_makemake -f --deep -o ddosim5g -O out \
       -KINET4_5_PROJ=../../inet4.5 \
       -KSIMU5G_PROJ=../../Simu5G \
       -DINET_IMPORT -I'$(INET4_5_PROJ)/src' -L'$(INET4_5_PROJ)/src' -lINET'$(D)' \
@@ -707,23 +700,25 @@ build_project(){
   info "Validating pub_DDoSimu5G project build..."
   build_success=false
   
-  # Check for library in src/ or out/ directory
-  if [ -f "src/libDDoSim5G.so" ]; then
-    info "✓ Project library built: src/libDDoSim5G.so"
-    info "  - Size: $(ls -lh src/libDDoSim5G.so | awk '{print $5}')"
+  # Check for various possible build outputs
+  if [ -f "src/ddosim5g" ]; then
+    info "✓ Project executable built: src/ddosim5g"
+    info "  - Size: $(ls -lh src/ddosim5g | awk '{print $5}')"
     build_success=true
-  elif [ -f "out/gcc-release/src/libDDoSim5G.so" ]; then
-    info "✓ Project library built: out/gcc-release/src/libDDoSim5G.so"
-    info "  - Size: $(ls -lh out/gcc-release/src/libDDoSim5G.so | awk '{print $5}')"
-    build_success=true
-  elif [ -f "src/libddosim5g.so" ]; then
+  fi
+  
+  if [ -f "src/libddosim5g.so" ]; then
     info "✓ Project library built: src/libddosim5g.so"
     info "  - Size: $(ls -lh src/libddosim5g.so | awk '{print $5}')"
     build_success=true
-  elif [ -f "out/gcc-release/src/libddosim5g.so" ]; then
-    info "✓ Project library built: out/gcc-release/src/libddosim5g.so"
-    info "  - Size: $(ls -lh out/gcc-release/src/libddosim5g.so | awk '{print $5}')"
-    build_success=true
+  fi
+  
+  if [ -d "out/gcc-release/src" ]; then
+    exe_count=$(find out/gcc-release/src -type f -executable 2>/dev/null | wc -l)
+    if [ "$exe_count" -gt 0 ]; then
+      info "✓ Build artifacts in out/gcc-release/src ($exe_count executables)"
+      build_success=true
+    fi
   fi
   
   # Check for NED and .msg files
@@ -733,8 +728,7 @@ build_project(){
   info "  - MSG files: $msg_count"
   
   if [ "$build_success" = false ]; then
-    warn "✗ Project build verification failed - no library found"
-    info "Expected library: src/libDDoSim5G.so or out/gcc-release/src/libDDoSim5G.so"
+    warn "✗ Project build verification failed - no executables or libraries found"
   fi
   
   popd >/dev/null
@@ -932,33 +926,31 @@ main(){
 
   # Copy pub_DDoSimu5G project into samples/DDoSimu5G
   info "Setting up DDoSimu5G project in $WORKDIR/DDoSimu5G"
-  # Always refresh the copy to ensure latest changes are included
-  if [ -d "$WORKDIR/DDoSimu5G" ]; then
-    info "Removing existing DDoSimu5G directory to refresh copy"
-    rm -rf "$WORKDIR/DDoSimu5G"
+  if [ ! -d "$WORKDIR/DDoSimu5G" ]; then
+    mkdir -p "$WORKDIR/DDoSimu5G"
+    info "Copying project files from $REPO_ROOT to $WORKDIR/DDoSimu5G"
+    # Copy everything EXCEPT:
+    # - Installation artifacts (omnetpp-*, tf_env)
+    # - Bootstrap/config files (bootstrap_install.sh, deps.json, BOOTSTRAP.md)
+    # - Documentation that stays in repo root (README.md, project_packages.txt, repo_structure.txt)
+    # - Profiling data (perf.data)
+    # - Git metadata (.git)
+    rsync -av \
+      --exclude='omnetpp-*/' \
+      --exclude='tf_env/' \
+      --exclude='.git/' \
+      --exclude='bootstrap_install.sh' \
+      --exclude='deps.json' \
+      --exclude='BOOTSTRAP.md' \
+      --exclude='README.md' \
+      --exclude='project_packages.txt' \
+      --exclude='repo_structure.txt' \
+      --exclude='perf.data' \
+      "$REPO_ROOT/" "$WORKDIR/DDoSimu5G/" >/dev/null
+    info "✓ DDoSimu5G project copied to samples directory"
+  else
+    info "✓ DDoSimu5G already exists at $WORKDIR/DDoSimu5G"
   fi
-  
-  mkdir -p "$WORKDIR/DDoSimu5G"
-  info "Copying project files from $REPO_ROOT to $WORKDIR/DDoSimu5G"
-  # Copy everything EXCEPT:
-  # - Installation artifacts (omnetpp-*, tf_env)
-  # - Bootstrap/config files (bootstrap_install.sh, deps.json, BOOTSTRAP.md)
-  # - Documentation that stays in repo root (README.md, project_packages.txt, repo_structure.txt)
-  # - Profiling data (perf.data)
-  # - Git metadata (.git)
-  rsync -av \
-    --exclude='omnetpp-*/' \
-    --exclude='tf_env/' \
-    --exclude='.git/' \
-    --exclude='bootstrap_install.sh' \
-    --exclude='deps.json' \
-    --exclude='BOOTSTRAP.md' \
-    --exclude='README.md' \
-    --exclude='project_packages.txt' \
-    --exclude='repo_structure.txt' \
-    --exclude='perf.data' \
-    "$REPO_ROOT/" "$WORKDIR/DDoSimu5G/" >/dev/null
-  info "✓ DDoSimu5G project copied to samples directory"
 
   # Apply project-specific modifications BEFORE building
   info "Applying project-specific modifications to INET and Simu5G"
@@ -1048,37 +1040,31 @@ main(){
     warn "✗ Simu5G build incomplete or failed"
   fi
   
-  # Check Project (built in samples directory)
+  # Check Project
   project_built=false
-  if [ -f "$WORKDIR/DDoSimu5G/src/libDDoSim5G.so" ]; then
+  if [ -f "$REPO_ROOT/src/ddosim5g" ] || [ -f "$REPO_ROOT/src/libddosim5g.so" ]; then
     info "✓ pub_DDoSimu5G Project: Built successfully"
-    lib_size=$(ls -lh "$WORKDIR/DDoSimu5G/src/libDDoSim5G.so" 2>/dev/null | awk '{print $5}')
-    info "  - Library: $WORKDIR/DDoSimu5G/src/libDDoSim5G.so ($lib_size)"
     project_built=true
-  elif [ -f "$WORKDIR/DDoSimu5G/src/libddosim5g.so" ]; then
-    info "✓ pub_DDoSimu5G Project: Built successfully"
-    lib_size=$(ls -lh "$WORKDIR/DDoSimu5G/src/libddosim5g.so" 2>/dev/null | awk '{print $5}')
-    info "  - Library: $WORKDIR/DDoSimu5G/src/libddosim5g.so ($lib_size)"
-    project_built=true
-  elif [ -f "$WORKDIR/DDoSimu5G/out/gcc-release/src/libDDoSim5G.so" ]; then
-    info "✓ pub_DDoSimu5G Project: Built successfully"
-    lib_size=$(ls -lh "$WORKDIR/DDoSimu5G/out/gcc-release/src/libDDoSim5G.so" 2>/dev/null | awk '{print $5}')
-    info "  - Library: out/gcc-release/src/libDDoSim5G.so ($lib_size)"
-    project_built=true
+  elif [ -d "$REPO_ROOT/out/gcc-release/src" ]; then
+    exe_count=$(find "$REPO_ROOT/out/gcc-release/src" -type f -executable 2>/dev/null | wc -l)
+    if [ "$exe_count" -gt 0 ]; then
+      info "✓ pub_DDoSimu5G Project: Built successfully"
+      info "  - Build artifacts: $exe_count executables"
+      project_built=true
+    fi
   fi
   
   if [ "$project_built" = false ]; then
     warn "✗ pub_DDoSimu5G Project build incomplete or failed"
   fi
   
-  # Check ONE Simulator (looks for compiled .class files, not JAR)
-  if [ -d "$REPO_ROOT/ONE_Simulator/the-one-1.6.0/core" ]; then
-    class_count=$(find "$REPO_ROOT/ONE_Simulator/the-one-1.6.0" -name "*.class" 2>/dev/null | wc -l)
-    if [ "$class_count" -gt 0 ]; then
-      info "✓ ONE Simulator: Compiled ($class_count .class files)"
-    else
-      info "⚠ ONE Simulator: Source present but not compiled"
-    fi
+  # Check ONE Simulator
+  if [ -f "$REPO_ROOT/ONE_Simulator/the-one-1.6.0/one.jar" ]; then
+    info "✓ ONE Simulator: Compiled"
+    jar_size=$(ls -lh "$REPO_ROOT/ONE_Simulator/the-one-1.6.0/one.jar" | awk '{print $5}')
+    info "  - JAR size: $jar_size"
+  elif [ -d "$REPO_ROOT/ONE_Simulator/the-one-1.6.0" ]; then
+    info "⚠ ONE Simulator: Source present but JAR not built"
   fi
   
   info "=========================================="
