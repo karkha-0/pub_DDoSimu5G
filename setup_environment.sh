@@ -233,15 +233,15 @@ install_omnetpp() {
   source "$INSTALL_DIR/venv/bin/activate"
   
   # Install Python requirements
-  if [ -f ./python/requirements.txt ]; then
-    info "Installing OMNeT++ Python requirements..."
-    pip install -q -r ./python/requirements.txt || warn "Failed to install some Python requirements"
-  fi
+  info "Installing Python packages for OMNeT++..."
   
-  # Check for posix_ipc (required by OMNeT++)
-  if ! python3 -c "import posix_ipc" 2>/dev/null; then
-    info "Installing posix_ipc..."
-    pip install -q posix_ipc || warn "Failed to install posix_ipc"
+  # Install packages required by OMNeT++ IDE and analysis tools
+  pip install -q --upgrade pip wheel setuptools
+  pip install -q numpy scipy pandas matplotlib posix_ipc || warn "Failed to install some Python packages"
+  
+  # Install additional requirements if file exists
+  if [ -f ./python/requirements.txt ]; then
+    pip install -q -r ./python/requirements.txt || warn "Failed to install additional Python requirements"
   fi
   
   # Configure
