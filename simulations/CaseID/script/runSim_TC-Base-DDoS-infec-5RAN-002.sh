@@ -16,6 +16,10 @@ else
     exit 1
 fi
 
+# Set library paths for INET and Simu5G
+samples_dir="../../../../"
+export LD_LIBRARY_PATH="$samples_dir/inet4.5/src:$samples_dir/Simu5G/src:$LD_LIBRARY_PATH"
+
 # Ask user for DDoS flag (0 = disabled, 1 = enabled)
 read -p "Enable DDoS traffic? Enter 0 (false) or 1 (true): " DDOS_FLAG
 
