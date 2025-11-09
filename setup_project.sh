@@ -66,7 +66,7 @@ EOF
 while [[ $# -gt 0 ]]; do
   case $1 in
     --omnet-dir)
-      OMNET_DIR="$2"
+      OMNET_DIR="${2%/}"  # Remove trailing slash
       shift 2
       ;;
     --repo-url)

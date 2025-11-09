@@ -68,7 +68,7 @@ EOF
 while [[ $# -gt 0 ]]; do
   case $1 in
     --install-dir)
-      INSTALL_DIR="$2"
+      INSTALL_DIR="${2%/}"  # Remove trailing slash
       shift 2
       ;;
     --skip-packages)

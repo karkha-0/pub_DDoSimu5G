@@ -175,7 +175,8 @@ main() {
   # Determine OMNeT++ directory for project setup
   local omnet_dir
   if [ -n "$INSTALL_DIR" ]; then
-    omnet_dir="$INSTALL_DIR/omnetpp-6.0.1"
+    # Remove trailing slash from INSTALL_DIR
+    omnet_dir="${INSTALL_DIR%/}/omnetpp-6.0.1"
   else
     omnet_dir="$(pwd)/omnetpp-6.0.1"
   fi
