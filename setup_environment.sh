@@ -15,7 +15,7 @@ NC='\033[0m' # No Color
 
 # Configuration - Hardcoded stable versions
 OMNET_VERSION="6.0.1"
-INET_VERSION="4.5.0"
+INET_VERSION="4.4.1"  # INET 4.5.0 has incompatible API changes with Simu5G 1.2.2
 SIMU5G_VERSION="1.2.2"
 
 OMNET_URL="https://github.com/omnetpp/omnetpp/releases/download/omnetpp-${OMNET_VERSION}/omnetpp-${OMNET_VERSION}-linux-x86_64.tgz"
@@ -344,12 +344,25 @@ build_simu5g() {
   
   cd Simu5G
   
+  # CRITICAL: Set INET_ROOT environment variable (required by Simu5G makefiles)
+  export INET_ROOT="$inet_dir"
+  info "Set INET_ROOT=$INET_ROOT"
+  
   # Source INET environment (needed for Simu5G build)
   if [ -f "$inet_dir/setenv" ]; then
     # shellcheck disable=SC1091
     set +u
-    source "$inet_dir/setenv"
+    cd "$inet_dir"
+    source setenv
+    cd "$simu5g_dir"
     set -u
+    info "✓ INET environment sourced"
+  fi
+  
+  # Configure Simu5G features to use INET
+  if [ ! -f ".oppfeaturestate" ]; then
+    info "Configuring Simu5G features..."
+    opp_featuretool enable VoIPStream 2>/dev/null || true
   fi
   
   # Configure Makefile to point to INET
