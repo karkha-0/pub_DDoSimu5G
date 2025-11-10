@@ -350,13 +350,26 @@ build_simu5g() {
   
   # Source INET environment (needed for Simu5G build)
   if [ -f "$inet_dir/setenv" ]; then
+    info "Sourcing INET environment from $inet_dir/setenv"
     # shellcheck disable=SC1091
     set +u
-    cd "$inet_dir"
-    source setenv
-    cd "$simu5g_dir"
+    pushd "$inet_dir" >/dev/null
+    . setenv -f 2>/dev/null || source setenv 2>/dev/null || warn "INET setenv failed (non-fatal)"
+    popd >/dev/null
     set -u
-    info "✓ INET environment sourced"
+    info "✓ INET environment sourced (INET_ROOT: ${INET_ROOT})"
+  else
+    warn "INET setenv not found at $inet_dir/setenv"
+  fi
+  
+  # Source Simu5G setenv if it exists
+  if [ -f "setenv" ]; then
+    info "Sourcing Simu5G environment"
+    # shellcheck disable=SC1091
+    set +u
+    . setenv -f 2>/dev/null || source setenv 2>/dev/null || warn "Simu5G setenv failed (non-fatal)"
+    set -u
+    info "✓ Simu5G environment sourced"
   fi
   
   # Configure Simu5G features to use INET
