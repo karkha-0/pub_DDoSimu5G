@@ -15,7 +15,8 @@ NC='\033[0m' # No Color
 
 # Configuration - Hardcoded stable versions
 OMNET_VERSION="6.0.1"
-INET_VERSION="4.4.1"  # INET 4.5.0 has incompatible API changes with Simu5G 1.2.2
+INET_VERSION="4.5.0"
+INET_DIR_NAME="inet4.5"  # Directory name (without patch version)
 SIMU5G_VERSION="1.2.2"
 
 OMNET_URL="https://github.com/omnetpp/omnetpp/releases/download/omnetpp-${OMNET_VERSION}/omnetpp-${OMNET_VERSION}-linux-x86_64.tgz"
@@ -269,7 +270,7 @@ EOF
 build_inet() {
   info "Setting up INET ${INET_VERSION}..."
   
-  local inet_dir="$OMNET_DIR/samples/inet${INET_VERSION}"
+  local inet_dir="$OMNET_DIR/samples/$INET_DIR_NAME"
   
   if [ -d "$inet_dir" ] && [ "$FORCE" != true ]; then
     info "✓ INET already exists at $inet_dir (use --force to reinstall)"
@@ -292,9 +293,9 @@ build_inet() {
   
   # Clone
   info "Cloning INET ${INET_VERSION}..."
-  git clone --depth 1 --branch "v${INET_VERSION}" "$INET_REPO" "inet${INET_VERSION}" || die "Failed to clone INET"
+  git clone --depth 1 --branch "v${INET_VERSION}" "$INET_REPO" "$INET_DIR_NAME" || die "Failed to clone INET"
   
-  cd "inet${INET_VERSION}"
+  cd "$INET_DIR_NAME"
   
   # Source INET environment (sets inet_root variable)
   if [ -f setenv ]; then
