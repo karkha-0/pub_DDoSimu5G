@@ -1,4 +1,4 @@
-#!/bin/bash
+./setup.sh --install-dir test_full_install/#!/bin/bash
 # setup.sh
 # Master setup script for pub_DDoSimu5G
 # Runs both environment and project setup
@@ -175,8 +175,10 @@ main() {
   # Determine OMNeT++ directory for project setup
   local omnet_dir
   if [ -n "$INSTALL_DIR" ]; then
-    # Remove trailing slash from INSTALL_DIR
-    omnet_dir="${INSTALL_DIR%/}/omnetpp-6.0.1"
+    # Convert to absolute path and remove trailing slash
+    local abs_install_dir
+    abs_install_dir="$(cd "$INSTALL_DIR" 2>/dev/null && pwd)" || abs_install_dir="$(mkdir -p "$INSTALL_DIR" && cd "$INSTALL_DIR" && pwd)"
+    omnet_dir="${abs_install_dir}/omnetpp-6.0.1"
   else
     omnet_dir="$(pwd)/omnetpp-6.0.1"
   fi

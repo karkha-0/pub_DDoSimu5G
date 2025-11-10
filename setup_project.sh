@@ -167,19 +167,27 @@ check_env_compatibility() {
   info "  - Simu5G: $simu5g_ver"
   
   # Check if versions match requirements (basic check)
+  local version_ok=true
   if [ "$omnet_ver" != "6.0.1" ]; then
     warn "OMNeT++ version mismatch: expected 6.0.1, found $omnet_ver"
+    version_ok=false
   fi
   
   if [ "$inet_ver" != "4.5.0" ]; then
     warn "INET version mismatch: expected 4.5.0, found $inet_ver"
+    version_ok=false
   fi
   
   if [ "$simu5g_ver" != "1.2.2" ]; then
     warn "Simu5G version mismatch: expected 1.2.2, found $simu5g_ver"
+    version_ok=false
   fi
   
-  info "✓ Environment compatibility check passed"
+  if [ "$version_ok" = true ]; then
+    info "✓ Environment compatibility check passed"
+  else
+    warn "Version mismatches detected - proceeding with caution"
+  fi
 }
 
 # Clone project
@@ -198,8 +206,9 @@ clone_project() {
     rm -rf "$project_dir"
   fi
   
-  mkdir -p "$OMNET_DIR/samples"
-  cd "$OMNET_DIR/samples"
+  # Ensure samples directory exists and navigate to it
+  mkdir -p "$OMNET_DIR/samples" || die "Failed to create samples directory"
+  cd "$OMNET_DIR/samples" || die "Failed to navigate to samples directory"
   
   info "Cloning project from: $PROJECT_REPO_URL"
   git clone --branch "$PROJECT_BRANCH" "$PROJECT_REPO_URL" DDoSimu5G || die "Failed to clone project"
@@ -221,6 +230,7 @@ apply_modifications() {
     return
   fi
   
+  # CRITICAL: Use inet4.5 directory name to match setup_environment.sh convention
   local inet_target="$OMNET_DIR/samples/inet4.5"
   local simu5g_target="$OMNET_DIR/samples/Simu5G"
   

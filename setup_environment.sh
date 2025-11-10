@@ -16,6 +16,9 @@ NC='\033[0m' # No Color
 # Configuration - Hardcoded stable versions
 OMNET_VERSION="6.0.1"
 INET_VERSION="4.5.0"
+# CRITICAL: INET directory MUST be "inet4.5" (not "inet4.5.0") to match bootstrap convention
+# Simu5G makefiles and relative paths expect "../inet4.5" hardcoded
+# Changing this will break Simu5G compilation with "cannot resolve import" errors
 INET_DIR_NAME="inet4.5"  # Directory name (without patch version)
 SIMU5G_VERSION="1.2.2"
 
