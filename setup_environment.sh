@@ -426,7 +426,7 @@ write_env_info() {
   },
   "paths": {
     "omnetpp": "${OMNET_DIR}",
-    "inet": "${OMNET_DIR}/samples/inet${INET_VERSION}",
+    "inet": "${OMNET_DIR}/samples/${INET_DIR_NAME}",
     "simu5g": "${OMNET_DIR}/samples/Simu5G"
   }
 }
