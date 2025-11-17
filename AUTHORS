@@ -1,0 +1,30 @@
+# DDoSimu5G Authors and Contributors
+
+## Principal Authors
+<!-- Add principal authors here -->
+
+## Contributors
+<!-- Add contributors here -->
+
+## Citation
+If you use DDoSimu5G in your research, please cite our work:
+
+```bibtex
+@article{ddosimu5g,
+  title={DDoSimu5G: A DDoS Attack Simulation Framework for 5G Networks},
+  author={[Authors to be added]},
+  journal={[Journal to be added]},
+  year={2025},
+  publisher={[Publisher to be added]}
+}
+```
+
+## Related Publications
+<!-- Add related publications here -->
+
+## Acknowledgments
+This project builds upon:
+- OMNeT++ discrete event simulator
+- INET Framework
+- Simu5G - 5G NR and LTE/LTE-A user-plane simulation model
+- The ONE Simulator for mobility trace generation
