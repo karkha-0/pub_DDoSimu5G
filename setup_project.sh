@@ -241,8 +241,8 @@ clone_project() {
     
     if [ -d "$local_source/src" ]; then
       info "Found local DDoSimu5G source (from release download)"
-      info "Copying to: $project_dir"
-      cp -r "$local_source" "$project_dir" || die "Failed to copy local source"
+      info "Moving to: $project_dir"
+      mv "$local_source" "$project_dir" || die "Failed to move local source"
       info "✓ Project installed from local source (offline-capable)"
       return 1  # Return 1 to indicate fresh install (need to build)
     fi
