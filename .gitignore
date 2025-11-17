@@ -1,27 +1,58 @@
-/out/
+# OMNeT++ IDE files
 .cproject
-.git
-.gitignore.swp
-.settings
-/results/
-.oppbuildspec
-HelloWorldSim
-HelloWorldSim_dbg
 .project
-/Simulations/results/
-/dataset/
-.pydevproject
-/dataset/
-.cmdenv-log
+.settings
+.oppbuildspec
 .oppfeaturestate
 .qtenvrc
-perf.data
-Makefile*
-/ONE_Simulator/the-one-1.6.0/reports/
-/sim_dataset/
-**/*.class
-simulations/CaseID/script/simRun_logs/
-ONE_Simulator/the-one-1.6.0/*.log
-**/*.class
-ONE_Simulator/the-one-1.6.0/sim_Scenario/plotting_results_MalwareInfection/infection_prop
+
+# Build artifacts
+/out/
+*.o
+*.so
+*.a
+*.dylib
+*.dll
+*.exe
+Makefile
+Makefile.*
+!Makefile.vc
+*_m.cc
+*_m.h
+*_sm.cc
+*_sm.h
+
+# Executables (both old and new names)
+/DDoSim5G
+/DDoSimu5G
+DDoSim5G_dbg
+DDoSimu5G_dbg
+HelloWorldSim
+HelloWorldSim_dbg
+
+# Simulation results and logs
+/results/
+/Simulations/results/
 simulations/CaseID/Test-cases-001/results/
+simulations/CaseID/script/simRun_logs/
+.cmdenv-log
+
+# Dataset and reports
+/dataset/
+/sim_dataset/
+/ONE_Simulator/the-one-1.6.0/reports/
+ONE_Simulator/the-one-1.6.0/sim_Scenario/plotting_results_MalwareInfection/infection_prop
+
+# Python
+**/*.class
+.pydevproject
+__pycache__/
+*.pyc
+
+# ONE Simulator logs
+ONE_Simulator/the-one-1.6.0/*.log
+
+# System files
+.git
+.gitignore.swp
+perf.data
