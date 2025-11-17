@@ -195,6 +195,20 @@ check_env_compatibility() {
   fi
 }
 
+# Detect project source directory structure
+# Returns the path to actual project source (handles both old flat and new DDoSimu5G/ subdirectory structure)
+get_project_source_dir() {
+  local project_dir="$OMNET_DIR/samples/DDoSimu5G"
+  
+  # Check if using new structure (DDoSimu5G/ subdirectory in cloned repo)
+  if [ -d "$project_dir/DDoSimu5G/src" ]; then
+    echo "$project_dir/DDoSimu5G"
+  else
+    # Legacy flat structure
+    echo "$project_dir"
+  fi
+}
+
 # Clone project
 clone_project() {
   info "Setting up pub_DDoSimu5G project..."
@@ -216,7 +230,17 @@ clone_project() {
   cd "$OMNET_DIR/samples" || die "Failed to navigate to samples directory"
   
   info "Cloning project from: $PROJECT_REPO_URL"
-  git clone --branch "$PROJECT_BRANCH" "$PROJECT_REPO_URL" DDoSimu5G || die "Failed to clone project"
+  git clone --branch "$PROJECT_BRANCH" "$PROJECT_REPO_URL" DDoSimu5G_temp || die "Failed to clone project"
+  
+  # Detect repository structure and copy accordingly
+  if [ -d "DDoSimu5G_temp/DDoSimu5G" ]; then
+    info "Detected new repository structure (DDoSimu5G/ subdirectory)"
+    mv "DDoSimu5G_temp/DDoSimu5G" "DDoSimu5G"
+    rm -rf "DDoSimu5G_temp"
+  else
+    info "Detected legacy repository structure (flat)"
+    mv "DDoSimu5G_temp" "DDoSimu5G"
+  fi
   
   info "✓ Project cloned to $project_dir"
   
@@ -228,7 +252,8 @@ apply_modifications() {
   info "Applying modifications to INET and Simu5G..."
   
   local project_dir="$OMNET_DIR/samples/DDoSimu5G"
-  local modified_source="$project_dir/modifiedExternalFiles"
+  local project_source_dir="$(get_project_source_dir)"
+  local modified_source="$project_source_dir/modifiedExternalFiles"
   
   if [ ! -d "$modified_source" ]; then
     warn "No modifications directory found at $modified_source"
@@ -303,12 +328,13 @@ build_project() {
   info "Building pub_DDoSimu5G project..."
   
   local project_dir="$OMNET_DIR/samples/DDoSimu5G"
+  local project_source_dir="$(get_project_source_dir)"
   
-  if [ ! -d "$project_dir" ]; then
-    die "Project directory not found: $project_dir"
+  if [ ! -d "$project_source_dir" ]; then
+    die "Project source directory not found: $project_source_dir"
   fi
   
-  cd "$project_dir"
+  cd "$project_source_dir"
   
   # Source OMNeT++ environment
   # shellcheck disable=SC1091
@@ -363,8 +389,8 @@ setup_one() {
   
   info "Setting up ONE Simulator..."
   
-  local project_dir="$OMNET_DIR/samples/DDoSimu5G"
-  local one_dir="$project_dir/ONE_Simulator/the-one-1.6.0"
+  local project_source_dir="$(get_project_source_dir)"
+  local one_dir="$project_source_dir/ONE_Simulator/the-one-1.6.0"
   
   if [ ! -d "$one_dir" ]; then
     warn "ONE Simulator source not found at $one_dir"
