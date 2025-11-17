@@ -157,9 +157,10 @@ check_env_compatibility() {
   local inet_ver
   local simu5g_ver
   
-  omnet_ver=$(grep -o '"omnetpp": *"[^"]*"' "$env_info_file" | sed 's/"omnetpp": *"\([^"]*\)"/\1/' | tr -d '\n\r' | xargs)
-  inet_ver=$(grep -o '"inet": *"[^"]*"' "$env_info_file" | sed 's/"inet": *"\([^"]*\)"/\1/' | tr -d '\n\r' | xargs)
-  simu5g_ver=$(grep -o '"simu5g": *"[^"]*"' "$env_info_file" | sed 's/"simu5g": *"\([^"]*\)"/\1/' | tr -d '\n\r' | xargs)
+  # Extract only from "versions" section, not "paths" section
+  omnet_ver=$(grep -A 5 '"versions"' "$env_info_file" | grep -o '"omnetpp": *"[^"]*"' | sed 's/"omnetpp": *"\([^"]*\)"/\1/' | tr -d '\n\r' | xargs)
+  inet_ver=$(grep -A 5 '"versions"' "$env_info_file" | grep -o '"inet": *"[^"]*"' | sed 's/"inet": *"\([^"]*\)"/\1/' | tr -d '\n\r' | xargs)
+  simu5g_ver=$(grep -A 5 '"versions"' "$env_info_file" | grep -o '"simu5g": *"[^"]*"' | sed 's/"simu5g": *"\([^"]*\)"/\1/' | tr -d '\n\r' | xargs)
   
   info "Detected environment versions:"
   info "  - OMNeT++: $omnet_ver"
