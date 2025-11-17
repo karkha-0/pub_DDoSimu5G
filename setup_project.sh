@@ -20,6 +20,7 @@ PROJECT_BRANCH="main"
 OMNET_DIR=""
 WITH_ONE=true  # Install ONE Simulator by default
 FORCE=false
+USE_LOCAL_SOURCE=true  # Use local DDoSimu5G/ if available (disabled when --repo-url specified)
 
 # Logging functions
 info() { echo -e "${GREEN}[INFO]${NC} $*"; }
@@ -35,7 +36,7 @@ Sets up pub_DDoSimu5G project in an existing OMNeT++ environment
 
 OPTIONS:
   --omnet-dir DIR      OMNeT++ installation directory (auto-detected if not specified)
-  --repo-url URL       Custom repository URL (default: $DEFAULT_REPO_URL)
+  --repo-url URL       Custom repository URL (forces git clone, ignores local source)
   --branch BRANCH      Git branch to checkout (default: main)
   --with-one           Install ONE Simulator (default: enabled)
   --without-one        Skip ONE Simulator installation
@@ -43,14 +44,17 @@ OPTIONS:
   -h, --help           Show this help message
 
 EXAMPLES:
-  # Auto-detect OMNeT++ and install with defaults
+  # Auto-detect OMNeT++ and use local source if available
   $0
 
-  # Specify OMNeT++ location
+  # Specify OMNeT++ location (still uses local source if available)
   $0 --omnet-dir ~/simulation/omnetpp-6.0.1
 
-  # Use custom repository
+  # Force clone from specific repository (ignores local source)
   $0 --repo-url https://github.com/myuser/my-fork.git
+
+  # Clone from specific branch
+  $0 --repo-url https://github.com/karkha-0/pub_DDoSimu5G.git --branch dev
 
   # Skip ONE Simulator
   $0 --without-one
@@ -71,6 +75,7 @@ while [[ $# -gt 0 ]]; do
       ;;
     --repo-url)
       PROJECT_REPO_URL="$2"
+      USE_LOCAL_SOURCE=false  # Disable local source when explicit repo specified
       shift 2
       ;;
     --branch)
@@ -225,11 +230,29 @@ clone_project() {
     rm -rf "$project_dir"
   fi
   
-  # Ensure samples directory exists and navigate to it
+  # Ensure samples directory exists
   mkdir -p "$OMNET_DIR/samples" || die "Failed to create samples directory"
+  
+  # Check for local DDoSimu5G/ directory (from GitHub release download)
+  # Only use if --repo-url was NOT specified (i.e., USE_LOCAL_SOURCE=true)
+  if [ "$USE_LOCAL_SOURCE" = true ]; then
+    local script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+    local local_source="$script_dir/DDoSimu5G"
+    
+    if [ -d "$local_source/src" ]; then
+      info "Found local DDoSimu5G source (from release download)"
+      info "Copying to: $project_dir"
+      cp -r "$local_source" "$project_dir" || die "Failed to copy local source"
+      info "✓ Project installed from local source (offline-capable)"
+      return 1  # Return 1 to indicate fresh install (need to build)
+    fi
+  fi
+  
+  # No local source or --repo-url specified: clone from repository
   cd "$OMNET_DIR/samples" || die "Failed to navigate to samples directory"
   
   info "Cloning project from: $PROJECT_REPO_URL"
+  info "Branch: $PROJECT_BRANCH"
   git clone --branch "$PROJECT_BRANCH" "$PROJECT_REPO_URL" DDoSimu5G_temp || die "Failed to clone project"
   
   # Detect repository structure and copy accordingly
