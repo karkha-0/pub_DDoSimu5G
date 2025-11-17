@@ -312,7 +312,7 @@ build_project() {
   set -u
   
   # Check if already built
-  if [ -f "src/libDDoSim5G.so" ] && [ "$FORCE" != true ]; then
+  if [ -f "src/libDDoSimu5G.so" ] && [ "$FORCE" != true ]; then
     info "✓ Project already built (use --force to rebuild)"
     return
   fi
@@ -326,7 +326,7 @@ build_project() {
   # Generate makefiles
   info "Generating project makefiles..."
   cd src
-  opp_makemake -f --make-so --deep -o DDoSim5G -O ../out \
+  opp_makemake -f --make-so --deep -o DDoSimu5G -O ../out \
     -KINET4_5_PROJ=../../inet4.5 \
     -KSIMU5G_PROJ=../../Simu5G \
     -DINET_IMPORT \
@@ -340,10 +340,10 @@ build_project() {
   make -j"$(nproc)" MODE=release || die "Project build failed"
   
   # Verify build
-  if [ -f "src/libDDoSim5G.so" ]; then
+  if [ -f "src/libDDoSimu5G.so" ]; then
     local size
-    size=$(ls -lh src/libDDoSim5G.so | awk '{print $5}')
-    info "✓ Project library built: src/libDDoSim5G.so ($size)"
+    size=$(ls -lh src/libDDoSimu5G.so | awk '{print $5}')
+    info "✓ Project library built: src/libDDoSimu5G.so ($size)"
   else
     die "Build succeeded but library not found"
   fi

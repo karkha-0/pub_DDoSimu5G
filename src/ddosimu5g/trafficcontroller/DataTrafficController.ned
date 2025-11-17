@@ -1,4 +1,4 @@
-package ddosim5g.trafficcontroller;
+package ddosimu5g.trafficcontroller;
 
 simple DataTrafficController {
     parameters:

@@ -67,7 +67,7 @@
 │       │   └── the-one-1.6.0
 │       │       └── sim_Scenario
 │       └── src
-│           └── ddosim5g
+│           └── ddosimu5g
 │               ├── apps
 │               ├── simcommands
 │               └── trafficcontroller
@@ -91,7 +91,7 @@
 │       └── Test-cases-001
 │           └── results
 └── src
-    └── ddosim5g
+    └── ddosimu5g
         ├── apps
         ├── simcommands
         └── trafficcontroller

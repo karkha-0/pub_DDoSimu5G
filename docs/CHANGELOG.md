@@ -146,7 +146,7 @@ All component versions are now explicitly defined in `env-requirements.json`:
 - OMNeT++: Built with Qtenv, OSG, and network builder support
 - INET: Built in release mode for optimal performance
 - Simu5G: Built with INET integration and 5G NR features
-- Project: Built as shared library (`libDDoSim5G.so`)
+- Project: Built as shared library (`libDDoSimu5G.so`)
 - Python: Virtual environment with `posix_ipc` for IPC operations
 
 #### Installation Phases

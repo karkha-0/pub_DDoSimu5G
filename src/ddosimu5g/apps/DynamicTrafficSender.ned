@@ -1,10 +1,11 @@
-package ddosim5g.apps;
+package ddosimu5g.apps;
 
 import inet.applications.contract.IApp;
 
-simple DynamicTrafficReceiver like IApp {
+simple DynamicTrafficSender like IApp {
     
     gates:
         output socketOut;
         input socketIn;
+    
 }

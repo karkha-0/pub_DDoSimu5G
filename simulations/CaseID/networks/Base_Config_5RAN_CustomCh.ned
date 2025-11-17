@@ -13,7 +13,7 @@ import inet.networklayer.ipv4.RoutingTableRecorder;
 import inet.node.ethernet.Eth10G;
 import ned.DatarateChannel;
 import simu5g.apps.cbr.CbrSender;
-import ddosim5g.trafficcontroller.DataTrafficController;
+import ddosimu5g.trafficcontroller.DataTrafficController;
 
 //import inet.visualizer.common.IntegratedVisualizer;
 

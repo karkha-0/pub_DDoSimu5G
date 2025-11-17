@@ -12,7 +12,7 @@ import simu5g.nodes.Upf;
 import inet.networklayer.ipv4.RoutingTableRecorder;
 import inet.node.ethernet.Eth10G;
 import ned.DatarateChannel;
-import ddosim5g.simcommands.PostSimulationCommand;
+import ddosimu5g.simcommands.PostSimulationCommand;
 
 network Base_Config_1RAN
 {

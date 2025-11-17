@@ -1,4 +1,4 @@
-package ddosim5g.simcommands;
+package ddosimu5g.simcommands;
 
 simple PostSimulationCommand {
     parameters:

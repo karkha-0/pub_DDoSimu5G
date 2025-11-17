@@ -67,7 +67,7 @@ samples_dir="../../../../"
 # Start the timer
 START_TIME=$(date +%s)
 
-#opp_run -r 0 -c TC-Base-DDoS-infec-5RAN-002 -n $PROJECT_ROOT_DIR/simulations/CaseID/networks/:$PROJECT_ROOT_DIR/src/:$samples_dir/inet4.5/src:$samples_dir/Simu5G-1.2.2/src -l $samples_dir/inet4.5/src/libINET.so -l $samples_dir/Simu5G-1.2.2/src/libsimu5g.so -l $PROJECT_ROOT_DIR/src/libDDoSim5G.so -u Cmdenv -f  ../Test-cases-001/TC-Base-DDoS-infec-5RAN-002.ini -s --cmdenv-redirect-output=true > "$LOG_FILE" 2>&1
+#opp_run -r 0 -c TC-Base-DDoS-infec-5RAN-002 -n $PROJECT_ROOT_DIR/simulations/CaseID/networks/:$PROJECT_ROOT_DIR/src/:$samples_dir/inet4.5/src:$samples_dir/Simu5G-1.2.2/src -l $samples_dir/inet4.5/src/libINET.so -l $samples_dir/Simu5G-1.2.2/src/libsimu5g.so -l $PROJECT_ROOT_DIR/src/libDDoSimu5G.so -u Cmdenv -f  ../Test-cases-001/TC-Base-DDoS-infec-5RAN-002.ini -s --cmdenv-redirect-output=true > "$LOG_FILE" 2>&1
 
 # Run simulation with selected repetition and optional parameter override
   #-c TC-Base-DDoS-infec-5RAN-002 \
@@ -77,7 +77,7 @@ opp_run -r $DDOS_FLAG \
   -n $PROJECT_ROOT_DIR/simulations/CaseID/networks/:$PROJECT_ROOT_DIR/src/:$samples_dir/inet4.5/src:$samples_dir/Simu5G-1.2.2/src \
   -l $samples_dir/inet4.5/src/libINET.so \
   -l $samples_dir/Simu5G-1.2.2/src/libsimu5g.so \
-  -l $PROJECT_ROOT_DIR/src/libDDoSim5G.so \
+  -l $PROJECT_ROOT_DIR/src/libDDoSimu5G.so \
   -u Cmdenv \
   -f ../Test-cases-001/TC-flood-DDoS-infec-5RAN-CustomChannel.ini \
   -s \
