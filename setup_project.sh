@@ -157,9 +157,9 @@ check_env_compatibility() {
   local inet_ver
   local simu5g_ver
   
-  omnet_ver=$(grep -o '"omnetpp": *"[^"]*"' "$env_info_file" | sed 's/"omnetpp": *"\([^"]*\)"/\1/')
-  inet_ver=$(grep -o '"inet": *"[^"]*"' "$env_info_file" | sed 's/"inet": *"\([^"]*\)"/\1/')
-  simu5g_ver=$(grep -o '"simu5g": *"[^"]*"' "$env_info_file" | sed 's/"simu5g": *"\([^"]*\)"/\1/')
+  omnet_ver=$(grep -o '"omnetpp": *"[^"]*"' "$env_info_file" | sed 's/"omnetpp": *"\([^"]*\)"/\1/' | tr -d '\n\r' | xargs)
+  inet_ver=$(grep -o '"inet": *"[^"]*"' "$env_info_file" | sed 's/"inet": *"\([^"]*\)"/\1/' | tr -d '\n\r' | xargs)
+  simu5g_ver=$(grep -o '"simu5g": *"[^"]*"' "$env_info_file" | sed 's/"simu5g": *"\([^"]*\)"/\1/' | tr -d '\n\r' | xargs)
   
   info "Detected environment versions:"
   info "  - OMNeT++: $omnet_ver"
@@ -168,6 +168,10 @@ check_env_compatibility() {
   
   # Check if versions match requirements (basic check)
   local version_ok=true
+  
+  # Debug: show what we're comparing
+  # info "DEBUG: Comparing '$omnet_ver' with '6.0.1'"
+  
   if [ "$omnet_ver" != "6.0.1" ]; then
     warn "OMNeT++ version mismatch: expected 6.0.1, found $omnet_ver"
     version_ok=false
