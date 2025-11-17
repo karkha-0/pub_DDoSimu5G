@@ -1,4 +1,4 @@
-./setup.sh --install-dir test_full_install/#!/bin/bash
+#!/bin/bash
 # setup.sh
 # Master setup script for pub_DDoSimu5G
 # Runs both environment and project setup
