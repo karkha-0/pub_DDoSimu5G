@@ -333,11 +333,11 @@ build_project() {
     -I'$(INET4_5_PROJ)/src' -L'$(INET4_5_PROJ)/src' -lINET'$(D)' \
     -I'$(SIMU5G_PROJ)/src' -L'$(SIMU5G_PROJ)/src' -lsimu5g'$(D)' \
     || die "Makefile generation failed"
-  cd ..
   
-  # Build
+  # Build (stay in src directory where Makefile is)
   info "Building project library (this may take 5-10 minutes)..."
   make -j"$(nproc)" MODE=release || die "Project build failed"
+  cd ..
   
   # Verify build
   if [ -f "src/libDDoSimu5G.so" ]; then
