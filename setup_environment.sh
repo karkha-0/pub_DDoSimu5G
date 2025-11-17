@@ -321,7 +321,7 @@ build_simu5g() {
   info "Setting up Simu5G ${SIMU5G_VERSION}..."
   
   local simu5g_dir="$OMNET_DIR/samples/Simu5G"
-  local inet_dir="$OMNET_DIR/samples/inet${INET_VERSION}"
+  local inet_dir="$OMNET_DIR/samples/$INET_DIR_NAME"
   
   if [ -d "$simu5g_dir" ] && [ "$FORCE" != true ]; then
     info "✓ Simu5G already exists at $simu5g_dir (use --force to reinstall)"
