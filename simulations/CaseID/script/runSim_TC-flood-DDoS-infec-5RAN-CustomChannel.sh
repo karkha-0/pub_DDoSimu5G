@@ -3,16 +3,34 @@
 ## Note:
 # To run this script you need to change the mobility and the infections paths in the ini and the ned file
 
-# Source OMNeT++ environment
+# Source OMNeT++ environment - dynamically find OMNeT++ installation
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-OMNET_DIR="$SCRIPT_DIR/../../../omnetpp-6.0.1"
 
-if [ -f "$OMNET_DIR/setenv" ]; then
+# Method 1: Check if already in environment (OMNET_ROOT set)
+if [ -n "$OMNET_ROOT" ] && [ -f "$OMNET_ROOT/setenv" ]; then
+    OMNET_DIR="$OMNET_ROOT"
+# Method 2: Search up directory tree for omnetpp installation
+else
+    OMNET_DIR=""
+    search_dir="$SCRIPT_DIR"
+    for i in {1..10}; do
+        if [ -f "$search_dir/setenv" ] && [ -f "$search_dir/bin/omnetpp" ]; then
+            OMNET_DIR="$search_dir"
+            break
+        fi
+        search_dir="$(dirname "$search_dir")"
+    done
+fi
+
+if [ -n "$OMNET_DIR" ] && [ -f "$OMNET_DIR/setenv" ]; then
     echo "Sourcing OMNeT++ environment from $OMNET_DIR/setenv"
     source "$OMNET_DIR/setenv"
 else
-    echo "ERROR: Cannot find OMNeT++ setenv at $OMNET_DIR/setenv"
-    echo "Please ensure OMNeT++ is installed correctly"
+    echo "ERROR: Cannot find OMNeT++ installation"
+    echo "Searched from: $SCRIPT_DIR"
+    echo "Please either:"
+    echo "  1. Run from installed project: <install-dir>/omnetpp-6.0.1/samples/DDoSimu5G/simulations/..."
+    echo "  2. Set OMNET_ROOT environment variable: export OMNET_ROOT=/path/to/omnetpp-6.0.1"
     exit 1
 fi
 
