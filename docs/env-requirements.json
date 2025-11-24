@@ -1,0 +1,36 @@
+{
+  "name": "pub_DDoSimu5G",
+  "version": "1.0.0",
+  "description": "DDoS Attack Simulation Framework for 5G Networks",
+  "required": {
+    "omnetpp": "6.0.1",
+    "inet": "4.5.0",
+    "simu5g": "1.2.2",
+    "one_simulator": "1.6.0",
+    "java": "11+"
+  },
+  "system": {
+    "disk_space_gb": 20,
+    "ram_gb_minimum": 8,
+    "ram_gb_recommended": 16,
+    "supported_os": [
+      "ubuntu-20.04+",
+      "debian-11+",
+      "fedora-35+",
+      "rhel-8+"
+    ]
+  },
+  "tested_with": {
+    "omnetpp": "6.0.1",
+    "inet": "4.5.0",
+    "simu5g": "1.2.2",
+    "one_simulator": "1.6.0",
+    "java": "11+",
+    "python": "3.8+"
+  },
+  "notes": {
+    "inet_directory": "inet4.5 (not inet4.5.0 - see docs/TROUBLESHOOTING.md)",
+    "one_simulator_java": "See ONE_Simulator/the-one-1.6.0/java_version.txt",
+    "plotting_requirements": "See ONE_Simulator/the-one-1.6.0/sim_Scenario/plotting_results_MalwareInfection/requirements.txt"
+  }
+}
