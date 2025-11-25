@@ -9,8 +9,8 @@
 // and cannot be removed from it.
 // 
 
-package modifiedExternalFiles.Simu5G.src.common.binder; //need to be changed just commented to remove error
-//package simu5g.common.binder;  //need to be changed just commented to remove error
+//package modifiedExternalFiles.Simu5G.src.common.binder; //need to be changed just commented to remove error
+package simu5g.common.binder;  //need to be changed just commented to remove error
 
 // 
 // Binder module

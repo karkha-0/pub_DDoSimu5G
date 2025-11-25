@@ -322,9 +322,7 @@ apply_modifications() {
       # Handle version-specific path transformations for v1.2.2
       # Remove /layer/ subdirectory for phy files
       target_path="${target_path//\/stack\/phy\/layer\//\/stack\/phy\/}"
-      # Remove /NR/ and rename NRUe -> NrUe for node files
-      target_path="${target_path//\/nodes\/NR\//\/nodes\/}"
-      target_path="${target_path//NRUe/NrUe}"
+      # Note: NR directory structure is preserved in v1.2.2 (nodes/NR/ remains as-is)
       
       local target_file="$simu5g_target/$target_path"
       
