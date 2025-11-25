@@ -320,9 +320,10 @@ apply_modifications() {
       local target_path="${rel_path%.cpy}"
       
       # Handle version-specific path transformations for v1.2.2
-      # Remove /layer/ subdirectory for phy files
-      target_path="${target_path//\/stack\/phy\/layer\//\/stack\/phy\/}"
-      # Note: NR directory structure is preserved in v1.2.2 (nodes/NR/ remains as-is)
+      # Note: Simu5G v1.2.2 uses the following structure:
+      #   - src/stack/phy/layer/  (layer subdirectory is preserved)
+      #   - src/nodes/NR/         (NR subdirectory is preserved)
+      # No path transformations needed - use paths as-is from modifiedExternalFiles
       
       local target_file="$simu5g_target/$target_path"
       
