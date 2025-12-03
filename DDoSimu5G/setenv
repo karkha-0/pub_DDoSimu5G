@@ -1,0 +1,63 @@
+#!/usr/bin/env -S sh -c "echo >&2 \"Error: You are running this script instead of sourcing it. Make sure to use it as 'source setenv' or '. setenv', otherwise its settings won't take effect.\"; exit 1"
+
+# first argument can be (e.g. 'source setenv -q'):
+# -q : do not show banner text on configuration success
+# -r : remove an already configured environment
+# -f : allow use from scripts (force sourcing)
+
+# Get the directory where this script reside using a trick (works differently on bash and zsh)
+# On bash, the current script's name is in 'BASH_SOURCE[0]'
+if [ "$BASH_VERSION" != "" ]; then # for BASH
+  dir=$(cd $(dirname ${BASH_SOURCE[0]}) && pwd)
+elif [ "$ZSH_VERSION" != "" ]; then # on zsh the script name is in '$0'
+  dir=$(cd $(dirname $0) && pwd)
+else # on any other SH compatible shell we assume that the current working directory is the DDoSimu5G root directory
+  dir=$(pwd)
+fi
+
+# check if dir is really pointing to a DDoSimu5G installation dir
+if [ ! -f $dir/Makefile ] || [ ! -d $dir/src ]; then
+    echo "Error: '$dir' does not look like a DDoSimu5G root directory"
+    return 1
+fi
+
+# remove previous environment to prevent the accumulation of path elements
+if [ -n "$DDOSIMU5G_ROOT" ]; then
+  if [ "$1" = "-r" ]; then
+    echo "Removed previous environment for '$DDOSIMU5G_ROOT'."
+    dir=
+  else
+    echo "Warning: overwriting previous environment for '$DDOSIMU5G_ROOT'."
+  fi
+  export PATH=${PATH#$DDOSIMU5G_ROOT/bin:}
+  export PYTHONPATH=${PYTHONPATH#$DDOSIMU5G_ROOT/python:}
+  export LD_LIBRARY_PATH=${LD_LIBRARY_PATH#$DDOSIMU5G_ROOT/src:}
+  export DDOSIMU5G_ROOT=
+fi
+
+# do not continue if removal was requested
+if [ "$1" = "-r" ]; then
+    return 0
+fi
+
+export DDOSIMU5G_ROOT=$dir
+export PATH=$dir/bin:$PATH
+export LD_LIBRARY_PATH=$dir/src:$LD_LIBRARY_PATH
+
+dir=
+
+if [ "$1" != "-q" ]; then
+  echo "Environment for DDoSimu5G in directory '$DDOSIMU5G_ROOT' is ready."
+
+  if [ ! -f $DDOSIMU5G_ROOT/src/libDDoSimu5G.so ]; then
+  cat <<__END__
+
+Warning: libDDoSimu5G.so not found. Run "make" to build DDoSimu5G.
+__END__
+  fi
+fi
+
+# source user specific script if present
+if [ -f "$DDOSIMU5G_ROOT/setenv_local" ] ; then
+  source $DDOSIMU5G_ROOT/setenv_local
+fi
