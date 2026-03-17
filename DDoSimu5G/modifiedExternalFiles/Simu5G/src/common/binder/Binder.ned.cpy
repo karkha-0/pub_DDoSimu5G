@@ -10,7 +10,7 @@
 // 
 
 //package modifiedExternalFiles.Simu5G.src.common.binder; //need to be changed just commented to remove error
-package simu5g.common.binder;  //need to be changed just commented to remove error
+package simu5g.common.binder;  
 
 // 
 // Binder module
