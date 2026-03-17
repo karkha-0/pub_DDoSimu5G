@@ -1,0 +1,33 @@
+{
+  "profileDescription": "HTTP Flood - Pulsing style with replace mode",
+  "attackProfile": {
+    "attackType": "http_flood",
+    "attackStyle": "pulsing",
+    "behaviorMode": "replace"
+  },
+  "timing": {
+    "dormantDuration": 1.0,
+    "attackDuration": 120.0
+  },
+  "attackParameters": {
+    "initialRate": 20,
+    "peakRate": 20,
+    "rampDuration": 0,
+    "burstOnDuration": 10.0,
+    "burstOffDuration": 1.0
+  },
+  "httpParameters": {
+    "numConnections": 5,
+    "httpMethod": "POST",
+    "requestPaths": "/api/v1/telemetry,/api/v1/location,/api/v1/diagnostics,/api/v1/update",
+    "userAgent": "Car (Linux; Android 10; Automotive) 5G-Connected",
+    "keepAlive": true,
+    "contentLength": 512
+  },
+  "targetConfiguration": {
+    "targets": [
+      "generalServer"
+    ],
+    "targetPort": 80
+  }
+}

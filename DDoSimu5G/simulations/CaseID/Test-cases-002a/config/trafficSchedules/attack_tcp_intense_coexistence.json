@@ -1,0 +1,26 @@
+{
+  "profileDescription": "TCP SYN Flood - Intense style with coexistence mode (most aggressive)",
+  "attackProfile": {
+    "attackType": "tcp_syn_flood",
+    "attackStyle": "intense",
+    "behaviorMode": "coexistence"
+  },
+  "timing": {
+    "dormantDuration": 2.0,
+    "attackDuration": 30.0
+  },
+  "attackParameters": {
+    "initialRate": 100,
+    "peakRate": 100,
+    "rampDuration": 0,
+    "burstOnDuration": 0,
+    "burstOffDuration": 0,
+    "enableSpoofing": true
+  },
+  "targetConfiguration": {
+    "targets": [
+      "generalServer"
+    ],
+    "targetPort": 9998
+  }
+}

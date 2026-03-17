@@ -1,0 +1,33 @@
+{
+  "profileDescription": "HTTP Flood - Ramping style with coexistence mode",
+  "attackProfile": {
+    "attackType": "http_flood",
+    "attackStyle": "ramping",
+    "behaviorMode": "coexistence"
+  },
+  "timing": {
+    "dormantDuration": 3.0,
+    "attackDuration": 60.0
+  },
+  "attackParameters": {
+    "initialRate": 10,
+    "peakRate": 30,
+    "rampDuration": 30.0,
+    "burstOnDuration": 0,
+    "burstOffDuration": 0
+  },
+  "httpParameters": {
+    "numConnections": 2,
+    "httpMethod": "POST",
+    "requestPaths": "/m2m/meter/reading,/m2m/meter/status,/m2m/meter/config",
+    "userAgent": "SmartMeter/2.1 (Linux; NB-IoT) CoAP-HTTP-Bridge/1.0",
+    "keepAlive": true,
+    "contentLength": 256
+  },
+  "targetConfiguration": {
+    "targets": [
+      "generalServer"
+    ],
+    "targetPort": 80
+  }
+}

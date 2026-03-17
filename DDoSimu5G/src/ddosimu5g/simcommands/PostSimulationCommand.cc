@@ -13,7 +13,7 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
-#include "../simcommands/PostSimulationCommand.h"
+#include "../../ddosimu5g/simcommands/PostSimulationCommand.h"
 
 Define_Module(PostSimulationCommand);
 

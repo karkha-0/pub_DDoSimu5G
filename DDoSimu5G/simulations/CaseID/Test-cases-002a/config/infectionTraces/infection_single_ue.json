@@ -1,0 +1,9 @@
+{
+  "infectionData" : [ {
+    "infected_by" : -1,
+    "infection_status" : "Infected Active",
+    "malware_active_time" : 30.0,
+    "node_postion_at_active_infected" : "(800.00,1100.00)",
+    "node_id" : 0
+  } ]
+}

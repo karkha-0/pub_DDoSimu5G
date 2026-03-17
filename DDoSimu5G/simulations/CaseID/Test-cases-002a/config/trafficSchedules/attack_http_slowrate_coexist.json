@@ -1,0 +1,33 @@
+{
+  "profileDescription": "HTTP Flood - Slowrate style with coexistence mode (stealthy)",
+  "attackProfile": {
+    "attackType": "http_flood",
+    "attackStyle": "slowrate",
+    "behaviorMode": "coexistence"
+  },
+  "timing": {
+    "dormantDuration": 20.0,
+    "attackDuration": 30.0
+  },
+  "attackParameters": {
+    "initialRate": 10,
+    "peakRate": 10,
+    "rampDuration": 0,
+    "burstOnDuration": 0,
+    "burstOffDuration": 0
+  },
+  "httpParameters": {
+    "numConnections": 3,
+    "httpMethod": "POST",
+    "requestPaths": "/uav/telemetry,/uav/gps,/uav/status,/uav/command",
+    "userAgent": "DJI-FlightController/4.2 (Linux; LTE-M) UAV-Ground-Station",
+    "keepAlive": true,
+    "contentLength": 384
+  },
+  "targetConfiguration": {
+    "targets": [
+      "generalServer"
+    ],
+    "targetPort": 80
+  }
+}

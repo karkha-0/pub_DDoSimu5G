@@ -1,0 +1,72 @@
+{
+  "description": "Connected Vehicle - V2X Real-time Telemetry",
+  "deviceType": "connected_vehicle",
+  "ueId": 2,
+  "schedule": [
+    {
+      "app_id": 0,
+      "type": "udp",
+      "startTime": 0,
+      "duration": 600,
+      "destAddress": "udpServer",
+      "destPort": 5000,
+      "messageLength": 256,
+      "sendInterval": 30.0,
+      "burstSize": 1,
+      "comment": "Driving mode - speed, location, diagnostics every 30s"
+    },
+    {
+      "app_id": 1,
+      "type": "dns",
+      "startTime": 3,
+      "duration": 600,
+      "destAddress": "dnsServer",
+      "destPort": 53,
+      "queryLength": 64,
+      "responseLength": 128,
+      "queryInterval": 300.0,
+      "comment": "DNS lookup every 5 min for cloud services"
+    },
+    {
+      "app_id": 2,
+      "type": "tcp",
+      "startTime": 10,
+      "duration": 590,
+      "destAddress": "tcpServer",
+      "destPort": 5001,
+      "requestLength": 1024,
+      "requestInterval": 10.0,
+      "keepAlive": true,
+      "comment": "OTA update channel - persistent connection, keepalive every 10s"
+    },
+    {
+      "app_id": 3,
+      "type": "udp",
+      "startTime": 300,
+      "duration": 10,
+      "destAddress": "udpServer",
+      "destPort": 5000,
+      "messageLength": 512,
+      "sendInterval": 0.5,
+      "burstSize": 1,
+      "comment": "Emergency event - rapid reporting 10 Hz (collision avoidance)"
+    },
+    {
+      "app_id": 4,
+      "type": "http",
+      "startTime": 500,
+      "duration": 60,
+      "destAddress": "httpServer",
+      "destPort": 80,
+      "requestLength": 1024,
+      "replyLength": 8192,
+      "numRequests": 2,
+      "requestInterval": 30.0,
+      "httpMethod": "POST",
+      "requestPaths": ["/api/v1/trip/upload", "/api/v1/maps/download"],
+      "userAgent": "Car (Linux; Android 10; Automotive) 5G-Connected",
+      "contentType": "application/json",
+      "comment": "Upload trip data + download map updates"
+    }
+  ]
+}

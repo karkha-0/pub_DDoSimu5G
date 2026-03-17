@@ -1,0 +1,27 @@
+{
+  "profileDescription": "UDP Flood - Intense style with coexistence mode",
+  "attackProfile": {
+    "attackType": "udp_flood",
+    "attackStyle": "intense",
+    "behaviorMode": "coexistence"
+  },
+  "timing": {
+    "dormantDuration": 5.0,
+    "attackDuration": 30.0
+  },
+  "attackParameters": {
+    "initialRate": 200,
+    "peakRate": 500,
+    "rampDuration": 40.0,
+    "burstOnDuration": 0,
+    "burstOffDuration": 0,
+    "packetSize": 1024,
+    "enableSpoofing": false
+  },
+  "targetConfiguration": {
+    "targets": [
+      "generalServer"
+    ],
+    "targetPort": 9999
+  }
+}

@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+<internetCloud symmetric="true">
+    <parameters>
+        <!-- Core network paths: UPF <-> internetCloud -->
+        <traffic src="internetCloud" dest="upf" delay="5ms + truncnormal(10ms, 2ms)" datarate="uniform(500Mbps, 1Gbps)" drop="uniform(0,1) &lt; 0.001" />
+        <traffic src="upf" dest="internetCloud" delay="5ms + truncnormal(10ms, 2ms)" datarate="uniform(500Mbps, 1Gbps)" drop="uniform(0,1) &lt; 0.001" />
+        
+        <!-- Application router paths: appRouter <-> internetCloud -->
+        <traffic src="internetCloud" dest="appRouter" delay="3ms + truncnormal(5ms, 1ms)" datarate="uniform(1Gbps, 10Gbps)" drop="uniform(0,1) &lt; 0.0005" />
+        <traffic src="appRouter" dest="internetCloud" delay="3ms + truncnormal(5ms, 1ms)" datarate="uniform(1Gbps, 10Gbps)" drop="uniform(0,1) &lt; 0.0005" />
+        
+        <!-- UPF <-> Application Router (edge network path) -->
+        <traffic src="upf" dest="appRouter" delay="2ms + truncnormal(3ms, 0.5ms)" datarate="uniform(1Gbps, 10Gbps)" drop="uniform(0,1) &lt; 0.0001" />
+        <traffic src="appRouter" dest="upf" delay="2ms + truncnormal(3ms, 0.5ms)" datarate="uniform(1Gbps, 10Gbps)" drop="uniform(0,1) &lt; 0.0001" />
+        
+        <!-- Application servers <-> appRouter (LAN speeds) -->
+        <traffic src="appRouter" dest="udpServer" delay="0.5ms + truncnormal(1ms, 0.2ms)" datarate="uniform(1Gbps, 10Gbps)" drop="uniform(0,1) &lt; 0.00001" />
+        <traffic src="udpServer" dest="appRouter" delay="0.5ms + truncnormal(1ms, 0.2ms)" datarate="uniform(1Gbps, 10Gbps)" drop="uniform(0,1) &lt; 0.00001" />
+        
+        <traffic src="appRouter" dest="tcpServer" delay="0.5ms + truncnormal(1ms, 0.2ms)" datarate="uniform(1Gbps, 10Gbps)" drop="uniform(0,1) &lt; 0.00001" />
+        <traffic src="tcpServer" dest="appRouter" delay="0.5ms + truncnormal(1ms, 0.2ms)" datarate="uniform(1Gbps, 10Gbps)" drop="uniform(0,1) &lt; 0.00001" />
+        
+        <traffic src="appRouter" dest="httpServer" delay="0.5ms + truncnormal(1ms, 0.2ms)" datarate="uniform(1Gbps, 10Gbps)" drop="uniform(0,1) &lt; 0.00001" />
+        <traffic src="httpServer" dest="appRouter" delay="0.5ms + truncnormal(1ms, 0.2ms)" datarate="uniform(1Gbps, 10Gbps)" drop="uniform(0,1) &lt; 0.00001" />
+        
+        <traffic src="appRouter" dest="dnsServer" delay="0.5ms + truncnormal(1ms, 0.2ms)" datarate="uniform(1Gbps, 10Gbps)" drop="uniform(0,1) &lt; 0.00001" />
+        <traffic src="dnsServer" dest="appRouter" delay="0.5ms + truncnormal(1ms, 0.2ms)" datarate="uniform(1Gbps, 10Gbps)" drop="uniform(0,1) &lt; 0.00001" />
+        
+        <traffic src="appRouter" dest="generalServer" delay="0.5ms + truncnormal(1ms, 0.2ms)" datarate="uniform(1Gbps, 10Gbps)" drop="uniform(0,1) &lt; 0.00001" />
+        <traffic src="generalServer" dest="appRouter" delay="0.5ms + truncnormal(1ms, 0.2ms)" datarate="uniform(1Gbps, 10Gbps)" drop="uniform(0,1) &lt; 0.00001" />
+        
+        <!-- Application servers <-> UPF (for direct routing if needed) -->
+        <traffic src="upf" dest="udpServer" delay="2ms + truncnormal(3ms, 0.5ms)" datarate="uniform(1Gbps, 10Gbps)" drop="uniform(0,1) &lt; 0.0001" />
+        <traffic src="udpServer" dest="upf" delay="2ms + truncnormal(3ms, 0.5ms)" datarate="uniform(1Gbps, 10Gbps)" drop="uniform(0,1) &lt; 0.0001" />
+        
+        <traffic src="upf" dest="tcpServer" delay="2ms + truncnormal(3ms, 0.5ms)" datarate="uniform(1Gbps, 10Gbps)" drop="uniform(0,1) &lt; 0.0001" />
+        <traffic src="tcpServer" dest="upf" delay="2ms + truncnormal(3ms, 0.5ms)" datarate="uniform(1Gbps, 10Gbps)" drop="uniform(0,1) &lt; 0.0001" />
+        
+        <traffic src="upf" dest="httpServer" delay="2ms + truncnormal(3ms, 0.5ms)" datarate="uniform(1Gbps, 10Gbps)" drop="uniform(0,1) &lt; 0.0001" />
+        <traffic src="httpServer" dest="upf" delay="2ms + truncnormal(3ms, 0.5ms)" datarate="uniform(1Gbps, 10Gbps)" drop="uniform(0,1) &lt; 0.0001" />
+        
+        <traffic src="upf" dest="dnsServer" delay="2ms + truncnormal(3ms, 0.5ms)" datarate="uniform(1Gbps, 10Gbps)" drop="uniform(0,1) &lt; 0.0001" />
+        <traffic src="dnsServer" dest="upf" delay="2ms + truncnormal(3ms, 0.5ms)" datarate="uniform(1Gbps, 10Gbps)" drop="uniform(0,1) &lt; 0.0001" />
+        
+        <traffic src="upf" dest="generalServer" delay="2ms + truncnormal(3ms, 0.5ms)" datarate="uniform(1Gbps, 10Gbps)" drop="uniform(0,1) &lt; 0.0001" />
+        <traffic src="generalServer" dest="upf" delay="2ms + truncnormal(3ms, 0.5ms)" datarate="uniform(1Gbps, 10Gbps)" drop="uniform(0,1) &lt; 0.0001" />
+    </parameters>
+</internetCloud>

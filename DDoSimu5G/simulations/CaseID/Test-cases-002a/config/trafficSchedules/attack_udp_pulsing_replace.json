@@ -1,0 +1,27 @@
+{
+  "profileDescription": "UDP Flood - Pulsing style with replace mode",
+  "attackProfile": {
+    "attackType": "udp_flood",
+    "attackStyle": "pulsing",
+    "behaviorMode": "replace"
+  },
+  "timing": {
+    "dormantDuration": 4.0,
+    "attackDuration": 90.0
+  },
+  "attackParameters": {
+    "initialRate": 120,
+    "peakRate": 120,
+    "rampDuration": 0,
+    "burstOnDuration": 6.0,
+    "burstOffDuration": 6.0,
+    "packetSize": 1024,
+    "enableSpoofing": false
+  },
+  "targetConfiguration": {
+    "targets": [
+      "generalServer"
+    ],
+    "targetPort": 9999
+  }
+}

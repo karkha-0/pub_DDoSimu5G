@@ -1,0 +1,1687 @@
+{
+  "version": "2.0.0",
+  "input_packets": "output_20260304_162905/upf.csv",
+  "input_flows": null,
+  "overview": {
+    "total_packets": 336751,
+    "duration_sec": 599.948877,
+    "total_bytes": 168947746,
+    "total_mb": 161.12112617492676,
+    "labels": {
+      "benign": 243038,
+      "malicious": 93713
+    },
+    "directions": {
+      "UL": 216068,
+      "DL": 120683
+    },
+    "protocols": {
+      "TCP": 217090,
+      "UDP": 119661
+    },
+    "app_protocols": {
+      "TCP": 149421,
+      "HTTP": 67669,
+      "DNS": 20629,
+      "UDP": 99032
+    },
+    "attack_types": {
+      "udp_flood": 22249,
+      "tcp_syn_flood": 17845,
+      "dns_amplification": 20514,
+      "http_flood": 33105
+    },
+    "size_stats": {
+      "n": 336751,
+      "mean": 501.69931492408335,
+      "median": 540,
+      "std": 478.91935399298194,
+      "min": 40,
+      "max": 1428,
+      "p25": 40.0,
+      "p75": 576.0,
+      "p95": 1428.0,
+      "p99": 1428.0
+    },
+    "time_range": [
+      0.009,
+      599.957877
+    ]
+  },
+  "per_direction": {
+    "DL": {
+      "count": 120683,
+      "labels": {
+        "benign": 120683
+      },
+      "protocols": {
+        "TCP": 100419,
+        "UDP": 20264
+      },
+      "attack_types": {},
+      "size_stats": {
+        "n": 120683,
+        "mean": 580.944142919881,
+        "median": 576,
+        "std": 251.0791184099032,
+        "min": 40,
+        "max": 1052,
+        "p25": 576.0,
+        "p75": 576.0,
+        "p95": 1052.0,
+        "p99": 1052.0
+      }
+    },
+    "UL": {
+      "count": 216068,
+      "labels": {
+        "benign": 122355,
+        "malicious": 93713
+      },
+      "protocols": {
+        "TCP": 116671,
+        "UDP": 99397
+      },
+      "attack_types": {
+        "udp_flood": 22249,
+        "tcp_syn_flood": 17845,
+        "dns_amplification": 20514,
+        "http_flood": 33105
+      },
+      "size_stats": {
+        "n": 216068,
+        "mean": 457.4377695910547,
+        "median": 81.0,
+        "std": 562.8459100238182,
+        "min": 40,
+        "max": 1428,
+        "p25": 40.0,
+        "p75": 1052.0,
+        "p95": 1428.0,
+        "p99": 1428.0
+      }
+    }
+  },
+  "direction_label_crosstab": {
+    "UL": {
+      "benign": 122355,
+      "malicious": 93713
+    },
+    "DL": {
+      "benign": 120683
+    }
+  },
+  "protocol_label_crosstab": {
+    "TCP": {
+      "benign": 166140,
+      "malicious": 50950
+    },
+    "UDP": {
+      "benign": 76898,
+      "malicious": 42763
+    }
+  },
+  "attack_type_stats": {
+    "benign": {
+      "count": 243038,
+      "directions": {
+        "UL": 122355,
+        "DL": 120683
+      },
+      "protocols": {
+        "TCP": 166140,
+        "UDP": 76898
+      },
+      "size_stats": {
+        "n": 243038,
+        "mean": 565.7942132506028,
+        "median": 576.0,
+        "std": 461.36818344494503,
+        "min": 40,
+        "max": 1428,
+        "p25": 40.0,
+        "p75": 576.0,
+        "p95": 1428.0,
+        "p99": 1428.0
+      }
+    },
+    "dns_amplification": {
+      "count": 20514,
+      "directions": {
+        "UL": 20514
+      },
+      "protocols": {
+        "UDP": 20514
+      },
+      "size_stats": {
+        "n": 20514,
+        "mean": 81,
+        "median": 81.0,
+        "std": 0.0,
+        "min": 81,
+        "max": 81,
+        "p25": 81.0,
+        "p75": 81.0,
+        "p95": 81.0,
+        "p99": 81.0
+      }
+    },
+    "http_flood": {
+      "count": 33105,
+      "directions": {
+        "UL": 33105
+      },
+      "protocols": {
+        "TCP": 33105
+      },
+      "size_stats": {
+        "n": 33105,
+        "mean": 89.10043800030206,
+        "median": 40,
+        "std": 145.5449914679931,
+        "min": 40,
+        "max": 576,
+        "p25": 40.0,
+        "p75": 40.0,
+        "p95": 506.0,
+        "p99": 576.0
+      }
+    },
+    "tcp_syn_flood": {
+      "count": 17845,
+      "directions": {
+        "UL": 17845
+      },
+      "protocols": {
+        "TCP": 17845
+      },
+      "size_stats": {
+        "n": 17845,
+        "mean": 40,
+        "median": 40,
+        "std": 0.0,
+        "min": 40,
+        "max": 40,
+        "p25": 40.0,
+        "p75": 40.0,
+        "p95": 40.0,
+        "p99": 40.0
+      }
+    },
+    "udp_flood": {
+      "count": 22249,
+      "directions": {
+        "UL": 22249
+      },
+      "protocols": {
+        "UDP": 22249
+      },
+      "size_stats": {
+        "n": 22249,
+        "mean": 1173.677378758596,
+        "median": 1052,
+        "std": 175.91279064260578,
+        "min": 1052,
+        "max": 1428,
+        "p25": 1052.0,
+        "p75": 1428.0,
+        "p95": 1428.0,
+        "p99": 1428.0
+      }
+    }
+  },
+  "size_distribution": {
+    "label": {
+      "benign": {
+        "<64": 69409,
+        "64-127": 4351,
+        "128-255": 2425,
+        "256-511": 1852,
+        "512-1023": 111681,
+        "1024-1499": 53320,
+        "\u22651500": 0
+      },
+      "malicious": {
+        "<64": 47418,
+        "64-127": 20671,
+        "128-255": 21,
+        "256-511": 2545,
+        "512-1023": 809,
+        "1024-1499": 22249,
+        "\u22651500": 0
+      }
+    },
+    "direction": {
+      "DL": {
+        "<64": 9909,
+        "64-127": 2069,
+        "128-255": 2389,
+        "256-511": 711,
+        "512-1023": 88649,
+        "1024-1499": 16956,
+        "\u22651500": 0
+      },
+      "UL": {
+        "<64": 106918,
+        "64-127": 22953,
+        "128-255": 57,
+        "256-511": 3686,
+        "512-1023": 23841,
+        "1024-1499": 58613,
+        "\u22651500": 0
+      }
+    }
+  },
+  "temporal_timeline": {
+    "bins": [
+      {
+        "start": 0.009,
+        "end": 10.009,
+        "benign": 4626,
+        "malicious": 0,
+        "UL": 2781,
+        "DL": 1845,
+        "UL_benign": 2781,
+        "UL_malicious": 0,
+        "DL_benign": 1845,
+        "DL_malicious": 0,
+        "total": 4626
+      },
+      {
+        "start": 10.009,
+        "end": 20.009,
+        "benign": 5232,
+        "malicious": 0,
+        "UL": 3065,
+        "DL": 2167,
+        "UL_benign": 3065,
+        "UL_malicious": 0,
+        "DL_benign": 2167,
+        "DL_malicious": 0,
+        "total": 5232
+      },
+      {
+        "start": 20.009,
+        "end": 30.009,
+        "benign": 5079,
+        "malicious": 0,
+        "UL": 2969,
+        "DL": 2110,
+        "UL_benign": 2969,
+        "UL_malicious": 0,
+        "DL_benign": 2110,
+        "DL_malicious": 0,
+        "total": 5079
+      },
+      {
+        "start": 30.009,
+        "end": 40.009,
+        "benign": 5799,
+        "malicious": 0,
+        "UL": 3333,
+        "DL": 2466,
+        "UL_benign": 3333,
+        "UL_malicious": 0,
+        "DL_benign": 2466,
+        "DL_malicious": 0,
+        "total": 5799
+      },
+      {
+        "start": 40.009,
+        "end": 50.009,
+        "benign": 5050,
+        "malicious": 0,
+        "UL": 2972,
+        "DL": 2078,
+        "UL_benign": 2972,
+        "UL_malicious": 0,
+        "DL_benign": 2078,
+        "DL_malicious": 0,
+        "total": 5050
+      },
+      {
+        "start": 50.009,
+        "end": 60.009,
+        "benign": 4968,
+        "malicious": 1086,
+        "UL": 4003,
+        "DL": 2051,
+        "UL_benign": 2917,
+        "UL_malicious": 1086,
+        "DL_benign": 2051,
+        "DL_malicious": 0,
+        "total": 6054
+      },
+      {
+        "start": 60.009,
+        "end": 70.009,
+        "benign": 5532,
+        "malicious": 2736,
+        "UL": 5957,
+        "DL": 2311,
+        "UL_benign": 3221,
+        "UL_malicious": 2736,
+        "DL_benign": 2311,
+        "DL_malicious": 0,
+        "total": 8268
+      },
+      {
+        "start": 70.009,
+        "end": 80.009,
+        "benign": 5017,
+        "malicious": 3478,
+        "UL": 6433,
+        "DL": 2062,
+        "UL_benign": 2955,
+        "UL_malicious": 3478,
+        "DL_benign": 2062,
+        "DL_malicious": 0,
+        "total": 8495
+      },
+      {
+        "start": 80.009,
+        "end": 90.009,
+        "benign": 4982,
+        "malicious": 2053,
+        "UL": 4994,
+        "DL": 2041,
+        "UL_benign": 2941,
+        "UL_malicious": 2053,
+        "DL_benign": 2041,
+        "DL_malicious": 0,
+        "total": 7035
+      },
+      {
+        "start": 90.009,
+        "end": 100.009,
+        "benign": 5165,
+        "malicious": 0,
+        "UL": 3020,
+        "DL": 2145,
+        "UL_benign": 3020,
+        "UL_malicious": 0,
+        "DL_benign": 2145,
+        "DL_malicious": 0,
+        "total": 5165
+      },
+      {
+        "start": 100.009,
+        "end": 110.009,
+        "benign": 4992,
+        "malicious": 716,
+        "UL": 3658,
+        "DL": 2050,
+        "UL_benign": 2942,
+        "UL_malicious": 716,
+        "DL_benign": 2050,
+        "DL_malicious": 0,
+        "total": 5708
+      },
+      {
+        "start": 110.009,
+        "end": 120.009,
+        "benign": 5036,
+        "malicious": 467,
+        "UL": 3426,
+        "DL": 2077,
+        "UL_benign": 2959,
+        "UL_malicious": 467,
+        "DL_benign": 2077,
+        "DL_malicious": 0,
+        "total": 5503
+      },
+      {
+        "start": 120.009,
+        "end": 130.00900000000001,
+        "benign": 5244,
+        "malicious": 469,
+        "UL": 3535,
+        "DL": 2178,
+        "UL_benign": 3066,
+        "UL_malicious": 469,
+        "DL_benign": 2178,
+        "DL_malicious": 0,
+        "total": 5713
+      },
+      {
+        "start": 130.00900000000001,
+        "end": 140.00900000000001,
+        "benign": 5009,
+        "malicious": 509,
+        "UL": 3457,
+        "DL": 2061,
+        "UL_benign": 2948,
+        "UL_malicious": 509,
+        "DL_benign": 2061,
+        "DL_malicious": 0,
+        "total": 5518
+      },
+      {
+        "start": 140.00900000000001,
+        "end": 150.00900000000001,
+        "benign": 5029,
+        "malicious": 719,
+        "UL": 3686,
+        "DL": 2062,
+        "UL_benign": 2967,
+        "UL_malicious": 719,
+        "DL_benign": 2062,
+        "DL_malicious": 0,
+        "total": 5748
+      },
+      {
+        "start": 150.00900000000001,
+        "end": 160.00900000000001,
+        "benign": 5101,
+        "malicious": 1016,
+        "UL": 4001,
+        "DL": 2116,
+        "UL_benign": 2985,
+        "UL_malicious": 1016,
+        "DL_benign": 2116,
+        "DL_malicious": 0,
+        "total": 6117
+      },
+      {
+        "start": 160.00900000000001,
+        "end": 170.00900000000001,
+        "benign": 5100,
+        "malicious": 1121,
+        "UL": 4106,
+        "DL": 2115,
+        "UL_benign": 2985,
+        "UL_malicious": 1121,
+        "DL_benign": 2115,
+        "DL_malicious": 0,
+        "total": 6221
+      },
+      {
+        "start": 170.00900000000001,
+        "end": 180.00900000000001,
+        "benign": 4918,
+        "malicious": 1230,
+        "UL": 4109,
+        "DL": 2039,
+        "UL_benign": 2879,
+        "UL_malicious": 1230,
+        "DL_benign": 2039,
+        "DL_malicious": 0,
+        "total": 6148
+      },
+      {
+        "start": 180.00900000000001,
+        "end": 190.00900000000001,
+        "benign": 5140,
+        "malicious": 2405,
+        "UL": 5420,
+        "DL": 2125,
+        "UL_benign": 3015,
+        "UL_malicious": 2405,
+        "DL_benign": 2125,
+        "DL_malicious": 0,
+        "total": 7545
+      },
+      {
+        "start": 190.00900000000001,
+        "end": 200.00900000000001,
+        "benign": 5164,
+        "malicious": 2745,
+        "UL": 5768,
+        "DL": 2141,
+        "UL_benign": 3023,
+        "UL_malicious": 2745,
+        "DL_benign": 2141,
+        "DL_malicious": 0,
+        "total": 7909
+      },
+      {
+        "start": 200.00900000000001,
+        "end": 210.00900000000001,
+        "benign": 4844,
+        "malicious": 2520,
+        "UL": 5387,
+        "DL": 1977,
+        "UL_benign": 2867,
+        "UL_malicious": 2520,
+        "DL_benign": 1977,
+        "DL_malicious": 0,
+        "total": 7364
+      },
+      {
+        "start": 210.00900000000001,
+        "end": 220.00900000000001,
+        "benign": 5344,
+        "malicious": 3573,
+        "UL": 6691,
+        "DL": 2226,
+        "UL_benign": 3118,
+        "UL_malicious": 3573,
+        "DL_benign": 2226,
+        "DL_malicious": 0,
+        "total": 8917
+      },
+      {
+        "start": 220.00900000000001,
+        "end": 230.00900000000001,
+        "benign": 5008,
+        "malicious": 4501,
+        "UL": 7447,
+        "DL": 2062,
+        "UL_benign": 2946,
+        "UL_malicious": 4501,
+        "DL_benign": 2062,
+        "DL_malicious": 0,
+        "total": 9509
+      },
+      {
+        "start": 230.00900000000001,
+        "end": 240.00900000000001,
+        "benign": 5061,
+        "malicious": 4250,
+        "UL": 7217,
+        "DL": 2094,
+        "UL_benign": 2967,
+        "UL_malicious": 4250,
+        "DL_benign": 2094,
+        "DL_malicious": 0,
+        "total": 9311
+      },
+      {
+        "start": 240.00900000000001,
+        "end": 250.00900000000001,
+        "benign": 5177,
+        "malicious": 2482,
+        "UL": 5504,
+        "DL": 2155,
+        "UL_benign": 3022,
+        "UL_malicious": 2482,
+        "DL_benign": 2155,
+        "DL_malicious": 0,
+        "total": 7659
+      },
+      {
+        "start": 250.00900000000001,
+        "end": 260.009,
+        "benign": 5072,
+        "malicious": 1619,
+        "UL": 4590,
+        "DL": 2101,
+        "UL_benign": 2971,
+        "UL_malicious": 1619,
+        "DL_benign": 2101,
+        "DL_malicious": 0,
+        "total": 6691
+      },
+      {
+        "start": 260.009,
+        "end": 270.009,
+        "benign": 5066,
+        "malicious": 1340,
+        "UL": 4320,
+        "DL": 2086,
+        "UL_benign": 2980,
+        "UL_malicious": 1340,
+        "DL_benign": 2086,
+        "DL_malicious": 0,
+        "total": 6406
+      },
+      {
+        "start": 270.009,
+        "end": 280.009,
+        "benign": 5177,
+        "malicious": 1330,
+        "UL": 4364,
+        "DL": 2143,
+        "UL_benign": 3034,
+        "UL_malicious": 1330,
+        "DL_benign": 2143,
+        "DL_malicious": 0,
+        "total": 6507
+      },
+      {
+        "start": 280.009,
+        "end": 290.009,
+        "benign": 5049,
+        "malicious": 2686,
+        "UL": 5627,
+        "DL": 2108,
+        "UL_benign": 2941,
+        "UL_malicious": 2686,
+        "DL_benign": 2108,
+        "DL_malicious": 0,
+        "total": 7735
+      },
+      {
+        "start": 290.009,
+        "end": 300.009,
+        "benign": 5127,
+        "malicious": 2929,
+        "UL": 5927,
+        "DL": 2129,
+        "UL_benign": 2998,
+        "UL_malicious": 2929,
+        "DL_benign": 2129,
+        "DL_malicious": 0,
+        "total": 8056
+      },
+      {
+        "start": 300.009,
+        "end": 310.009,
+        "benign": 5994,
+        "malicious": 3221,
+        "UL": 6253,
+        "DL": 2962,
+        "UL_benign": 3032,
+        "UL_malicious": 3221,
+        "DL_benign": 2962,
+        "DL_malicious": 0,
+        "total": 9215
+      },
+      {
+        "start": 310.009,
+        "end": 320.009,
+        "benign": 6367,
+        "malicious": 4058,
+        "UL": 6807,
+        "DL": 3618,
+        "UL_benign": 2749,
+        "UL_malicious": 4058,
+        "DL_benign": 3618,
+        "DL_malicious": 0,
+        "total": 10425
+      },
+      {
+        "start": 320.009,
+        "end": 330.009,
+        "benign": 6481,
+        "malicious": 3693,
+        "UL": 6401,
+        "DL": 3773,
+        "UL_benign": 2708,
+        "UL_malicious": 3693,
+        "DL_benign": 3773,
+        "DL_malicious": 0,
+        "total": 10174
+      },
+      {
+        "start": 330.009,
+        "end": 340.009,
+        "benign": 6646,
+        "malicious": 2946,
+        "UL": 5965,
+        "DL": 3627,
+        "UL_benign": 3019,
+        "UL_malicious": 2946,
+        "DL_benign": 3627,
+        "DL_malicious": 0,
+        "total": 9592
+      },
+      {
+        "start": 340.009,
+        "end": 350.009,
+        "benign": 7996,
+        "malicious": 4750,
+        "UL": 7521,
+        "DL": 5225,
+        "UL_benign": 2771,
+        "UL_malicious": 4750,
+        "DL_benign": 5225,
+        "DL_malicious": 0,
+        "total": 12746
+      },
+      {
+        "start": 350.009,
+        "end": 360.009,
+        "benign": 8681,
+        "malicious": 5770,
+        "UL": 8385,
+        "DL": 6066,
+        "UL_benign": 2615,
+        "UL_malicious": 5770,
+        "DL_benign": 6066,
+        "DL_malicious": 0,
+        "total": 14451
+      },
+      {
+        "start": 360.009,
+        "end": 370.009,
+        "benign": 8933,
+        "malicious": 5254,
+        "UL": 8244,
+        "DL": 5943,
+        "UL_benign": 2990,
+        "UL_malicious": 5254,
+        "DL_benign": 5943,
+        "DL_malicious": 0,
+        "total": 14187
+      },
+      {
+        "start": 370.009,
+        "end": 380.009,
+        "benign": 7640,
+        "malicious": 3194,
+        "UL": 5891,
+        "DL": 4943,
+        "UL_benign": 2697,
+        "UL_malicious": 3194,
+        "DL_benign": 4943,
+        "DL_malicious": 0,
+        "total": 10834
+      },
+      {
+        "start": 380.009,
+        "end": 390.009,
+        "benign": 8976,
+        "malicious": 4471,
+        "UL": 7115,
+        "DL": 6332,
+        "UL_benign": 2644,
+        "UL_malicious": 4471,
+        "DL_benign": 6332,
+        "DL_malicious": 0,
+        "total": 13447
+      },
+      {
+        "start": 390.009,
+        "end": 400.009,
+        "benign": 7324,
+        "malicious": 2350,
+        "UL": 5263,
+        "DL": 4411,
+        "UL_benign": 2913,
+        "UL_malicious": 2350,
+        "DL_benign": 4411,
+        "DL_malicious": 0,
+        "total": 9674
+      },
+      {
+        "start": 400.009,
+        "end": 410.009,
+        "benign": 4551,
+        "malicious": 4099,
+        "UL": 4320,
+        "DL": 4330,
+        "UL_benign": 221,
+        "UL_malicious": 4099,
+        "DL_benign": 4330,
+        "DL_malicious": 0,
+        "total": 8650
+      },
+      {
+        "start": 410.009,
+        "end": 420.009,
+        "benign": 2335,
+        "malicious": 1927,
+        "UL": 2133,
+        "DL": 2129,
+        "UL_benign": 206,
+        "UL_malicious": 1927,
+        "DL_benign": 2129,
+        "DL_malicious": 0,
+        "total": 4262
+      },
+      {
+        "start": 420.009,
+        "end": 430.009,
+        "benign": 542,
+        "malicious": 0,
+        "UL": 271,
+        "DL": 271,
+        "UL_benign": 271,
+        "UL_malicious": 0,
+        "DL_benign": 271,
+        "DL_malicious": 0,
+        "total": 542
+      },
+      {
+        "start": 430.009,
+        "end": 440.009,
+        "benign": 380,
+        "malicious": 0,
+        "UL": 190,
+        "DL": 190,
+        "UL_benign": 190,
+        "UL_malicious": 0,
+        "DL_benign": 190,
+        "DL_malicious": 0,
+        "total": 380
+      },
+      {
+        "start": 440.009,
+        "end": 450.009,
+        "benign": 390,
+        "malicious": 0,
+        "UL": 195,
+        "DL": 195,
+        "UL_benign": 195,
+        "UL_malicious": 0,
+        "DL_benign": 195,
+        "DL_malicious": 0,
+        "total": 390
+      },
+      {
+        "start": 450.009,
+        "end": 460.009,
+        "benign": 544,
+        "malicious": 0,
+        "UL": 272,
+        "DL": 272,
+        "UL_benign": 272,
+        "UL_malicious": 0,
+        "DL_benign": 272,
+        "DL_malicious": 0,
+        "total": 544
+      },
+      {
+        "start": 460.009,
+        "end": 470.009,
+        "benign": 384,
+        "malicious": 0,
+        "UL": 192,
+        "DL": 192,
+        "UL_benign": 192,
+        "UL_malicious": 0,
+        "DL_benign": 192,
+        "DL_malicious": 0,
+        "total": 384
+      },
+      {
+        "start": 470.009,
+        "end": 480.009,
+        "benign": 392,
+        "malicious": 0,
+        "UL": 196,
+        "DL": 196,
+        "UL_benign": 196,
+        "UL_malicious": 0,
+        "DL_benign": 196,
+        "DL_malicious": 0,
+        "total": 392
+      },
+      {
+        "start": 480.009,
+        "end": 490.009,
+        "benign": 556,
+        "malicious": 0,
+        "UL": 278,
+        "DL": 278,
+        "UL_benign": 278,
+        "UL_malicious": 0,
+        "DL_benign": 278,
+        "DL_malicious": 0,
+        "total": 556
+      },
+      {
+        "start": 490.009,
+        "end": 500.009,
+        "benign": 384,
+        "malicious": 0,
+        "UL": 192,
+        "DL": 192,
+        "UL_benign": 192,
+        "UL_malicious": 0,
+        "DL_benign": 192,
+        "DL_malicious": 0,
+        "total": 384
+      },
+      {
+        "start": 500.009,
+        "end": 510.009,
+        "benign": 474,
+        "malicious": 0,
+        "UL": 237,
+        "DL": 237,
+        "UL_benign": 237,
+        "UL_malicious": 0,
+        "DL_benign": 237,
+        "DL_malicious": 0,
+        "total": 474
+      },
+      {
+        "start": 510.009,
+        "end": 520.009,
+        "benign": 548,
+        "malicious": 0,
+        "UL": 274,
+        "DL": 274,
+        "UL_benign": 274,
+        "UL_malicious": 0,
+        "DL_benign": 274,
+        "DL_malicious": 0,
+        "total": 548
+      },
+      {
+        "start": 520.009,
+        "end": 530.009,
+        "benign": 384,
+        "malicious": 0,
+        "UL": 192,
+        "DL": 192,
+        "UL_benign": 192,
+        "UL_malicious": 0,
+        "DL_benign": 192,
+        "DL_malicious": 0,
+        "total": 384
+      },
+      {
+        "start": 530.009,
+        "end": 540.009,
+        "benign": 390,
+        "malicious": 0,
+        "UL": 195,
+        "DL": 195,
+        "UL_benign": 195,
+        "UL_malicious": 0,
+        "DL_benign": 195,
+        "DL_malicious": 0,
+        "total": 390
+      },
+      {
+        "start": 540.009,
+        "end": 550.009,
+        "benign": 548,
+        "malicious": 0,
+        "UL": 274,
+        "DL": 274,
+        "UL_benign": 274,
+        "UL_malicious": 0,
+        "DL_benign": 274,
+        "DL_malicious": 0,
+        "total": 548
+      },
+      {
+        "start": 550.009,
+        "end": 560.009,
+        "benign": 382,
+        "malicious": 0,
+        "UL": 191,
+        "DL": 191,
+        "UL_benign": 191,
+        "UL_malicious": 0,
+        "DL_benign": 191,
+        "DL_malicious": 0,
+        "total": 382
+      },
+      {
+        "start": 560.009,
+        "end": 570.009,
+        "benign": 390,
+        "malicious": 0,
+        "UL": 195,
+        "DL": 195,
+        "UL_benign": 195,
+        "UL_malicious": 0,
+        "DL_benign": 195,
+        "DL_malicious": 0,
+        "total": 390
+      },
+      {
+        "start": 570.009,
+        "end": 580.009,
+        "benign": 542,
+        "malicious": 0,
+        "UL": 271,
+        "DL": 271,
+        "UL_benign": 271,
+        "UL_malicious": 0,
+        "DL_benign": 271,
+        "DL_malicious": 0,
+        "total": 542
+      },
+      {
+        "start": 580.009,
+        "end": 590.009,
+        "benign": 384,
+        "malicious": 0,
+        "UL": 192,
+        "DL": 192,
+        "UL_benign": 192,
+        "UL_malicious": 0,
+        "DL_benign": 192,
+        "DL_malicious": 0,
+        "total": 384
+      },
+      {
+        "start": 590.009,
+        "end": 600.009,
+        "benign": 392,
+        "malicious": 0,
+        "UL": 196,
+        "DL": 196,
+        "UL_benign": 196,
+        "UL_malicious": 0,
+        "DL_benign": 196,
+        "DL_malicious": 0,
+        "total": 392
+      }
+    ],
+    "bin_sec": 10
+  },
+  "top_ips": {
+    "top_src": [
+      [
+        "10.3.0.2",
+        66412
+      ],
+      [
+        "10.14.0.31",
+        33890
+      ],
+      [
+        "10.14.0.33",
+        33884
+      ],
+      [
+        "10.14.0.32",
+        33702
+      ],
+      [
+        "10.6.0.2",
+        33468
+      ],
+      [
+        "10.2.0.2",
+        20207
+      ],
+      [
+        "10.14.0.16",
+        16613
+      ],
+      [
+        "10.14.0.18",
+        16506
+      ],
+      [
+        "10.14.0.15",
+        15493
+      ],
+      [
+        "10.14.0.6",
+        10123
+      ]
+    ],
+    "top_dst": [
+      [
+        "10.6.0.2",
+        73199
+      ],
+      [
+        "10.3.0.2",
+        65164
+      ],
+      [
+        "10.2.0.2",
+        56576
+      ],
+      [
+        "10.14.0.31",
+        22521
+      ],
+      [
+        "10.14.0.33",
+        22229
+      ],
+      [
+        "10.14.0.32",
+        21579
+      ],
+      [
+        "10.5.0.2",
+        20572
+      ],
+      [
+        "10.14.0.16",
+        16748
+      ],
+      [
+        "10.14.0.18",
+        16613
+      ],
+      [
+        "10.14.0.17",
+        6109
+      ]
+    ],
+    "per_direction": {
+      "UL": {
+        "top_src": [
+          [
+            "10.14.0.31",
+            33890
+          ],
+          [
+            "10.14.0.33",
+            33884
+          ],
+          [
+            "10.14.0.32",
+            33702
+          ],
+          [
+            "10.14.0.16",
+            16613
+          ],
+          [
+            "10.14.0.18",
+            16506
+          ],
+          [
+            "10.14.0.15",
+            15493
+          ],
+          [
+            "10.14.0.6",
+            10123
+          ],
+          [
+            "10.14.0.10",
+            9350
+          ],
+          [
+            "10.14.0.8",
+            7970
+          ],
+          [
+            "10.14.0.7",
+            6466
+          ]
+        ],
+        "top_dst": [
+          [
+            "10.6.0.2",
+            73199
+          ],
+          [
+            "10.3.0.2",
+            65164
+          ],
+          [
+            "10.2.0.2",
+            56576
+          ],
+          [
+            "10.5.0.2",
+            20572
+          ],
+          [
+            "10.4.0.2",
+            557
+          ]
+        ]
+      },
+      "DL": {
+        "top_src": [
+          [
+            "10.3.0.2",
+            66412
+          ],
+          [
+            "10.6.0.2",
+            33468
+          ],
+          [
+            "10.2.0.2",
+            20207
+          ],
+          [
+            "10.4.0.2",
+            539
+          ],
+          [
+            "10.5.0.2",
+            57
+          ]
+        ],
+        "top_dst": [
+          [
+            "10.14.0.31",
+            22521
+          ],
+          [
+            "10.14.0.33",
+            22229
+          ],
+          [
+            "10.14.0.32",
+            21579
+          ],
+          [
+            "10.14.0.16",
+            16748
+          ],
+          [
+            "10.14.0.18",
+            16613
+          ],
+          [
+            "10.14.0.17",
+            6109
+          ],
+          [
+            "10.14.0.29",
+            2002
+          ],
+          [
+            "10.14.0.15",
+            2000
+          ],
+          [
+            "10.14.0.27",
+            1995
+          ],
+          [
+            "10.14.0.28",
+            1986
+          ]
+        ]
+      }
+    }
+  },
+  "class_imbalance": {
+    "packet_counts": {
+      "benign": 243038,
+      "malicious": 93713
+    },
+    "benign_malicious_ratio": 2.593428873261981,
+    "imbalance_ratio": 2.593428873261981,
+    "UL_counts": {
+      "benign": 122355,
+      "malicious": 93713
+    },
+    "UL_ratio": 1.305635290728074,
+    "DL_counts": {
+      "benign": 120683
+    },
+    "DL_ratio": "inf"
+  },
+  "benign_app_protocol_profile": {
+    "total_benign_packets": 243038,
+    "total_benign_bytes": 137509494,
+    "protocols": {
+      "DNS": {
+        "count": 115,
+        "pct_packets": 0.04731770340440589,
+        "bytes": 14228,
+        "pct_bytes": 0.010346921936895499,
+        "directions": {
+          "UL": 58,
+          "DL": 57
+        },
+        "size_stats": {
+          "n": 115,
+          "mean": 123.72173913043478,
+          "median": 92,
+          "std": 31.99879014726133,
+          "min": 92,
+          "max": 156,
+          "p25": 92.0,
+          "p75": 156.0,
+          "p95": 156.0,
+          "p99": 156.0
+        },
+        "payload_stats": {
+          "n": 115,
+          "mean": 95.72173913043478,
+          "median": 64,
+          "std": 31.99879014726133,
+          "min": 64,
+          "max": 128,
+          "p25": 64.0,
+          "p75": 128.0,
+          "p95": 128.0,
+          "p99": 128.0
+        },
+        "top_src_ports": [
+          [
+            2001,
+            58
+          ],
+          [
+            53,
+            57
+          ]
+        ],
+        "top_dst_ports": [
+          [
+            53,
+            58
+          ],
+          [
+            2001,
+            57
+          ]
+        ]
+      },
+      "HTTP": {
+        "count": 34564,
+        "pct_packets": 14.221644351912047,
+        "bytes": 17593662,
+        "pct_bytes": 12.794507119632046,
+        "directions": {
+          "UL": 557,
+          "DL": 34007
+        },
+        "size_stats": {
+          "n": 34564,
+          "mean": 509.0169540562435,
+          "median": 576.0,
+          "std": 174.66431193227217,
+          "min": 40,
+          "max": 576,
+          "p25": 576.0,
+          "p75": 576.0,
+          "p95": 576.0,
+          "p99": 576.0
+        },
+        "payload_stats": {
+          "n": 34564,
+          "mean": 469.0110519615785,
+          "median": 536.0,
+          "std": 174.6800921241036,
+          "min": 0,
+          "max": 536,
+          "p25": 536.0,
+          "p75": 536.0,
+          "p95": 536.0,
+          "p99": 536.0
+        },
+        "top_src_ports": [
+          [
+            80,
+            34007
+          ],
+          [
+            10033,
+            46
+          ],
+          [
+            10015,
+            46
+          ],
+          [
+            10019,
+            46
+          ],
+          [
+            10035,
+            46
+          ]
+        ],
+        "top_dst_ports": [
+          [
+            1025,
+            33456
+          ],
+          [
+            80,
+            557
+          ],
+          [
+            10019,
+            47
+          ],
+          [
+            10017,
+            47
+          ],
+          [
+            10033,
+            45
+          ]
+        ]
+      },
+      "TCP": {
+        "count": 131576,
+        "pct_packets": 54.13803602728792,
+        "bytes": 39585808,
+        "pct_bytes": 28.787690833914347,
+        "directions": {
+          "UL": 65164,
+          "DL": 66412
+        },
+        "size_stats": {
+          "n": 131576,
+          "mean": 300.85888003891284,
+          "median": 96.0,
+          "std": 265.86968807196104,
+          "min": 40,
+          "max": 576,
+          "p25": 40.0,
+          "p75": 576.0,
+          "p95": 576.0,
+          "p99": 576.0
+        },
+        "payload_stats": {
+          "n": 131576,
+          "mean": 260.85760321031194,
+          "median": 56.0,
+          "std": 265.870931225463,
+          "min": 0,
+          "max": 536,
+          "p25": 0.0,
+          "p75": 536.0,
+          "p95": 536.0,
+          "p99": 536.0
+        },
+        "top_src_ports": [
+          [
+            5001,
+            66412
+          ],
+          [
+            10040,
+            17768
+          ],
+          [
+            10042,
+            17763
+          ],
+          [
+            10041,
+            17581
+          ],
+          [
+            10018,
+            1309
+          ]
+        ],
+        "top_dst_ports": [
+          [
+            5001,
+            65164
+          ],
+          [
+            10040,
+            18521
+          ],
+          [
+            10042,
+            18230
+          ],
+          [
+            10041,
+            17579
+          ],
+          [
+            10016,
+            1317
+          ]
+        ]
+      },
+      "UDP": {
+        "count": 76783,
+        "pct_packets": 31.593001917395632,
+        "bytes": 80315796,
+        "pct_bytes": 58.40745512451671,
+        "directions": {
+          "UL": 56576,
+          "DL": 20207
+        },
+        "size_stats": {
+          "n": 76783,
+          "mean": 1046.0101324511936,
+          "median": 1052,
+          "std": 431.5833713820218,
+          "min": 92,
+          "max": 1428,
+          "p25": 540.0,
+          "p75": 1428.0,
+          "p95": 1428.0,
+          "p99": 1428.0
+        },
+        "payload_stats": {
+          "n": 76783,
+          "mean": 1018.0101324511936,
+          "median": 1024,
+          "std": 431.5833713820218,
+          "min": 64,
+          "max": 1400,
+          "p25": 512.0,
+          "p75": 1400.0,
+          "p95": 1400.0,
+          "p99": 1400.0
+        },
+        "top_src_ports": [
+          [
+            1001,
+            38524
+          ],
+          [
+            5000,
+            20207
+          ],
+          [
+            1000,
+            12253
+          ],
+          [
+            1003,
+            5799
+          ]
+        ],
+        "top_dst_ports": [
+          [
+            5000,
+            56576
+          ],
+          [
+            1000,
+            12251
+          ],
+          [
+            1003,
+            5797
+          ],
+          [
+            1001,
+            2159
+          ]
+        ]
+      }
+    }
+  },
+  "statistical_tests": {
+    "cohens_d_ip_len_benign_vs_malicious": 0.48732715241398955,
+    "cohens_d_l4_payload_benign_vs_malicious": 0.4799497351959689,
+    "cohens_d_ttl_benign_vs_malicious": -2.123620965507262,
+    "cohens_d_ip_len_UL_vs_DL": -0.28340412466538745,
+    "cohens_d_ip_len_UL_benign_vs_malicious": 0.39518423902712657,
+    "cohens_d_ip_len_DL_benign_vs_malicious": null,
+    "entropy_label": 0.853104478032613,
+    "entropy_direction": 0.9413256961297498,
+    "entropy_protocol": 0.9387466656694947,
+    "entropy_app_protocol": 1.7514511942461035,
+    "entropy_attack_type": 1.9582185704330435,
+    "ip_len_benign_vs_malicious_welch_t_stat": 125.43470409128771,
+    "ip_len_benign_vs_malicious_welch_p_value": 0.0,
+    "ip_len_benign_vs_malicious_mannwhitney_U": 14778396295.5,
+    "ip_len_benign_vs_malicious_mannwhitney_p": 0.0,
+    "l4_payload_benign_vs_malicious_welch_t_stat": 123.56714422935156,
+    "l4_payload_benign_vs_malicious_welch_p_value": 0.0,
+    "l4_payload_benign_vs_malicious_mannwhitney_U": 14776643959.0,
+    "l4_payload_benign_vs_malicious_mannwhitney_p": 0.0,
+    "ttl_benign_vs_malicious_welch_t_stat": -740.2837295901128,
+    "ttl_benign_vs_malicious_welch_p_value": 0.0,
+    "ttl_benign_vs_malicious_mannwhitney_U": 2653671021.0,
+    "ttl_benign_vs_malicious_mannwhitney_p": 0.0,
+    "ip_len_UL_vs_DL_welch_t_stat": -87.58300369248744,
+    "ip_len_UL_vs_DL_welch_p_value": 0.0,
+    "ip_len_UL_vs_DL_mannwhitney_U": 8314064534.0,
+    "ip_len_UL_vs_DL_mannwhitney_p": 0.0,
+    "ip_len_UL_benign_vs_malicious_welch_t_stat": 92.3466445719576,
+    "ip_len_UL_benign_vs_malicious_welch_p_value": 0.0,
+    "ip_len_UL_benign_vs_malicious_mannwhitney_U": 6552305637.0,
+    "ip_len_UL_benign_vs_malicious_mannwhitney_p": 0.0,
+    "ks_ip_len_benign_vs_malicious_stat": 0.4393320007228189,
+    "ks_ip_len_benign_vs_malicious_p": 0.0,
+    "ks_ip_len_UL_vs_DL_stat": 0.5759527392125179,
+    "ks_ip_len_UL_vs_DL_p": 0.0,
+    "chi2_direction_label": 72523.2514126726,
+    "chi2_direction_label_p": 0.0,
+    "chi2_direction_label_dof": 1,
+    "cramers_v_direction_label": 0.46407073946541527,
+    "chi2_protocol_label": 5779.318547585344,
+    "chi2_protocol_label_p": 0.0,
+    "chi2_protocol_label_dof": 1
+  },
+  "cross_validation": {
+    "count_parity": {
+      "per_class": {
+        "benign": {
+          "pcap_count": 122355,
+          "pcap_app_count": 62898,
+          "pcap_overhead_count": 59457,
+          "pcap_compared": 62898,
+          "label_count": 59677,
+          "diff": 3221,
+          "pct_diff": 5.4,
+          "within_tolerance": true
+        },
+        "malicious": {
+          "pcap_count": 93713,
+          "pcap_app_count": 64147,
+          "pcap_overhead_count": 29566,
+          "pcap_compared": 64147,
+          "label_count": 63954,
+          "diff": 193,
+          "pct_diff": 0.3,
+          "within_tolerance": true
+        }
+      },
+      "overall_discrepancy_pct": 2.761,
+      "tolerance_pct": 10.0,
+      "pass": true
+    },
+    "dual_vantage": {
+      "vantage_a": "UPF",
+      "vantage_b": "gNodeB",
+      "UPF_malicious_total": 93713,
+      "gNodeB_malicious_total": 93713,
+      "count_ratio": 1.0,
+      "attack_type_cosine_sim": 1.0,
+      "per_type": {
+        "dns_amplification": {
+          "UPF": 20514,
+          "gNodeB": 20514,
+          "ratio": 1.0
+        },
+        "http_flood": {
+          "UPF": 33105,
+          "gNodeB": 33105,
+          "ratio": 1.0
+        },
+        "tcp_syn_flood": {
+          "UPF": 17845,
+          "gNodeB": 17845,
+          "ratio": 1.0
+        },
+        "udp_flood": {
+          "UPF": 22249,
+          "gNodeB": 22249,
+          "ratio": 1.0
+        }
+      },
+      "pass": true
+    }
+  }
+}

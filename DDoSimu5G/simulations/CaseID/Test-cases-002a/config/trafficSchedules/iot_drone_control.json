@@ -1,0 +1,50 @@
+{
+  "description": "Drone - Command & Control with Telemetry",
+  "deviceType": "drone",
+  "ueId": 3,
+  "schedule": [
+    {
+      "app_id": 0,
+      "type": "udp",
+      "startTime": 0,
+      "duration": 400,
+      "destAddress": "udpServer",
+      "destPort": 5000,
+      "messageLength": 512,
+      "sendInterval": 0.1,
+      "burstSize": 1,
+      "comment": "Active flight - telemetry at 10 Hz (position, battery, camera)"
+    },
+    {
+      "app_id": 3,
+      "type": "tcp",
+      "startTime": 100,
+      "duration": 300,
+      "destAddress": "tcpServer",
+      "destPort": 5001,
+      "requestLength": 1024,
+      "requestInterval": 0.5,
+      "keepAlive": true,
+      "comment": "Command channel - persistent connection, command every 0.5s"
+    },
+    {
+      "app_id": 1,
+      "type": "udp",
+      "startTime": 200,
+      "duration": 200,
+      "destAddress": "udpServer",
+      "destPort": 5000,
+      "messageLength": 1400,
+      "sendInterval": 0.033,
+      "burstSize": 1,
+      "comment": "Video stream - 30 fps (MTU-sized packets)"
+    },
+    {
+      "app_id": 9,
+      "type": "idle",
+      "startTime": 400,
+      "duration": 200,
+      "comment": "Landed - standby mode"
+    }
+  ]
+}

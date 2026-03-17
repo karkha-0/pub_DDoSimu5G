@@ -1,0 +1,81 @@
+{
+  "infectionData" : [ {
+    "infected_by" : -1,
+    "infection_status" : "Infected Active",
+    "malware_active_time" : 50.0,
+    "node_postion_at_active_infected" : "(650.00,1050.00)",
+    "node_id" : 0
+  }, {
+    "infected_by" : -1,
+    "infection_status" : "Infected Active",
+    "malware_active_time" : 100.0,
+    "node_postion_at_active_infected" : "(750.00,1000.00)",
+    "node_id" : 1
+  }, {
+    "infected_by" : -1,
+    "infection_status" : "Infected Active",
+    "malware_active_time" : 140.0,
+    "node_postion_at_active_infected" : "(850.00,1100.00)",
+    "node_id" : 2
+  }, {
+    "infected_by" : -1,
+    "infection_status" : "Infected Active",
+    "malware_active_time" : 160.0,
+    "node_postion_at_active_infected" : "(950.00,1150.00)",
+    "node_id" : 3
+  }, {
+    "infected_by" : -1,
+    "infection_status" : "Infected Active",
+    "malware_active_time" : 180.0,
+    "node_postion_at_active_infected" : "(1050.00,1050.00)",
+    "node_id" : 4
+  }, {
+    "infected_by" : -1,
+    "infection_status" : "Infected Active",
+    "malware_active_time" : 200.0,
+    "node_postion_at_active_infected" : "(1150.00,1100.00)",
+    "node_id" : 5
+  }, {
+    "infected_by" : -1,
+    "infection_status" : "Infected Active",
+    "malware_active_time" : 220.0,
+    "node_postion_at_active_infected" : "(1250.00,1150.00)",
+    "node_id" : 6
+  }, {
+    "infected_by" : -1,
+    "infection_status" : "Infected Active",
+    "malware_active_time" : 240.0,
+    "node_postion_at_active_infected" : "(1350.00,1050.00)",
+    "node_id" : 7
+  }, {
+    "infected_by" : -1,
+    "infection_status" : "Infected Active",
+    "malware_active_time" : 260.0,
+    "node_postion_at_active_infected" : "(650.00,1200.00)",
+    "node_id" : 8
+  }, {
+    "infected_by" : -1,
+    "infection_status" : "Infected Active",
+    "malware_active_time" : 280.0,
+    "node_postion_at_active_infected" : "(750.00,1150.00)",
+    "node_id" : 9
+  }, {
+    "infected_by" : -1,
+    "infection_status" : "Infected Active",
+    "malware_active_time" : 300.0,
+    "node_postion_at_active_infected" : "(850.00,1200.00)",
+    "node_id" : 10
+  }, {
+    "infected_by" : -1,
+    "infection_status" : "Infected Active",
+    "malware_active_time" : 320.0,
+    "node_postion_at_active_infected" : "(950.00,1150.00)",
+    "node_id" : 11
+  }, {
+    "infected_by" : -1,
+    "infection_status" : "Infected Active",
+    "malware_active_time" : 340.0,
+    "node_postion_at_active_infected" : "(950.00,1150.00)",
+    "node_id" : 12
+  } ]
+}

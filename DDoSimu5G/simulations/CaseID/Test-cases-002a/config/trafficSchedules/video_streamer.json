@@ -1,0 +1,101 @@
+{
+  "description": "Video Streamer - High-Throughput Video Consumption (eMBB use case)",
+  "deviceType": "video_streamer",
+  "ueId": 7,
+  "schedule": [
+    {
+      "app_id": 0,
+      "type": "dns",
+      "startTime": 0,
+      "duration": 600,
+      "destAddress": "dnsServer",
+      "destPort": 53,
+      "queryLength": 64,
+      "responseLength": 128,
+      "queryInterval": 60.0,
+      "comment": "DNS lookups every 60s for CDN servers"
+    },
+    {
+      "app_id": 1,
+      "type": "http",
+      "startTime": 5,
+      "duration": 30,
+      "destAddress": "httpServer",
+      "destPort": 80,
+      "requestLength": 400,
+      "replyLength": 5000,
+      "numRequests": 3,
+      "requestInterval": 2.0,
+      "httpMethod": "GET",
+      "requestPaths": ["/", "/api/player/config", "/api/video/metadata"],
+      "userAgent": "Mozilla/5.0 (Linux; Android 11; SM-G991B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.45 Mobile Safari/537.36",
+      "contentType": "application/json",
+      "comment": "Initial page load + video metadata"
+    },
+    {
+      "app_id": 2,
+      "type": "tcp",
+      "startTime": 40,
+      "duration": 280,
+      "destAddress": "tcpServer",
+      "destPort": 5001,
+      "requestLength": 65536,
+      "requestInterval": 0.21,
+      "keepAlive": true,
+      "comment": "HD video stream at ~2.5 Mbps (64 KB chunks every 0.21s)"
+    },
+    {
+      "app_id": 3,
+      "type": "udp",
+      "startTime": 50,
+      "duration": 550,
+      "destAddress": "udpServer",
+      "destPort": 5000,
+      "messageLength": 64,
+      "sendInterval": 5.0,
+      "burstSize": 1,
+      "comment": "Video quality feedback (concurrent with stream)"
+    },
+    {
+      "app_id": 4,
+      "type": "tcp",
+      "startTime": 340,
+      "duration": 220,
+      "destAddress": "tcpServer",
+      "destPort": 5001,
+      "requestLength": 65536,
+      "requestInterval": 0.163,
+      "keepAlive": true,
+      "comment": "4K video stream at ~3.2 Mbps (64 KB chunks every 0.163s)"
+    },
+    {
+      "app_id": 5,
+      "type": "http",
+      "startTime": 360,
+      "duration": 60,
+      "destAddress": "httpServer",
+      "destPort": 80,
+      "requestLength": 256,
+      "replyLength": 3000,
+      "numRequests": 5,
+      "requestInterval": 8.0,
+      "httpMethod": "GET",
+      "requestPaths": ["/api/recommendations", "/api/trending", "/api/channels"],
+      "userAgent": "YouTubeApp/17.49.6 (Linux; U; Android 11; SM-G991B)",
+      "contentType": "application/json",
+      "comment": "Browse recommendations (concurrent with stream)"
+    },
+    {
+      "app_id": 6,
+      "type": "tcp",
+      "startTime": 500,
+      "duration": 80,
+      "destAddress": "tcpServer",
+      "destPort": 5001,
+      "requestLength": 256,
+      "requestInterval": 5.0,
+      "keepAlive": true,
+      "comment": "Chat/comments channel during streaming - message every 5s"
+    }
+  ]
+}

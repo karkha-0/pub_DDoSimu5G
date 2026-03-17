@@ -1,0 +1,48 @@
+{
+  "description": "Smart Meter - Utility Monitoring (mMTC use case - adjusted for short sim)",
+  "deviceType": "smart_meter",
+  "ueId": 4,
+  "schedule": [
+    {
+      "app_id": 0,
+      "type": "udp",
+      "startTime": 0,
+      "duration": 600,
+      "destAddress": "udpServer",
+      "destPort": 5000,
+      "messageLength": 96,
+      "sendInterval": 150.0,
+      "burstSize": 1,
+      "comment": "Meter reading every 150s (for 600s sim - realistic would be 900s/15min)"
+    },
+    {
+      "app_id": 1,
+      "type": "dns",
+      "startTime": 5,
+      "duration": 600,
+      "destAddress": "dnsServer",
+      "destPort": 53,
+      "queryLength": 64,
+      "responseLength": 128,
+      "queryInterval": 120.0,
+      "comment": "DNS lookup every 2 min for server discovery (realistic: 30 min)"
+    },
+    {
+      "app_id": 2,
+      "type": "http",
+      "startTime": 50,
+      "duration": 550,
+      "destAddress": "httpServer",
+      "destPort": 80,
+      "requestLength": 256,
+      "replyLength": 2048,
+      "numRequests": 2,
+      "requestInterval": 250.0,
+      "httpMethod": "GET",
+      "requestPaths": ["/m2m/config", "/m2m/firmware", "/m2m/tariff"],
+      "userAgent": "SmartMeter/2.1 (Linux; NB-IoT) CoAP-HTTP-Bridge/1.0",
+      "contentType": "application/json",
+      "comment": "Config updates every 5 min "
+    }
+  ]
+}

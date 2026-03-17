@@ -24,7 +24,6 @@ Makefile.*
 
 # Executables (both old and new names)
 /DDoSim5G
-/DDoSimu5G
 DDoSim5G_dbg
 DDoSimu5G_dbg
 HelloWorldSim
@@ -35,6 +34,7 @@ HelloWorldSim_dbg
 /Simulations/results/
 simulations/CaseID/Test-cases-001/results/
 simulations/CaseID/script/simRun_logs/
+DDoSimu5G/simulations/CaseID/DDoS-Mobility-Study/
 .cmdenv-log
 
 # Dataset and reports

@@ -1,0 +1,30 @@
+{
+  "profileDescription": "DNS Amplification - Pulsing style with hybrid mode",
+  "attackProfile": {
+    "attackType": "dns_amplification",
+    "attackStyle": "pulsing",
+    "behaviorMode": "hybrid"
+  },
+  "timing": {
+    "dormantDuration": 3.0,
+    "attackDuration": 80.0
+  },
+  "attackParameters": {
+    "initialRate": 80,
+    "peakRate": 80,
+    "rampDuration": 0,
+    "burstOnDuration": 5.0,
+    "burstOffDuration": 1.0,
+    "packetSize": 512,
+    "enableSpoofing": true,
+    "queryDomain": "large-response-domain.example.com",
+    "amplificationFactor": 28.0,
+    "openResolvers": "dnsServer"
+  },
+  "targetConfiguration": {
+    "targets": [
+      "generalServer"
+    ],
+    "targetPort": 80
+  }
+}

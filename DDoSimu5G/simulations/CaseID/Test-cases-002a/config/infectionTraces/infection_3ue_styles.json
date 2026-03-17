@@ -1,0 +1,21 @@
+{
+  "infectionData" : [ {
+    "infected_by" : -1,
+    "infection_status" : "Infected Active",
+    "malware_active_time" : 80.0,
+    "node_postion_at_active_infected" : "(700.00,1050.00)",
+    "node_id" : 0
+  }, {
+    "infected_by" : -1,
+    "infection_status" : "Infected Active",
+    "malware_active_time" : 120.0,
+    "node_postion_at_active_infected" : "(900.00,1100.00)",
+    "node_id" : 1
+  }, {
+    "infected_by" : -1,
+    "infection_status" : "Infected Active",
+    "malware_active_time" : 160.0,
+    "node_postion_at_active_infected" : "(1100.00,1150.00)",
+    "node_id" : 2
+  } ]
+}

@@ -1,0 +1,30 @@
+{
+  "profileDescription": "DNS Amplification - Intense style with replace mode",
+  "attackProfile": {
+    "attackType": "dns_amplification",
+    "attackStyle": "intense",
+    "behaviorMode": "replace"
+  },
+  "timing": {
+    "dormantDuration": 1.0,
+    "attackDuration": 90.0
+  },
+  "attackParameters": {
+    "initialRate": 150,
+    "peakRate": 150,
+    "rampDuration": 0,
+    "burstOnDuration": 0,
+    "burstOffDuration": 0,
+    "packetSize": 512,
+    "enableSpoofing": true,
+    "queryDomain": "large-response-domain.example.com",
+    "amplificationFactor": 28.0,
+    "openResolvers": "dnsServer"
+  },
+  "targetConfiguration": {
+    "targets": [
+      "generalServer"
+    ],
+    "targetPort": 80
+  }
+}

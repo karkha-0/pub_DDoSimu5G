@@ -1,0 +1,30 @@
+{
+  "profileDescription": "DNS Amplification - Stealthy style with coexistence mode",
+  "attackProfile": {
+    "attackType": "dns_amplification",
+    "attackStyle": "stealthy",
+    "behaviorMode": "coexistence"
+  },
+  "timing": {
+    "dormantDuration": 12.0,
+    "attackDuration": 30.0
+  },
+  "attackParameters": {
+    "initialRate": 30,
+    "peakRate": 90,
+    "rampDuration": 35.0,
+    "burstOnDuration": 0,
+    "burstOffDuration": 0,
+    "packetSize": 768,
+    "enableSpoofing": true,
+    "queryDomain": "large-response-domain.example.com",
+    "amplificationFactor": 28.0,
+    "openResolvers": "dnsServer"
+  },
+  "targetConfiguration": {
+    "targets": [
+      "generalServer"
+    ],
+    "targetPort": 80
+  }
+}

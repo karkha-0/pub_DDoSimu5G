@@ -21,7 +21,6 @@
 #include <omnetpp.h>  // Include OMNeT++ header
 #include <sys/stat.h>  // For POSIX stat and mkdir functions
 #include <sys/types.h> // For POSIX stat and mkdir functions
-#include <cstdlib> // for system()
 
 using namespace omnetpp;  // Use OMNeT++ namespace
 

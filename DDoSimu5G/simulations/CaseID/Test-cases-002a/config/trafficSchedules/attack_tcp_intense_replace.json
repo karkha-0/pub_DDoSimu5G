@@ -1,0 +1,26 @@
+{
+  "profileDescription": "TCP SYN Flood - Intense style with replace mode (most aggressive)",
+  "attackProfile": {
+    "attackType": "tcp_syn_flood",
+    "attackStyle": "intense",
+    "behaviorMode": "replace"
+  },
+  "timing": {
+    "dormantDuration": 2.0,
+    "attackDuration": 60.0
+  },
+  "attackParameters": {
+    "initialRate": 150,
+    "peakRate": 150,
+    "rampDuration": 0,
+    "burstOnDuration": 0,
+    "burstOffDuration": 0,
+    "enableSpoofing": true
+  },
+  "targetConfiguration": {
+    "targets": [
+      "generalServer"
+    ],
+    "targetPort": 9998
+  }
+}

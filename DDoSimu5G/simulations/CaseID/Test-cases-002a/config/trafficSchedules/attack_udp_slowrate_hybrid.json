@@ -1,0 +1,27 @@
+{
+  "profileDescription": "UDP Flood - Slowrate style with hybrid mode (hard to detect)",
+  "attackProfile": {
+    "attackType": "udp_flood",
+    "attackStyle": "slowrate",
+    "behaviorMode": "hybrid"
+  },
+  "timing": {
+    "dormantDuration": 15.0,
+    "attackDuration": 120.0
+  },
+  "attackParameters": {
+    "initialRate": 60,
+    "peakRate": 60,
+    "rampDuration": 0,
+    "burstOnDuration": 0,
+    "burstOffDuration": 0,
+    "packetSize": 1400,
+    "enableSpoofing": false
+  },
+  "targetConfiguration": {
+    "targets": [
+      "generalServer"
+    ],
+    "targetPort": 9999
+  }
+}

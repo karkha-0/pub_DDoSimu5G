@@ -1,0 +1,72 @@
+{
+  "description": "Wearable Health Monitor - Fitbit/Apple Watch (mMTC use case)",
+  "deviceType": "wearable",
+  "ueId": 0,
+  "schedule": [
+    {
+      "app_id": 0,
+      "type": "udp",
+      "startTime": 0,
+      "duration": 600,
+      "destAddress": "udpServer",
+      "destPort": 5000,
+      "messageLength": 128,
+      "sendInterval": 120.0,
+      "burstSize": 1,
+      "comment": "Heart rate + step count every 120s"
+    },
+    {
+      "app_id": 1,
+      "type": "dns",
+      "startTime": 2,
+      "duration": 600,
+      "destAddress": "dnsServer",
+      "destPort": 53,
+      "queryLength": 64,
+      "responseLength": 128,
+      "queryInterval": 600.0,
+      "comment": "DNS lookup every 10 min for cloud services"
+    },
+    {
+      "app_id": 2,
+      "type": "tcp",
+      "startTime": 5,
+      "duration": 595,
+      "destAddress": "tcpServer",
+      "destPort": 5001,
+      "requestLength": 512,
+      "requestInterval": 30.0,
+      "keepAlive": true,
+      "comment": "Persistent notification channel (push alerts every 30s)"
+    },
+    {
+      "app_id": 3,
+      "type": "udp",
+      "startTime": 300,
+      "duration": 300,
+      "destAddress": "udpServer",
+      "destPort": 5000,
+      "messageLength": 256,
+      "sendInterval": 5.0,
+      "burstSize": 1,
+      "comment": "Exercise mode - GPS tracking + high-freq vitals every 5s"
+    },
+    {
+      "app_id": 4,
+      "type": "http",
+      "startTime": 400,
+      "duration": 120,
+      "destAddress": "httpServer",
+      "destPort": 80,
+      "requestLength": 512,
+      "replyLength": 1024,
+      "numRequests": 1,
+      "requestInterval": 10.0,
+      "httpMethod": "POST",
+      "requestPaths": ["/health/sync", "/health/vitals", "/health/activity"],
+      "userAgent": "FitbitApp/2.3 (iOS 15.0; iPhone13,2)",
+      "contentType": "application/json",
+      "comment": "Sync accumulated data to cloud (once daily)"
+    }
+  ]
+}

@@ -1,0 +1,50 @@
+{
+  "description": "Asset Tracker - GPS Tracking Device (packages, containers, vehicles)",
+  "deviceType": "asset_tracker",
+  "ueId": 5,
+  "schedule": [
+    {
+      "app_id": 0,
+      "type": "udp",
+      "startTime": 0,
+      "duration": 300,
+      "destAddress": "udpServer",
+      "destPort": 5000,
+      "messageLength": 80,
+      "sendInterval": 60.0,
+      "burstSize": 1,
+      "comment": "GPS location update every 60s (stationary phase)"
+    },
+    {
+      "app_id": 0,
+      "type": "udp",
+      "startTime": 300,
+      "duration": 100,
+      "destAddress": "udpServer",
+      "destPort": 5000,
+      "messageLength": 80,
+      "sendInterval": 5.0,
+      "burstSize": 1,
+      "comment": "Movement detected - faster updates every 5s"
+    },
+    {
+      "app_id": 0,
+      "type": "udp",
+      "startTime": 400,
+      "duration": 60,
+      "destAddress": "udpServer",
+      "destPort": 5000,
+      "messageLength": 80,
+      "sendInterval": 1.0,
+      "burstSize": 1,
+      "comment": "Geofence alert - rapid reporting every 1s"
+    },
+    {
+      "app_id": 9,
+      "type": "idle",
+      "startTime": 460,
+      "duration": 140,
+      "comment": "Deep sleep - conserve battery"
+    }
+  ]
+}

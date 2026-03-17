@@ -1,0 +1,44 @@
+{
+  "description": "Industrial IoT Sensor - Temperature/Pressure Monitoring",
+  "deviceType": "industrial_sensor",
+  "ueId": 1,
+  "schedule": [
+    {
+      "app_id": 0,
+      "type": "udp",
+      "startTime": 0,
+      "duration": 600,
+      "destAddress": "udpServer",
+      "destPort": 5000,
+      "messageLength": 64,
+      "sendInterval": 120.0,
+      "burstSize": 1,
+      "comment": "Temperature reading every 2 minutes"
+    },
+    {
+      "app_id": 1,
+      "type": "udp",
+      "startTime": 300,
+      "duration": 60,
+      "destAddress": "udpServer",
+      "destPort": 5000,
+      "messageLength": 64,
+      "sendInterval": 5.0,
+      "burstSize": 10,
+      "comment": "Alert: rapid sampling burst (10 samples/sec for 1 min)"
+    },
+    {
+      "app_id": 3,
+      "type": "tcp",
+      "startTime": 500,
+      "duration": 30,
+      "destAddress": "tcpServer",
+      "destPort": 5001,
+      "requestLength": 2048,
+      "numRequests": 1,
+      "requestInterval": 30.0,
+      "keepAlive": false,
+      "comment": "Firmware update check - single 2KB payload"
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "profileDescription": "TCP SYN Flood - Stealthy style with replace mode",
+  "attackProfile": {
+    "attackType": "tcp_syn_flood",
+    "attackStyle": "stealthy",
+    "behaviorMode": "replace"
+  },
+  "timing": {
+    "dormantDuration": 10.0,
+    "attackDuration": 160.0
+  },
+  "attackParameters": {
+    "initialRate": 10,
+    "peakRate": 10,
+    "rampDuration": 30.0,
+    "burstOnDuration": 0,
+    "burstOffDuration": 0,
+    "enableSpoofing": true
+  },
+  "targetConfiguration": {
+    "targets": [
+      "generalServer"
+    ],
+    "targetPort": 9998
+  }
+}
