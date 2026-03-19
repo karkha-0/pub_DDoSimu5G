@@ -45,7 +45,7 @@ That's it! The script will:
 2. Set up the pub_DDoSimu5G project
 3. Build all components
 
-## Installed Components
+### Installed Components
 
 After installation, you will have:
 
