@@ -189,6 +189,67 @@ After installation, you will have:
 
 Component versions are defined in `env-requirements.json`.
 
+## Results Analysis 
+### Convert D2D Model mobility traces from ONE to Simu5G
+
+If you need to generate new mobility traces (existing traces are pre-generated):
+
+```bash
+cd omnetpp-6.0.1/samples/DDoSimu5G/simulations/CaseID/script/mob_tracesConversionPy/fromONEtoSimu5G/
+
+# Convert JSON mobility traces to .mobility format
+python3 convert_mob_traces.py <path-to-json-mobility> <output.movements>
+```
+
+### Results and Visualization
+
+#### D2D Infection & Mobility Analysis
+
+Plots for the D2D malware propagation model are in:
+
+```bash
+# Activate the project virtual environment (created by setup.sh)
+cd omnetpp-6.0.1
+source venv/bin/activate
+
+cd samples/DDoSimu5G/results_analysis/D2D_analysis/plotting_results_MalwareInfection/
+jupyter notebook
+```
+
+Notebooks:
+- `D2D_Infection_Analysis.ipynb` — infection rate, survival curves, propagation chains
+- `D2D_Contact_Analysis.ipynb` — node connectivity, contact variability
+- `Plotting Infection Propagation.ipynb` — mobility trajectories & infection locations
+
+All required Python packages (pandas, matplotlib, seaborn, lifelines, networkx, etc.) are pre-installed in the virtual environment by `setup.sh`.
+
+### Opening Project in OMNeT++ IDE
+
+```bash
+# Launch OMNeT++ IDE
+source venv/bin/activate
+cd omnetpp-6.0.1
+./bin/omnetpp
+
+# In IDE: File → Open Projects from File System...
+# Select: omnetpp-6.0.1/samples/DDoSimu5G
+```
+
+**Configure NED file locations** (if needed):
+- Right-click project → Properties → OMNeT++ → NED Source Folders
+- Ensure all source directories are included
+
+## Development and Contributing
+
+### Building from Source
+
+```bash
+# If you modify the project source
+cd omnetpp-6.0.1/samples/DDoSimu5G/src
+make clean
+make MODE=release
+```
+
 ## Troubleshooting
 
 ### Installation Issues
@@ -279,66 +340,6 @@ pub_DDoSimu5G/
 This project is licensed under the MIT License. You are free to use, modify, and distribute this software for academic and non-commercial purposes, provided proper credit is given to the original authors.
 
 If you use DDoSimu5G in your research, please cite the repository.
-
-### Convert D2D Model mobility traces from ONE to Simu5G
-
-If you need to generate new mobility traces (existing traces are pre-generated):
-
-```bash
-cd omnetpp-6.0.1/samples/DDoSimu5G/simulations/CaseID/script/mob_tracesConversionPy/fromONEtoSimu5G/
-
-# Convert JSON mobility traces to .mobility format
-python3 convert_mob_traces.py <path-to-json-mobility> <output.movements>
-```
-
-### Results and Visualization
-
-#### D2D Infection & Mobility Analysis
-
-Plots for the D2D malware propagation model are in:
-
-```bash
-# Activate the project virtual environment (created by setup.sh)
-cd omnetpp-6.0.1
-source venv/bin/activate
-
-cd samples/DDoSimu5G/results_analysis/D2D_analysis/plotting_results_MalwareInfection/
-jupyter notebook
-```
-
-Notebooks:
-- `D2D_Infection_Analysis.ipynb` — infection rate, survival curves, propagation chains
-- `D2D_Contact_Analysis.ipynb` — node connectivity, contact variability
-- `Plotting Infection Propagation.ipynb` — mobility trajectories & infection locations
-
-All required Python packages (pandas, matplotlib, seaborn, lifelines, networkx, etc.) are pre-installed in the virtual environment by `setup.sh`.
-
-### Opening Project in OMNeT++ IDE
-
-```bash
-# Launch OMNeT++ IDE
-source venv/bin/activate
-cd omnetpp-6.0.1
-./bin/omnetpp
-
-# In IDE: File → Open Projects from File System...
-# Select: omnetpp-6.0.1/samples/DDoSimu5G
-```
-
-**Configure NED file locations** (if needed):
-- Right-click project → Properties → OMNeT++ → NED Source Folders
-- Ensure all source directories are included
-
-## Development and Contributing
-
-### Building from Source
-
-```bash
-# If you modify the project source
-cd omnetpp-6.0.1/samples/DDoSimu5G/src
-make clean
-make MODE=release
-```
 
 ## Support and Documentation
 
