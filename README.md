@@ -29,6 +29,7 @@ git clone https://github.com/karkha-0/pub_DDoSimu5G.git
 cd pub_DDoSimu5G
 
 # Run complete installation (30-45 minutes)
+sudo chmod +x setup.sh
 ./setup.sh
 ```
 
