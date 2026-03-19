@@ -12,6 +12,13 @@ This project provides a modular simulation framework combining Simu5G and The ON
 
 DDoSimu5G is useful for researchers and practitioners studying IoT-borne malware, network resilience, and 5G traffic behavior under stress.
 
+## Authors & Contacts
+
+- **Karim Khalil** *(corresponding author)* — karim.khalil@eit.lth.se — Department of EIT, Lund University
+- **Christian Gehrmann** — christian.gehrmann@eit.lth.se — Department of EIT, Lund University
+- **Sara Ramezanian** — sara.ramezanian@kau.se — Lund University & Karlstad University
+- **Jakob Sternby** — jakob.sternby@ericsson.com — Ericsson Research
+
 ## Quick Start
 
 ### Prerequisites
@@ -41,11 +48,11 @@ That's it! The script will:
 ### Running Your First Simulation
 
 ```bash
-# Navigate to simulation scripts
-cd omnetpp-6.0.1/samples/DDoSimu5G/simulations/CaseID/script
+# Navigate to TC-001a scripts
+cd omnetpp-6.0.1/samples/DDoSimu5G/simulations/CaseID/Test-cases-001a/script
 
-# Run a test case
-./runSim_TC-Base-DDoS-infec-5RAN-002.sh
+# Run all test cases (interactive menu)
+./run_all_configs.sh
 ```
 
 ## Installation Options
@@ -109,6 +116,45 @@ This is useful if you:
 | CPU | Multi-core recommended for compilation |
 | Python | 3.8+ with pip and venv |
 | Internet | Required for initial download |
+
+## Hardware/Software Configuration Used by Authors
+
+The experiments reported in the paper were run on:
+
+| Component | Specification |
+|-----------|---------------|
+| CPU | Intel Core i7-8700K @ 3.70GHz (6 cores / 12 threads) |
+| RAM | 32 GB DDR4 |
+| OS | Ubuntu 24.04.3 LTS (kernel 6.8.0) |
+| Compiler | GCC (system default) |
+| Simulator | OMNeT++ 6.0.1 Cmdenv mode |
+
+## Kick the Tires
+
+After installation, verify everything works with a short smoke test:
+
+```bash
+cd omnetpp-6.0.1/samples/DDoSimu5G/simulations/CaseID/Test-cases-001a/script
+./run_all_configs.sh
+# Select option 1 (Baseline-TC) — runs ~16 minutes
+```
+
+A successful run produces:
+- Simulation log in `Test-cases-001a/run_results/logs/`
+- Performance stats in `Test-cases-001a/run_results/<label>_<config>_<timestamp>/perf.json`
+- OMNeT++ result files (`.sca`, `.vec`) in `Test-cases-001a/run_results/`
+
+### Expected Runtimes
+
+| Test Case | Paper Label | Description | Expected Runtime | Peak RAM |
+|-----------|------------|-------------|-----------------|----------|
+| Option 1 | Baseline-TC | 100 stationary UEs, benign CBR | ~16 min | ~210 MB |
+| Option 2 | TC001 | 100 mobile UEs, benign CBR | ~16 min | ~210 MB |
+| Option 3 | TC002 | 100 mobile + 400 stationary, benign | TBD | TBD |
+| Option 4 | TC003 | DDoS flooding (500 UEs) | TBD | TBD |
+| **All 4** | — | Full paper reproduction | **~1–2 hours** | — |
+
+> Runtimes measured on the authors' hardware (see above). Your times may vary.
 
 ## Installed Components
 
@@ -179,18 +225,33 @@ pip install jupyter pandas matplotlib numpy
 
 ```
 pub_DDoSimu5G/
-├── setup.sh                    # Master installation script
-├── setup_environment.sh        # Environment-only installer
-├── setup_project.sh           # Project-only installer
-├── env-requirements.json      # Version requirements
-├── CHANGELOG.md               # Version history
-├── src/                       # Project source code
-├── simulations/               # Simulation scenarios
-│   └── CaseID/
-│       └── script/           # Simulation run scripts
-├── modifiedExternalFiles/    # Patches for INET/Simu5G
-├── ONE_Simulator/            # Mobility trace generator
-└── results/                  # Analysis notebooks and data
+├── setup.sh                        # Master installation script
+├── setup_environment.sh            # Environment-only installer
+├── setup_project.sh                # Project-only installer
+├── AUTHORS                         # Authors and citation info
+├── LICENSE                         # MIT License
+├── docs/
+│   └── env-requirements.json       # Version requirements
+├── DDoSimu5G/                      # Main project (installed into omnetpp samples/)
+│   ├── src/                        # DDoSimu5G C++ source code
+│   ├── simulations/CaseID/
+│   │   ├── config/                 # Shared XML configs & infection traces
+│   │   ├── networks/               # NED network topologies
+│   │   ├── Test-cases-001a/        # ★ Self-contained TC-001 (paper test cases)
+│   │   │   ├── TC-Base-DDoS-infec-5RAN-002.ini   # Benign configs
+│   │   │   ├── TC-flood-DDoS-infec-5RAN-002.ini  # DDoS flood configs
+│   │   │   ├── config/             # Local XML + infection traces
+│   │   │   ├── networks/           # Local NED files
+│   │   │   └── script/
+│   │   │       └── run_all_configs.sh  # ★ Unified runner (paper test cases)
+│   │   └── Test-cases-001/         # Legacy (reference only)
+│   ├── results_analysis/
+│   │   └── D2D_analysis/           # ★ D2D infection & mobility analysis
+│   │       ├── plotting_results_MalwareInfection/  # Jupyter notebooks + plots
+│   │       └── simulation_results_MalwareInfection/ # Raw ONE Simulator run data
+│   ├── modifiedExternalFiles/      # Patches for INET/Simu5G
+│   └── ONE_Simulator/              # Mobility trace generator
+└── archive/                        # Deprecated scripts
 ```
 
 ## Crediting
@@ -200,22 +261,31 @@ This project is licensed under the MIT License. You are free to use, modify, and
 If you use DDoSimu5G in your research, please cite the repository.
 
 
-The simulation run scripts are located in `simulations/CaseID/script/`:
+### Running the Paper Test Cases (TC-001)
+
+The unified runner maps directly to the test cases in Table 5 of the paper:
 
 ```bash
-cd omnetpp-6.0.1/samples/DDoSimu5G/simulations/CaseID/script
-
-# Run a DDoS infection scenario
-./runSim_TC-Base-DDoS-infec-5RAN-002.sh
-
-# Run a baseline scenario (no attack)
-./runSim_TC-Base-benign-5RAN-001.sh
+cd omnetpp-6.0.1/samples/DDoSimu5G/simulations/CaseID/Test-cases-001a/script
+./run_all_configs.sh
 ```
 
-The scripts automatically:
-- Source the OMNeT++ environment
-- Set up library paths
-- Run the simulation with proper parameters
+The interactive menu offers:
+
+| Option | Paper Label | Scenario |
+|--------|------------|----------|
+| 1 | Baseline-TC | 100 stationary UEs, benign CBR |
+| 2 | TC001 | 100 mobile UEs (RWP), benign CBR |
+| 3 | TC002 | 100 mobile + 400 stationary, benign |
+| 4 | TC003 | DDoS flooding (100 mobile + 400 stationary) |
+| 14 | — | Run all 4 paper test cases |
+
+The script automatically:
+- Detects the OMNeT++, INET, Simu5G, and DDoSimu5G installations
+- Sets up library paths and environment
+- Runs simulations in Cmdenv (headless) mode
+- Collects performance metrics (`perf.json`) per run
+- Logs output to `run_results/logs/`
 
 **Note**: Modified source files from `modifiedExternalFiles/` are automatically applied during installation by `setup_project.sh`.
 
@@ -231,31 +301,32 @@ python3 convert_mob_traces.py <path-to-json-mobility> <output.movements>
 ```
 
 ### Results and Visualization
-  
-All plots are reproducible using the Jupyter notebooks in `results/Test-Cases-001/plotting/Test_cases_plots/`:
+
+#### D2D Infection & Mobility Analysis
+
+Plots for the D2D malware propagation model are in:
 
 ```bash
-# Activate Python environment (automatically created during setup)
+# Activate the project virtual environment (created by setup.sh)
 cd omnetpp-6.0.1
 source venv/bin/activate
 
-# Install Jupyter if not already installed
-pip install jupyter pandas matplotlib numpy
-
-# Open Jupyter notebooks
-cd samples/DDoSimu5G/results/Test-Cases-001/plotting/Test_cases_plots/
+cd samples/DDoSimu5G/results_analysis/D2D_analysis/plotting_results_MalwareInfection/
 jupyter notebook
 ```
 
-**Python packages installed by setup**:
-- `posix_ipc`: For inter-process communication and shared memory operations
+Notebooks:
+- `D2D_Infection_Analysis.ipynb` — infection rate, survival curves, propagation chains
+- `D2D_Contact_Analysis.ipynb` — node connectivity, contact variability
+- `Plotting Infection Propagation.ipynb` — mobility trajectories & infection locations
 
-Use the pre-exported `.csv` files in `results/Test-Cases-001/plotting/raw_data/` or regenerate with OMNeT++ scavetool.
+All required Python packages (pandas, matplotlib, seaborn, lifelines, networkx, etc.) are pre-installed in the virtual environment by `setup.sh`.
 
 ### Opening Project in OMNeT++ IDE
 
 ```bash
 # Launch OMNeT++ IDE
+source venv/bin/activate
 cd omnetpp-6.0.1
 ./bin/omnetpp
 

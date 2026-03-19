@@ -1,30 +1,44 @@
 # DDoSimu5G Authors and Contributors
 
-## Principal Authors
-<!-- Add principal authors here -->
+## Authors
 
-## Contributors
-<!-- Add contributors here -->
+- **Karim Khalil** *(Corresponding author)*
+  Department of EIT, Lund University, Lund, Sweden
+  Email: karim.khalil@eit.lth.se
+  ORCID: [0009-0009-2775-5677](https://orcid.org/0009-0009-2775-5677)
+
+- **Christian Gehrmann**
+  Department of EIT, Lund University, Lund, Sweden
+  Email: christian.gehrmann@eit.lth.se
+  ORCID: [0000-0001-8003-200X](https://orcid.org/0000-0001-8003-200X)
+
+- **Sara Ramezanian**
+  Department of EIT, Lund University, Lund, Sweden &
+  Dep. of Mathematics & Computer Science, Karlstad University, Karlstad, Sweden
+  Email: sara.ramezanian@kau.se
+  ORCID: [0000-0002-5526-0817](https://orcid.org/0000-0002-5526-0817)
+
+- **Jakob Sternby**
+  Ericsson Research, Ericsson, Lund, Sweden
+  Email: jakob.sternby@ericsson.com
 
 ## Citation
 If you use DDoSimu5G in your research, please cite our work:
 
 ```bibtex
-@article{ddosimu5g,
+@inproceedings{khalil2026ddosimu5g,
   title={DDoSimu5G: A DDoS Attack Simulation Framework for 5G Networks},
-  author={[Authors to be added]},
-  journal={[Journal to be added]},
-  year={2025},
-  publisher={[Publisher to be added]}
+  author={Khalil, Karim and Gehrmann, Christian and Ramezanian, Sara and Sternby, Jakob},
+  booktitle={Proceedings of the ACM SIGSIM Conference on Principles of Advanced Discrete Simulation (PADS)},
+  year={2026},
+  publisher={ACM},
+  doi={[to be added after publication]}
 }
 ```
 
-## Related Publications
-<!-- Add related publications here -->
-
 ## Acknowledgments
 This project builds upon:
-- OMNeT++ discrete event simulator
-- INET Framework
-- Simu5G - 5G NR and LTE/LTE-A user-plane simulation model
-- The ONE Simulator for mobility trace generation
+- [OMNeT++](https://omnetpp.org/) discrete event simulator
+- [INET Framework](https://inet.omnetpp.org/)
+- [Simu5G](http://simu5g.org/) - 5G NR and LTE/LTE-A user-plane simulation model
+- [The ONE Simulator](https://akeranen.github.io/the-one/) for mobility trace generation
