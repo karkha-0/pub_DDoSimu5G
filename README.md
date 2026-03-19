@@ -129,30 +129,50 @@ The experiments reported in the paper were run on:
 | Compiler | GCC (system default) |
 | Simulator | OMNeT++ 6.0.1 Cmdenv mode |
 
-## Kick the Tires
+## Running the Simulations
 
-After installation, verify everything works with a short smoke test:
+After installation, run the paper test cases (Table 5 of the paper):
 
 ```bash
 cd omnetpp-6.0.1/samples/DDoSimu5G/simulations/CaseID/Test-cases-001a/script
 ./run_all_configs.sh
-# Select option 1 (Baseline-TC) — runs ~16 minutes
 ```
+
+The interactive menu offers:
+
+| Option | Paper Label | Scenario |
+|--------|------------|----------|
+| 1 | Baseline-TC | 100 stationary UEs, benign CBR |
+| 2 | TC001 | 100 mobile UEs (RWP), benign CBR |
+| 3 | TC002 | 100 mobile + 400 stationary, benign |
+| 4 | TC003 | DDoS flooding (100 mobile + 400 stationary) |
+| 14 | — | Run all 4 paper test cases |
+
+For a quick **smoke test**, select option 1 (Baseline-TC) — runs in ~16 minutes.
+
+The script automatically:
+- Detects the OMNeT++, INET, Simu5G, and DDoSimu5G installations
+- Sets up library paths and environment
+- Runs simulations in Cmdenv (headless) mode
+- Collects performance metrics (`perf.json`) per run
+- Logs output to `run_results/logs/`
 
 A successful run produces:
 - Simulation log in `Test-cases-001a/run_results/logs/`
 - Performance stats in `Test-cases-001a/run_results/<label>_<config>_<timestamp>/perf.json`
 - OMNeT++ result files (`.sca`, `.vec`) in `Test-cases-001a/run_results/`
 
+**Note**: Modified source files from `modifiedExternalFiles/` are automatically applied during installation by `setup_project.sh`.
+
 ### Expected Runtimes
 
 | Test Case | Paper Label | Description | Expected Runtime | Peak RAM |
 |-----------|------------|-------------|-----------------|----------|
 | Option 1 | Baseline-TC | 100 stationary UEs, benign CBR | ~16 min | ~210 MB |
-| Option 2 | TC001 | 100 mobile UEs, benign CBR | ~16 min | ~210 MB |
+| Option 2 | TC001 | 100 mobile UEs, benign CBR | ~22 min | ~285 MB |
 | Option 3 | TC002 | 100 mobile + 400 stationary, benign | TBD | TBD |
-| Option 4 | TC003 | DDoS flooding (500 UEs) | TBD | TBD |
-| **All 4** | — | Full paper reproduction | **~1–2 hours** | — |
+| Option 4 | TC003 | DDoS flooding (500 UEs) | ~128 min | TBD |
+| **All 4** | — | Full paper reproduction | **~3–4 hours** | — |
 
 > Runtimes measured on the authors' hardware (see above). Your times may vary.
 
@@ -260,35 +280,6 @@ This project is licensed under the MIT License. You are free to use, modify, and
 
 If you use DDoSimu5G in your research, please cite the repository.
 
-
-### Running the Paper Test Cases (TC-001)
-
-The unified runner maps directly to the test cases in Table 5 of the paper:
-
-```bash
-cd omnetpp-6.0.1/samples/DDoSimu5G/simulations/CaseID/Test-cases-001a/script
-./run_all_configs.sh
-```
-
-The interactive menu offers:
-
-| Option | Paper Label | Scenario |
-|--------|------------|----------|
-| 1 | Baseline-TC | 100 stationary UEs, benign CBR |
-| 2 | TC001 | 100 mobile UEs (RWP), benign CBR |
-| 3 | TC002 | 100 mobile + 400 stationary, benign |
-| 4 | TC003 | DDoS flooding (100 mobile + 400 stationary) |
-| 14 | — | Run all 4 paper test cases |
-
-The script automatically:
-- Detects the OMNeT++, INET, Simu5G, and DDoSimu5G installations
-- Sets up library paths and environment
-- Runs simulations in Cmdenv (headless) mode
-- Collects performance metrics (`perf.json`) per run
-- Logs output to `run_results/logs/`
-
-**Note**: Modified source files from `modifiedExternalFiles/` are automatically applied during installation by `setup_project.sh`.
-
 ### Convert D2D Model mobility traces from ONE to Simu5G
 
 If you need to generate new mobility traces (existing traces are pre-generated):
@@ -338,15 +329,6 @@ cd omnetpp-6.0.1
 - Right-click project → Properties → OMNeT++ → NED Source Folders
 - Ensure all source directories are included
 
-## Migration from bootstrap_install.sh
-
-If you previously used `bootstrap_install.sh`:
-
-1. The old script is now `bootstrap_install.old.sh` (deprecated)
-2. Use `setup.sh` for the same one-command installation
-3. Or use the modular scripts for more control
-4. See `CHANGELOG.md` for detailed migration guide
-
 ## Development and Contributing
 
 ### Building from Source
@@ -357,10 +339,6 @@ cd omnetpp-6.0.1/samples/DDoSimu5G/src
 make clean
 make MODE=release
 ```
-
-### Running Tests
-
-Test cases are defined as simulation configurations. See `simulations/CaseID/omnetpp.ini` for all scenarios.
 
 ## Support and Documentation
 
