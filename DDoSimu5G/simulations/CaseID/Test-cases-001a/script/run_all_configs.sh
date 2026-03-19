@@ -17,65 +17,44 @@
 
 set -euo pipefail
 
-# ── Locate and source environments ──────────────────────────────────────────
+# ── Derive ALL paths from the script's fixed position in the tree ─────────
+# This script always lives at:
+#   <omnetpp>/samples/DDoSimu5G/simulations/CaseID/Test-cases-001a/script/
+# So every dependency can be calculated without searching or env-var guessing.
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-TC_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"        # Test-cases-001a
-SIM_DIR="$(cd "$TC_DIR/../.." && pwd)"        # simulations/CaseID
+TC_DIR="$(cd "$SCRIPT_DIR/.."              && pwd)"   # Test-cases-001a
+DDOSIMU5G_ROOT="$(cd "$SCRIPT_DIR/../../../../"    && pwd)"   # 4 up → DDoSimu5G project root
+OMNET_ROOT="$(cd "$SCRIPT_DIR/../../../../../../" && pwd)"   # 6 up → OMNeT++ installation root
 
-# Method 1: OMNET_ROOT already set
-if [ -n "${OMNET_ROOT:-}" ] && [ -f "$OMNET_ROOT/setenv" ]; then
-    OMNET_DIR="$OMNET_ROOT"
-# Method 2: Walk up directory tree
-else
-    OMNET_DIR=""
-    search_dir="$SCRIPT_DIR"
-    for i in {1..10}; do
-        if [ -f "$search_dir/setenv" ] && [ -f "$search_dir/bin/omnetpp" ]; then
-            OMNET_DIR="$search_dir"
-            break
-        fi
-        search_dir="$(dirname "$search_dir")"
-    done
-fi
-
-if [ -n "$OMNET_DIR" ] && [ -f "$OMNET_DIR/setenv" ]; then
-    echo "Sourcing OMNeT++ environment from $OMNET_DIR/setenv"
-    source "$OMNET_DIR/setenv" -q
-else
-    echo "ERROR: Cannot find OMNeT++ installation"
-    echo "Searched from: $SCRIPT_DIR"
-    echo "Please either:"
-    echo "  1. Run from installed project: <install-dir>/omnetpp-6.0.1/samples/DDoSimu5G/simulations/..."
-    echo "  2. Set OMNET_ROOT environment variable: export OMNET_ROOT=/path/to/omnetpp-6.0.1"
+# Quick sanity-check: opp_run must exist in the derived OMNeT++ root
+if [ ! -f "$OMNET_ROOT/bin/opp_run" ] && [ ! -f "$OMNET_ROOT/bin/opp_run_dbg" ]; then
+    echo "ERROR: opp_run not found under $OMNET_ROOT/bin/"
+    echo "The script must reside at:"
+    echo "  <omnetpp-root>/samples/DDoSimu5G/simulations/CaseID/Test-cases-001a/script/"
     exit 1
 fi
 
-INET_DIR="$OMNET_DIR/samples/inet4.5"
-if [ -f "$INET_DIR/setenv" ]; then
-    echo "Sourcing INET environment from $INET_DIR/setenv"
-    source "$INET_DIR/setenv" -q
-else
-    echo "ERROR: Cannot find INET at $INET_DIR"; exit 1
-fi
+# Discover INET and Simu5G by glob — works for any version (inet4.5, inet4.5.2, Simu5G-1.4.0, …)
+INET_ROOT="$(find "$OMNET_ROOT/samples" -maxdepth 1 -type d -name "inet*" 2>/dev/null | sort -V | tail -1)"
+SIMU5G_ROOT="$(find "$OMNET_ROOT/samples" -maxdepth 1 -type d -name "Simu5G*" 2>/dev/null | sort -V | tail -1)"
 
-SIMU5G_DIR="$OMNET_DIR/samples/Simu5G"
-if [ -f "$SIMU5G_DIR/setenv" ]; then
-    echo "Sourcing Simu5G environment from $SIMU5G_DIR/setenv"
-    cd "$SIMU5G_DIR" && source ./setenv -f && cd - > /dev/null
-else
-    echo "ERROR: Cannot find Simu5G at $SIMU5G_DIR"; exit 1
-fi
+if [ -z "$INET_ROOT" ];    then echo "ERROR: No inet* directory found in $OMNET_ROOT/samples/";   exit 1; fi
+if [ -z "$SIMU5G_ROOT" ];  then echo "ERROR: No Simu5G* directory found in $OMNET_ROOT/samples/"; exit 1; fi
 
-DDOSIMU5G_DIR="$OMNET_DIR/samples/DDoSimu5G"
-if [ -f "$DDOSIMU5G_DIR/setenv" ]; then
-    echo "Sourcing DDoSimu5G environment from $DDOSIMU5G_DIR/setenv"
-    source "$DDOSIMU5G_DIR/setenv" -q
-else
-    echo "ERROR: Cannot find DDoSimu5G at $DDOSIMU5G_DIR"; exit 1
-fi
+export OMNET_ROOT INET_ROOT SIMU5G_ROOT DDOSIMU5G_ROOT
+
+# Add bin directories to PATH (skip if already present)
+for _bindir in "$OMNET_ROOT/bin" "$INET_ROOT/bin" "$SIMU5G_ROOT/bin"; do
+    [[ ":$PATH:" != *":$_bindir:"* ]] && export PATH="$_bindir:$PATH"
+done
 
 export LD_LIBRARY_PATH="${INET_ROOT}/src:${SIMU5G_ROOT}/src:${DDOSIMU5G_ROOT}/src:${LD_LIBRARY_PATH:-}"
-export PROJECT_ROOT_DIR="$DDOSIMU5G_DIR"
+export PROJECT_ROOT_DIR="$DDOSIMU5G_ROOT"
+
+echo "OMNeT++   : $OMNET_ROOT"
+echo "INET      : $INET_ROOT"
+echo "Simu5G    : $SIMU5G_ROOT"
+echo "DDoSimu5G : $DDOSIMU5G_ROOT"
 
 # ── INI files (self-contained inside TC-001a) ──────────────────────────────
 BASE_INI="$TC_DIR/TC-Base-DDoS-infec-5RAN-002.ini"
