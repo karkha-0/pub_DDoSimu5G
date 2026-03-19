@@ -173,9 +173,9 @@ A successful run produces:
 |-----------|------------|-------------|-----------------|----------|
 | Option 1 | Baseline-TC | 100 stationary UEs, benign CBR | ~16 min | ~210 MB |
 | Option 2 | TC001 | 100 mobile UEs, benign CBR | ~22 min | ~285 MB |
-| Option 3 | TC002 | 100 mobile + 400 stationary, benign | TBD | TBD |
+| Option 3 | TC002 | 100 mobile + 400 stationary, benign | ~139 min | ~614 MB |
 | Option 4 | TC003 | DDoS flooding (500 UEs) | ~128 min | TBD |
-| **All 4** | — | Full paper reproduction | **~3–4 hours** | — |
+| **All 4** | — | Full paper reproduction | **~5–6 hours** | — |
 
 > Runtimes measured on the authors' hardware (see above). Your times may vary.
 

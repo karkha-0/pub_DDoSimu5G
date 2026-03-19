@@ -58,10 +58,17 @@ fi
 DDOSIMU5G_DIR="$OMNET_DIR/samples/DDoSimu5G"
 if [ -f "$DDOSIMU5G_DIR/setenv" ]; then
     echo "Sourcing DDoSimu5G environment from $DDOSIMU5G_DIR/setenv"
-    source "$DDOSIMU5G_DIR/setenv" -q
+    source "$DDOSIMU5G_DIR/setenv" -q || true
 else
     echo "ERROR: Cannot find DDoSimu5G at $DDOSIMU5G_DIR"
     exit 1
+fi
+
+# Fallback: if setenv did not export DDOSIMU5G_ROOT (e.g. Makefile missing),
+# derive it directly from the known directory.
+if [ -z "$DDOSIMU5G_ROOT" ]; then
+    echo "Warning: setenv did not set DDOSIMU5G_ROOT — using $DDOSIMU5G_DIR directly"
+    export DDOSIMU5G_ROOT="$DDOSIMU5G_DIR"
 fi
 
 # Now INET_ROOT, SIMU5G_ROOT, and DDOSIMU5G_ROOT are set - use absolute paths

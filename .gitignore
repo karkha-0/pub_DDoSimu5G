@@ -23,8 +23,6 @@ Makefile.*
 *_sm.h
 
 # Executables (both old and new names)
-/DDoSim5G
-/DDoSimu5G
 DDoSim5G_dbg
 DDoSimu5G_dbg
 HelloWorldSim

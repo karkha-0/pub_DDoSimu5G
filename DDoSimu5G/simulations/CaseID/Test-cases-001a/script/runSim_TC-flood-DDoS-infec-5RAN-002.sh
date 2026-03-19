@@ -58,10 +58,17 @@ fi
 DDOSIMU5G_DIR="$OMNET_DIR/samples/DDoSimu5G"
 if [ -f "$DDOSIMU5G_DIR/setenv" ]; then
     echo "Sourcing DDoSimu5G environment from $DDOSIMU5G_DIR/setenv"
-    source "$DDOSIMU5G_DIR/setenv" -q
+    source "$DDOSIMU5G_DIR/setenv" -q || true
 else
     echo "ERROR: Cannot find DDoSimu5G at $DDOSIMU5G_DIR"
     exit 1
+fi
+
+# Fallback: if setenv did not export DDOSIMU5G_ROOT (e.g. Makefile missing),
+# derive it directly from the known directory.
+if [ -z "$DDOSIMU5G_ROOT" ]; then
+    echo "Warning: setenv did not set DDOSIMU5G_ROOT — using $DDOSIMU5G_DIR directly"
+    export DDOSIMU5G_ROOT="$DDOSIMU5G_DIR"
 fi
 
 # Now INET_ROOT, SIMU5G_ROOT, and DDOSIMU5G_ROOT are set - use absolute paths
@@ -109,24 +116,24 @@ DATE_TIME=$(date +"%Y%m%d_%H%M%S")
 LOG_FILE="$LOG_DIR/${CONFIG_NAME}_simulation_DDOS_FLAG_${DDOS_FLAG}_${SIMTIME}_${DATE_TIME}.log"
 
 
-export PROJECT_ROOT_DIR="../../.."
-samples_dir="../../../../"
+export PROJECT_ROOT_DIR="$DDOSIMU5G_ROOT"
 
 
 # Start the timer
 START_TIME=$(date +%s)
 
-#opp_run -r 0 -c TC-Base-DDoS-infec-5RAN-002 -n $PROJECT_ROOT_DIR/simulations/CaseID/networks/:$PROJECT_ROOT_DIR/src/:$samples_dir/inet4.5/src:$samples_dir/Simu5G/src -l $samples_dir/inet4.5/src/libINET.so -l $samples_dir/Simu5G/src/libsimu5g.so -l $PROJECT_ROOT_DIR/src/libDDoSimu5G.so -u Cmdenv -f  ../Test-cases-001/TC-Base-DDoS-infec-5RAN-002.ini -s --cmdenv-redirect-output=true > "$LOG_FILE" 2>&1
+#opp_run -r 0 -c TC-Base-DDoS-infec-5RAN-002 -n $PROJECT_ROOT_DIR/simulations/CaseID/networks/:$PROJECT_ROOT_DIR/src/:$samples_dir/inet4.5/src:$samples_dir/Simu5G-1.2.2/src -l $samples_dir/inet4.5/src/libINET.so -l $samples_dir/Simu5G-1.2.2/src/libsimu5g.so -l $PROJECT_ROOT_DIR/src/libDDoSimu5G.so -u Cmdenv -f  ../Test-cases-001/TC-Base-DDoS-infec-5RAN-002.ini -s --cmdenv-redirect-output=true > "$LOG_FILE" 2>&1
 
 # Run simulation with selected repetition and optional parameter override
   #-c TC-Base-DDoS-infec-5RAN-002 \
   
 opp_run -r $DDOS_FLAG \
   -c $CONFIG_NAME \
-  -n $PROJECT_ROOT_DIR/simulations/CaseID/networks/:$PROJECT_ROOT_DIR/src/:$samples_dir/inet4.5/src:$samples_dir/Simu5G/src \
-  -l $samples_dir/inet4.5/src/libINET.so \
-  -l $samples_dir/Simu5G/src/libsimu5g.so \
-  -l $PROJECT_ROOT_DIR/src/libDDoSimu5G.so \
+  -n $DDOSIMU5G_ROOT/simulations/CaseID/networks/:$DDOSIMU5G_ROOT/src/:$INET_ROOT/src:$SIMU5G_ROOT/src \
+  -l $INET_ROOT/src/libINET.so \
+  -l $SIMU5G_ROOT/src/libsimu5g.so \
+  -l $DDOSIMU5G_ROOT/src/libDDoSimu5G.so \
+  --image-path=$INET_ROOT/images:$SIMU5G_ROOT/images \
   -u Cmdenv \
   -f ../Test-cases-001/TC-flood-DDoS-infec-5RAN-002.ini \
   -s \
