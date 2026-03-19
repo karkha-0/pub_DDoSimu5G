@@ -45,15 +45,18 @@ That's it! The script will:
 2. Set up the pub_DDoSimu5G project
 3. Build all components
 
-### Running Your First Simulation
+## Installed Components
 
-```bash
-# Navigate to TC-001a scripts
-cd omnetpp-6.0.1/samples/DDoSimu5G/simulations/CaseID/Test-cases-001a/script
+After installation, you will have:
 
-# Run all test cases (interactive menu)
-./run_all_configs.sh
-```
+- **OMNeT++ 6.0.1**: Network simulation framework (WITH_NETBUILDER enabled)
+- **INET 4.5.0**: Internet protocol suite for OMNeT++
+- **Simu5G 1.2.2**: 5G NR network simulation library
+- **pub_DDoSimu5G**: This project with DDoS simulation capabilities
+- **Python venv**: Virtual environment with `posix_ipc` for result analysis
+- **ONE Simulator 1.6.0**: Opportunistic Network Environment (optional)
+
+Component versions are defined in `env-requirements.json`.
 
 ## Installation Options
 
@@ -176,18 +179,6 @@ A successful run produces:
 
 > Runtimes measured on the authors' hardware (see above). Your times may vary.
 
-## Installed Components
-
-After installation, you will have:
-
-- **OMNeT++ 6.0.1**: Network simulation framework (WITH_NETBUILDER enabled)
-- **INET 4.5.0**: Internet protocol suite for OMNeT++
-- **Simu5G 1.2.2**: 5G NR network simulation library
-- **pub_DDoSimu5G**: This project with DDoS simulation capabilities
-- **Python venv**: Virtual environment with `posix_ipc` for result analysis
-- **ONE Simulator 1.6.0**: Opportunistic Network Environment (optional)
-
-Component versions are defined in `env-requirements.json`.
 
 ## Results Analysis 
 ### Convert D2D Model mobility traces from ONE to Simu5G
