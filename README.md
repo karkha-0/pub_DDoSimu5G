@@ -40,11 +40,6 @@ sudo chmod +x setup.sh
 ./setup.sh
 ```
 
-That's it! The script will:
-1. Install OMNeT++ 6.0.1, INET 4.5.0, and Simu5G 1.2.2
-2. Set up the pub_DDoSimu5G project
-3. Build all components
-
 ### Installed Components
 
 After installation, you will have:
@@ -57,6 +52,11 @@ After installation, you will have:
 - **ONE Simulator 1.6.0**: Opportunistic Network Environment (optional)
 
 Component versions are defined in `env-requirements.json`.
+
+That's it! The script will:
+1. Install OMNeT++ 6.0.1, INET 4.5.0, and Simu5G 1.2.2
+2. Set up the pub_DDoSimu5G project
+3. Build all components
 
 ## Installation Options
 
