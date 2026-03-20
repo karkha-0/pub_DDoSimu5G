@@ -241,7 +241,7 @@ install_omnetpp() {
   
   # Install packages required by OMNeT++ IDE and analysis tools
   pip install -q --upgrade pip wheel setuptools
-  pip install -q numpy scipy pandas matplotlib posix_ipc || warn "Failed to install some Python packages"
+  pip install -q numpy scipy pandas matplotlib posix_ipc ipykernel || warn "Failed to install some Python packages"
   
   # Install additional requirements if file exists
   if [ -f ./python/requirements.txt ]; then
