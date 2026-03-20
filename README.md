@@ -174,8 +174,8 @@ A successful run produces:
 | Option 1 | Baseline-TC | 100 stationary UEs, benign CBR | ~16 min | ~210 MB |
 | Option 2 | TC001 | 100 mobile UEs, benign CBR | ~22 min | ~285 MB |
 | Option 3 | TC002 | 100 mobile + 400 stationary, benign | ~139 min | ~614 MB |
-| Option 4 | TC003 | DDoS flooding (500 UEs) | ~132 min | ~609 MB |
-| **All 4** | — | Full paper reproduction | **~5–6 hours** | — |
+| Option 4 | TC003 | DDoS flooding (500 UEs) | ~231 min | ~2,124 MB |
+| **All 4** | — | Full paper reproduction | **~6–7 hours** | — |
 
 > Runtimes measured on the authors' hardware (see above). Your times may vary.
 
@@ -213,6 +213,36 @@ Notebooks:
 - `Plotting Infection Propagation.ipynb` — mobility trajectories & infection locations
 
 All required Python packages (pandas, matplotlib, seaborn, lifelines, networkx, etc.) are pre-installed in the virtual environment by `setup.sh`.
+
+#### 5G KPI Extraction & Visualization
+
+After running the simulations, extract and visualize 5G network KPIs:
+
+**Step 1 — Extract UPF data rate from simulation results:**
+
+```bash
+cd omnetpp-6.0.1/samples/DDoSimu5G/simulations/CaseID/Test-cases-001a/run_results
+./extract_kpis.sh
+```
+
+This uses `opp_scavetool` to export UPF incoming data rate vectors from each test case's `.vec` files into CSV-R format under `run_results/extracted_data/`.
+
+**Step 2 — Open the analysis notebook:**
+
+```bash
+# Activate the project virtual environment
+cd omnetpp-6.0.1
+source venv/bin/activate
+
+cd samples/DDoSimu5G/results_analysis/5G_KPI_analysis/
+jupyter notebook KPI_Analysis.ipynb
+```
+
+The notebook produces:
+- **Plot 1** — Baseline: UPF data rate with 100 stationary UEs (kbps)
+- **Plot 2** — TC001: UPF data rate with 100 roaming UEs (kbps)
+- **Plot 3** — TC002: UPF data rate with 500 UEs, benign traffic (kbps)
+- **Plot 4** — TC003: UPF data rate under DDoS flooding (Mbps)
 
 ### Opening Project in OMNeT++ IDE
 
@@ -314,10 +344,15 @@ pub_DDoSimu5G/
 │   │   │   ├── TC-flood-DDoS-infec-5RAN-002.ini  # DDoS flood configs
 │   │   │   ├── config/             # Local XML + infection traces
 │   │   │   ├── networks/           # Local NED files
+│   │   │   ├── run_results/
+│   │   │   │   ├── extract_kpis.sh     # ★ KPI extraction via scavetool
+│   │   │   │   └── extracted_data/     # CSV output from extract_kpis.sh
 │   │   │   └── script/
 │   │   │       └── run_all_configs.sh  # ★ Unified runner (paper test cases)
 │   │   └── Test-cases-001/         # Legacy (reference only)
 │   ├── results_analysis/
+│   │   ├── 5G_KPI_analysis/        # ★ 5G KPI extraction & visualization
+│   │   │   └── KPI_Analysis.ipynb  # UPF data rate & RLC packet loss plots
 │   │   └── D2D_analysis/           # ★ D2D infection & mobility analysis
 │   │       ├── plotting_results_MalwareInfection/  # Jupyter notebooks + plots
 │   │       └── simulation_results_MalwareInfection/ # Raw ONE Simulator run data
