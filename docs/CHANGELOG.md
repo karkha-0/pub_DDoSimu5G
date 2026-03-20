@@ -5,6 +5,31 @@ All notable changes to pub_DDoSimu5G will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - 2026-03-20
+
+### 5G KPI Analysis & Bug Fixes
+
+#### Added
+
+- **5G KPI extraction script** (`extract_kpis.sh`): Automated UPF incoming data rate extraction from `.vec` result files using `opp_scavetool` (CSV-R format)
+- **KPI Analysis notebook** (`KPI_Analysis.ipynb`): Jupyter notebook producing five publication-ready plots:
+  - Plots 1–3: UPF incoming data rate for Baseline, TC001, TC002 (kbps)
+  - Plot 4: UPF incoming data rate for TC003 under DDoS flooding (Mbps, capped at 10 Mbps)
+- **`ipykernel`** added to Python venv setup for Jupyter kernel support
+- **README sections** for 5G KPI extraction workflow and notebook visualization
+
+#### Fixed
+
+- **Critical build order bug in `setup_project.sh`**: Modified `.cpy` source files (e.g., CbrSender `controlIn` handler) were copied *after* libraries were already compiled, so patches were never built in. Added `rebuild_modified_libraries()` to recompile INET/Simu5G after patching.
+- **TC003 expected runtime** updated in README (231 min / 2,124 MB peak RAM)
+
+#### Changed
+
+- `setup.sh` output messages corrected to reflect modular install flow
+- `setup_environment.sh` now installs `ipykernel` in the Python venv
+
+---
+
 ## [1.0.0] - 2025-11-07
 
 ### Major Restructuring - Installation System Overhaul

@@ -377,7 +377,7 @@ If you use DDoSimu5G in your research, please cite the repository.
 
 ## Version Information
 
-- **Current Version**: v1.0.0-prep (release candidate)
+- **Current Version**: v1.1.0
 - **OMNeT++**: 6.0.1
 - **INET**: 4.5.0
 - **Simu5G**: 1.2.2
