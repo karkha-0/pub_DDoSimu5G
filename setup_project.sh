@@ -343,6 +343,52 @@ apply_modifications() {
   fi
   
   info "✓ Modifications applied"
+
+  # =====================================================
+  # CRITICAL: Rebuild modified external libraries
+  # The .cpy files overwrite INET/Simu5G sources AFTER those libraries
+  # were already compiled by setup_environment.sh. Without this rebuild,
+  # the running binaries still contain the ORIGINAL code (e.g. CbrSender
+  # without controlIn handling), causing silent failures at runtime.
+  # =====================================================
+  rebuild_modified_libraries "$inet_target" "$simu5g_target" "$modified_source"
+}
+
+# Rebuild INET and Simu5G libraries after applying source modifications
+rebuild_modified_libraries() {
+  local inet_target="$1"
+  local simu5g_target="$2"
+  local modified_source="$3"
+
+  info "Rebuilding modified external libraries..."
+
+  # Source OMNeT++ environment for make
+  # shellcheck disable=SC1091
+  set +u
+  source "$OMNET_DIR/setenv" -q 2>/dev/null || source "$OMNET_DIR/setenv"
+  set -u
+
+  # Rebuild INET if .cc files were modified
+  local inet_cc_count
+  inet_cc_count=$(find "$modified_source/inet4.5" -name "*.cc.cpy" 2>/dev/null | wc -l)
+  if [ "$inet_cc_count" -gt 0 ] && [ -f "$inet_target/Makefile" ]; then
+    info "Rebuilding INET (${inet_cc_count} modified source files)..."
+    cd "$inet_target"
+    make -j"$(nproc)" MODE=release 2>&1 | tail -5 || die "INET rebuild failed"
+    info "  ✓ INET library rebuilt"
+  fi
+
+  # Rebuild Simu5G if .cc or .h files were modified
+  local simu5g_src_count
+  simu5g_src_count=$(find "$modified_source/Simu5G" \( -name "*.cc.cpy" -o -name "*.h.cpy" \) 2>/dev/null | wc -l)
+  if [ "$simu5g_src_count" -gt 0 ] && [ -f "$simu5g_target/Makefile" ]; then
+    info "Rebuilding Simu5G (${simu5g_src_count} modified source files)..."
+    cd "$simu5g_target"
+    make -j"$(nproc)" MODE=release 2>&1 | tail -5 || die "Simu5G rebuild failed"
+    info "  ✓ Simu5G library rebuilt"
+  fi
+
+  info "✓ External libraries rebuilt with modifications"
 }
 
 # Build project
@@ -493,11 +539,7 @@ main() {
   info "=========================================="
   info "Project location: $OMNET_DIR/samples/DDoSimu5G"
   info ""
-  info "To run simulations:"
-  info "  1. cd $OMNET_DIR/samples/DDoSimu5G/simulations/CaseID/script"
-  info "  2. ./runSim_TC-Base-DDoS-infec-5RAN-002.sh"
-  info ""
-  info "The simulation scripts will automatically set up the environment."
+  info "See README.md for simulation instructions and test-case details."
   info "=========================================="
 }
 
