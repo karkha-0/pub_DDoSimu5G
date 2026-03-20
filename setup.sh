@@ -201,7 +201,7 @@ main() {
   info "     source setenv"
   info ""
   info "  2. Open in OMNeT++ IDE:"
-  info "     cd ../$omnet_dir"
+  info "     cd $INSTALL_DIR"
   info "     source venv/bin/activate"
   info "     ./bin/omnetpp"
   info "     File > Open Projects... > samples/DDoSimu5G"
