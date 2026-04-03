@@ -194,7 +194,7 @@ pub_DDoSimu5G/
 
 ## Crediting
   
-This project is licensed under the MIT License. You are free to use, modify, and distribute this software for academic and non-commercial purposes, provided proper credit is given to the original authors.
+This project is licensed under the GNU Lesser General Public License v3.0 (LGPL-3.0). You are free to use, modify, and distribute this software, provided that modifications to the DDoSimu5G source itself are shared under the same license. Code that merely uses or links against DDoSimu5G may be distributed under different terms. This license is consistent with the LGPL-3.0 licenses of the upstream dependencies (INET 4.5.0 and Simu5G 1.2.2) that this project extends.
 
 If you use DDoSimu5G in your research, please cite the repository.
 
@@ -305,8 +305,6 @@ Test cases are defined as simulation configurations. See `simulations/CaseID/omn
 - **INET**: 4.5.0
 - **Simu5G**: 1.2.2
 - **ONE Simulator**: 1.6.0
-
-See `env-requirements.json` for complete version specifications.
 
 ---
 
