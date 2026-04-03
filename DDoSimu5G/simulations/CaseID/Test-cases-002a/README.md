@@ -135,5 +135,3 @@ python3 pcap_to_csv.py --input-dir run_results/pcaps/<config>/<datetime>/ --outp
 # Extract per-flow statistics
 python3 pcap_to_csv.py --input upf.pcap --output flows.csv --mode flows
 ```
-
-See [PostAnalysis_README.md](scripts/PostAnalysis_README.md) for detailed script documentation.
