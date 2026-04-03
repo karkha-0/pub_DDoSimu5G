@@ -19,7 +19,7 @@ For the software architecture and configuration details, see [TECHNICAL_REFERENC
 ## Directory Structure
 
 ```
-Test-cases-002/
+Test-cases-002a/
 ├── config/
 │   ├── infectionTraces/           # Infection timeline JSONs
 │   │   ├── infection_single_ue.json
@@ -54,7 +54,7 @@ cd <omnetpp-dir>
 source setenv
 
 # Run all configurations
-cd samples/DDoSimu5G/simulations/CaseID/Test-cases-002/scripts
+cd samples/DDoSimu5G/simulations/CaseID/Test-cases-002a/scripts
 ./run_all_configs.sh
 ```
 
@@ -134,19 +134,6 @@ python3 pcap_to_csv.py --input-dir run_results/pcaps/<config>/<datetime>/ --outp
 
 # Extract per-flow statistics
 python3 pcap_to_csv.py --input upf.pcap --output flows.csv --mode flows
-```
-
-### Statistical Analysis
-
-```bash
-# Basic analysis
-python3 analyze_curated_v2.py --csv features.csv --output-dir results/
-
-# Flow-level analysis
-python3 analyze_curated_v2.py --csv flows.csv --output-dir results/ --mode flows
-
-# Dual-vantage comparison (gNodeB + UPF)
-python3 analyze_curated_v2.py --csv features_gnb.csv --csv2 features_upf.csv --output-dir results/ --mode dual
 ```
 
 See [PostAnalysis_README.md](scripts/PostAnalysis_README.md) for detailed script documentation.
