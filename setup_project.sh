@@ -383,6 +383,7 @@ build_project() {
     -KINET4_5_PROJ=../../inet4.5 \
     -KSIMU5G_PROJ=../../Simu5G \
     -DINET_IMPORT \
+    -I. \
     -I'$(INET4_5_PROJ)/src' -L'$(INET4_5_PROJ)/src' -lINET'$(D)' \
     -I'$(SIMU5G_PROJ)/src' -L'$(SIMU5G_PROJ)/src' -lsimu5g'$(D)' \
     || die "Makefile generation failed"
