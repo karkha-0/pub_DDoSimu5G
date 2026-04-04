@@ -254,7 +254,7 @@ install_omnetpp() {
   fi
 
   # Install packages required by OMNeT++ IDE and analysis tools
-  pip install -q numpy scipy pandas matplotlib posix_ipc || warn "Failed to install some Python packages"
+  pip install -q numpy scipy pandas matplotlib posix_ipc dpkt || warn "Failed to install some Python packages"
   
   # Install additional requirements if file exists
   if [ -f ./python/requirements.txt ]; then
@@ -292,12 +292,17 @@ WITH_OSGEARTH=no
 EOF
 
   export VIRTUAL_ENV="$INSTALL_DIR/venv"
-  # Pass flags as env vars too — OMNeT++ configure checks for qmake before reading configure.user
-  WITH_OSG=no WITH_OSGEARTH=no ${qtenv_flag} ./configure || die "OMNeT++ configure failed"
+  export WITH_OSG=no
+  export WITH_OSGEARTH=no
+  # Pass WITH_QTENV as export if needed — OMNeT++ configure checks for qmake before reading configure.user
+  if [ -n "${qtenv_flag:-}" ]; then
+    export WITH_QTENV=no
+  fi
+  ./configure || die "OMNeT++ configure failed"
   
-  # Build
+  # Build — release mode only, skip bundled samples (they are not needed for simulations)
   info "Building OMNeT++ (this may take 10-20 minutes)..."
-  make -j"$(nproc)" || die "OMNeT++ build failed"
+  make -j"$(nproc)" MODE=release base || die "OMNeT++ build failed"
   
   info "✓ OMNeT++ ${OMNET_VERSION} installed successfully"
 }
@@ -340,6 +345,8 @@ build_inet() {
     source setenv
     set -u
   fi
+  # INET setenv overwrites PATH — re-assert OMNeT++ tools
+  export PATH="$OMNET_DIR/bin:$PATH"
   
   # Build
   info "Building INET (this may take 15-30 minutes)..."
@@ -371,6 +378,8 @@ build_simu5g() {
   set +u
   source "$OMNET_DIR/setenv"
   set -u
+  # Explicitly ensure OMNeT++ tools are in PATH (setenv may not export reliably in all shells)
+  export PATH="$OMNET_DIR/bin:$PATH"
   
   mkdir -p "$OMNET_DIR/samples"
   cd "$OMNET_DIR/samples"
@@ -408,6 +417,8 @@ build_simu5g() {
     set -u
     info "✓ Simu5G environment sourced"
   fi
+  # All setenv scripts may overwrite PATH — re-assert OMNeT++ tools
+  export PATH="$OMNET_DIR/bin:$PATH"
   
   # Configure Simu5G features to use INET
   if [ ! -f ".oppfeaturestate" ]; then
