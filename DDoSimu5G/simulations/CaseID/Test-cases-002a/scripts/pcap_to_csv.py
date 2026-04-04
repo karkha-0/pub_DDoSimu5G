@@ -886,8 +886,8 @@ def main():
                                   debug=args.debug, ue_ips=ue_ips)
 
             # Always produce a TOS-sanitized "ML-ready" copy
-            sanitized_csv = str(Path(output_csv).with_stem(
-                Path(output_csv).stem + '_ml'))
+            _p = Path(output_csv)
+            sanitized_csv = str(_p.parent / (_p.stem + '_ml' + _p.suffix))
             sanitize_tos_csv(output_csv, sanitized_csv)
 
             if args.make_flows:
@@ -931,8 +931,8 @@ def main():
                               debug=args.debug, ue_ips=ue_ips)
 
         # Always produce a TOS-sanitized "ML-ready" copy
-        sanitized_csv = str(Path(output_csv).with_stem(
-            Path(output_csv).stem + '_ml'))
+        _p = Path(output_csv)
+        sanitized_csv = str(_p.parent / (_p.stem + '_ml' + _p.suffix))
         sanitize_tos_csv(output_csv, sanitized_csv)
 
         if args.make_flows:

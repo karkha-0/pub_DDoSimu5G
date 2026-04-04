@@ -70,9 +70,12 @@ else
     echo "ERROR: Cannot find DDoSimu5G at $DDOSIMU5G_DIR"
     exit 1
 fi
+# Explicitly set DDOSIMU5G_ROOT — BASH_SOURCE resolution may fail in Docker/non-interactive shells
+export DDOSIMU5G_ROOT="$DDOSIMU5G_DIR"
+export PATH="$OMNET_DIR/bin:$DDOSIMU5G_DIR/bin:$PATH"
 
 # Now INET_ROOT, SIMU5G_ROOT, and DDOSIMU5G_ROOT are set - use absolute paths
-export LD_LIBRARY_PATH="$INET_ROOT/src:$SIMU5G_ROOT/src:$DDOSIMU5G_ROOT/src:$LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH="$INET_ROOT/src:$SIMU5G_ROOT/src:$DDOSIMU5G_ROOT/src:${LD_LIBRARY_PATH:-}"
 export PROJECT_ROOT_DIR="$DDOSIMU5G_ROOT"
 
 # Configuration
@@ -256,7 +259,7 @@ for i in "${!CONFIGS_TO_RUN[@]}"; do
     /usr/bin/time -f "%M %P" -o "$TIME_OUTPUT_FILE" \
     opp_run -r 0 \
       -c "$CONFIG_NAME" \
-      -n "$DDOSIMU5G_ROOT/simulations/CaseID/Test-cases-002/:$DDOSIMU5G_ROOT/simulations/CaseID/networks/:$DDOSIMU5G_ROOT/src/:$INET_ROOT/src:$SIMU5G_ROOT/src" \
+      -n "$DDOSIMU5G_ROOT/simulations/CaseID/Test-cases-002a/:$DDOSIMU5G_ROOT/simulations/CaseID/Test-cases-002a/scenarios/ned/:$DDOSIMU5G_ROOT/src/:$INET_ROOT/src:$SIMU5G_ROOT/src" \
       -l "$INET_ROOT/src/libINET.so" \
       -l "$SIMU5G_ROOT/src/libsimu5g.so" \
       -l "$DDOSIMU5G_ROOT/src/libDDoSimu5G.so" \
