@@ -379,11 +379,28 @@ build_project() {
   # Generate makefiles
   info "Generating project makefiles..."
   cd src
+  # Locate nlohmann/json.hpp - prefer system install, fall back to bundled copy
+  local nlohmann_inc
+  if [ -d "/usr/include/nlohmann" ]; then
+    nlohmann_inc="/usr/include"
+  elif [ -d "/usr/local/include/nlohmann" ]; then
+    nlohmann_inc="/usr/local/include"
+  else
+    # Bundle single-header as fallback
+    warn "nlohmann/json.hpp not found as system package — downloading single-header fallback"
+    mkdir -p ../include/nlohmann
+    wget -q -O ../include/nlohmann/json.hpp \
+      https://github.com/nlohmann/json/releases/download/v3.11.3/json.hpp \
+      || die "Failed to download nlohmann/json.hpp"
+    nlohmann_inc="$(cd ../include && pwd)"
+  fi
+
   opp_makemake -f --make-so --deep -o DDoSimu5G -O ../out \
     -KINET4_5_PROJ=../../inet4.5 \
     -KSIMU5G_PROJ=../../Simu5G \
     -DINET_IMPORT \
     -I. \
+    -I"$nlohmann_inc" \
     -I'$(INET4_5_PROJ)/src' -L'$(INET4_5_PROJ)/src' -lINET'$(D)' \
     -I'$(SIMU5G_PROJ)/src' -L'$(SIMU5G_PROJ)/src' -lsimu5g'$(D)' \
     || die "Makefile generation failed"
