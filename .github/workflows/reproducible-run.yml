@@ -35,6 +35,10 @@ jobs:
             karkha085/ddosimu5g:v2.0.0 \
             bash /code/run 2>&1
 
+      - name: Fix results permissions
+        if: always()
+        run: sudo chmod -R a+r ${{ github.workspace }}/results/ || true
+
       - name: List results
         if: always()
         run: |
