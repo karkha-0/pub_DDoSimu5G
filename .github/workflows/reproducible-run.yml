@@ -1,0 +1,44 @@
+name: Reproducible Run
+
+# Mirrors Code Ocean's "Reproducible Run" — pulls the published Docker image,
+# runs the simulation, and uploads all outputs as a downloadable artifact.
+on:
+  push:
+    branches: [TC002, main]
+  workflow_dispatch:   # allows manual trigger from the GitHub Actions UI
+
+jobs:
+  reproduce:
+    name: Run DDoSimu5G simulation
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Pull Docker image
+        run: docker pull karkha085/ddosimu5g:v2.0.0
+
+      - name: Create results directory
+        run: mkdir -p ${{ github.workspace }}/results
+
+      - name: Run simulation (reproducible run)
+        run: |
+          docker run --rm \
+            -v "${{ github.workspace }}/results:/results" \
+            karkha085/ddosimu5g:v2.0.0 \
+            bash /code/run
+
+      - name: List results
+        if: always()
+        run: |
+          echo "=== Contents of /results ==="
+          find ${{ github.workspace }}/results -type f | sort
+
+      - name: Upload results as artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: simulation-results-${{ github.run_id }}
+          path: ${{ github.workspace }}/results/
+          retention-days: 90
