@@ -24,7 +24,9 @@ if [ -z "$LATEST_RUN" ]; then
     echo "WARNING: No PCAP run directory found for $CONFIG_NAME"
 else
     echo "Processing PCAP run: $LATEST_RUN"
-    python3 pcap_to_csv.py --input-dir "$LATEST_RUN" --output /results/ 
+    python3 pcap_to_csv.py --input-dir "$LATEST_RUN" --output /results/ \
+        || echo "⚠️ WARNING: pcap_to_csv.py exited non-zero (see traceback above)"
+fi
 
 # 3. Copy simulation results (PCAPs, vectors, scalars) to /results/
 RUN_RESULTS="/code/omnetpp-6.0.1/samples/DDoSimu5G/simulations/CaseID/Test-cases-002a/run_results"
