@@ -1,0 +1,53 @@
+name: Reproducible Run
+
+# Runs on TC002_docker branch only — not part of main/TC002 codebase.
+# Pulls the published Docker image, mounts the repo as /code, and runs
+# the simulation exactly as Code Ocean does.
+on:
+  push:
+    branches: [TC002_docker]
+  workflow_dispatch:
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  reproduce:
+    name: Run DDoSimu5G simulation
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Pull Docker image
+        run: docker pull karkha085/ddosimu5g:v2.0.0
+
+      - name: Create results directory
+        run: mkdir -p ${{ github.workspace }}/results
+
+      - name: Run simulation (reproducible run)
+        run: |
+          docker run --rm \
+            -v "${{ github.workspace }}:/code" \
+            -v "${{ github.workspace }}/results:/results" \
+            -w /code \
+            karkha085/ddosimu5g:v2.0.0 \
+            bash /code/run 2>&1
+
+      - name: List results
+        if: always()
+        run: |
+          echo "=== Contents of results/ ==="
+          find ${{ github.workspace }}/results -type f | sort
+          echo "=== Disk usage ==="
+          du -sh ${{ github.workspace }}/results/ || true
+
+      - name: Upload results as artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: simulation-results-${{ github.run_id }}
+          path: ${{ github.workspace }}/results/
+          if-no-files-found: warn
+          retention-days: 90
