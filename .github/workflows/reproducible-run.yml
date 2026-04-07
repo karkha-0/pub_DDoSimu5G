@@ -7,6 +7,9 @@ on:
     branches: [TC002, main]
   workflow_dispatch:   # allows manual trigger from the GitHub Actions UI
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   reproduce:
     name: Run DDoSimu5G simulation
@@ -27,13 +30,15 @@ jobs:
           docker run --rm \
             -v "${{ github.workspace }}/results:/results" \
             karkha085/ddosimu5g:v2.0.0 \
-            bash /code/run
+            bash -c "bash /code/run 2>&1"
 
       - name: List results
         if: always()
         run: |
-          echo "=== Contents of /results ==="
+          echo "=== Contents of results/ ==="
           find ${{ github.workspace }}/results -type f | sort
+          echo "=== Disk usage ==="
+          du -sh ${{ github.workspace }}/results/ || true
 
       - name: Upload results as artifact
         if: always()
@@ -41,4 +46,5 @@ jobs:
         with:
           name: simulation-results-${{ github.run_id }}
           path: ${{ github.workspace }}/results/
+          if-no-files-found: warn
           retention-days: 90
