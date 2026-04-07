@@ -28,8 +28,15 @@ else
         || echo "⚠️ WARNING: pcap_to_csv.py exited non-zero (see traceback above)"
 fi
 
-# 3. Copy simulation results (PCAPs, vectors, scalars) to /results/
+# 3. Rename any colon-containing directory names (colons are invalid in artifact paths on Windows/NTFS)
 RUN_RESULTS="/code/omnetpp-6.0.1/samples/DDoSimu5G/simulations/CaseID/Test-cases-002a/run_results"
+if [ -d "$RUN_RESULTS" ]; then
+    find "$RUN_RESULTS" -depth -name "*:*" | while IFS= read -r f; do
+        mv "$f" "$(dirname "$f")/$(basename "$f" | tr ':' '-')"
+    done
+fi
+
+# 4. Copy simulation results (PCAPs, vectors, scalars) to /results/
 if [ -d "$RUN_RESULTS" ]; then
     cp -r "$RUN_RESULTS"/* /results/ 2>/dev/null || true
 else
