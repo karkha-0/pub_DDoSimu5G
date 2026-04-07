@@ -25,7 +25,7 @@ if [ -z "$LATEST_RUN" ]; then
 else
     echo "Processing PCAP run: $LATEST_RUN"
     python3 pcap_to_csv.py --input-dir "$LATEST_RUN" --output /results/ \
-        || echo "⚠️ WARNING: pcap_to_csv.py exited non-zero (see traceback above)"
+        || echo "WARNING: pcap_to_csv.py exited non-zero (see traceback above)"
 fi
 
 # 3. Rename any colon-containing directory names (colons are invalid in artifact paths on Windows/NTFS)
