@@ -13,7 +13,7 @@ env:
 
 jobs:
   reproduce:
-    name: Run DDoSimu5G simulation
+    name: Run DDoSimu5G v2 simulation
     runs-on: ubuntu-latest
 
     steps:
