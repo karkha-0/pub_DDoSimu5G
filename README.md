@@ -137,8 +137,8 @@ The experiments reported in the paper were run on:
 After installation, run the paper test cases (Table 5 of the paper):
 
 ```bash
-cd omnetpp-6.0.1/samples/DDoSimu5G/simulations/CaseID/Test-cases-001a/script
-./run_all_configs.sh
+cd omnetpp-6.0.1/samples/DDoSimu5G/simulations/CaseID/Test-cases-001a/
+./script/run_all_configs.sh
 ```
 
 The interactive menu offers:
