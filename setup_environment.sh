@@ -156,12 +156,15 @@ install_system_packages() {
       sudo apt-get update
       sudo apt-get install -y \
         build-essential git wget curl unzip \
+        gcc-10 g++-10 \
         python3 python3-venv python3-pip \
         bison flex \
         libxml2-dev zlib1g-dev \
-        qt6-base-dev qt6-tools-dev qt6-tools-dev-tools \
+        nlohmann-json3-dev \
         xdg-utils \
         || die "Failed to install packages"
+      # Qt6 is only available on Ubuntu 22.04+ — install if available, skip silently if not
+      sudo apt-get install -y qt6-base-dev qt6-tools-dev qt6-tools-dev-tools 2>/dev/null || true
       ;;
     dnf)
       sudo dnf install -y \
@@ -169,7 +172,7 @@ install_system_packages() {
         python3 python3-pip \
         bison flex \
         libxml2-devel zlib-devel \
-        qt6-qtbase-devel qt6-qttools-devel \
+        json-devel \
         xdg-utils \
         || warn "Some packages may have failed to install"
       ;;
@@ -186,11 +189,26 @@ install_system_packages() {
     *)
       warn "Unknown package manager. Please install required packages manually:"
       warn "  - build-essential, git, wget, curl, python3, bison, flex"
-      warn "  - Qt6 development packages, libxml2-dev, zlib-dev"
+      warn "  - build-essential, libxml2-dev, zlib-dev (Qt not needed - headless/cmdenv mode)"
       ;;
   esac
   
   info "✓ System packages installed"
+}
+
+# Force GCC 10 — Ubuntu 20.04 defaults to GCC 9 which fails to compile INET/OMNeT++ 6
+configure_compiler() {
+  if command -v gcc-10 >/dev/null 2>&1 && command -v g++-10 >/dev/null 2>&1; then
+    info "Configuring GCC 10 as default compiler..."
+    update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10 100 \
+                        --slave /usr/bin/g++ g++ /usr/bin/g++-10 2>/dev/null || true
+    update-alternatives --set gcc /usr/bin/gcc-10 2>/dev/null || true
+    export CC=gcc-10
+    export CXX=g++-10
+    info "✓ Compiler: $(gcc --version | head -1)"
+  else
+    warn "gcc-10 not found — using system default (may fail on Ubuntu 20.04)"
+  fi
 }
 
 # Install OMNeT++
@@ -234,20 +252,50 @@ install_omnetpp() {
   fi
   
   # shellcheck disable=SC1091
+  set +u
   source "$INSTALL_DIR/venv/bin/activate"
+  set -u
   
   # Install Python requirements
   info "Installing Python packages for OMNeT++..."
-  
+
+  # Check Python version - setuptools>=58 and pip>=21 dropped Python 3.5 support.
+  # Ubuntu 16.04 ships Python 3.5; Ubuntu 20.04+ ships 3.8+.
+  if python3 -c "import sys; exit(0 if sys.version_info >= (3, 6) else 1)" 2>/dev/null; then
+    pip install -q --upgrade pip wheel setuptools || warn "Failed to upgrade pip tools"
+  else
+    warn "Python < 3.6 detected — pinning pip/setuptools to versions compatible with Python 3.5"
+    warn "Consider upgrading the base OS to Ubuntu 22.04 for full functionality"
+    pip install -q "pip<21" "setuptools<58" "wheel<0.37" || warn "Failed to install pinned pip tools"
+  fi
+
   # Install packages required by OMNeT++ IDE and analysis tools
-  pip install -q --upgrade pip wheel setuptools
-  pip install -q numpy scipy pandas matplotlib posix_ipc ipykernel || warn "Failed to install some Python packages"
+  pip install -q numpy scipy pandas matplotlib posix_ipc dpkt || warn "Failed to install some Python packages"
   
   # Install additional requirements if file exists
   if [ -f ./python/requirements.txt ]; then
     pip install -q -r ./python/requirements.txt || warn "Failed to install additional Python requirements"
   fi
   
+  # Stub out xdg-desktop-menu to suppress "no writable system menu directory found"
+  # errors in headless/Docker environments (Code Ocean, CI, etc.)
+  local xdg_stub_dir
+  xdg_stub_dir=$(mktemp -d)
+  printf '#!/bin/sh\nexit 0\n' > "$xdg_stub_dir/xdg-desktop-menu"
+  printf '#!/bin/sh\nexit 0\n' > "$xdg_stub_dir/xdg-icon-resource"
+  chmod +x "$xdg_stub_dir/xdg-desktop-menu" "$xdg_stub_dir/xdg-icon-resource"
+  export PATH="$xdg_stub_dir:$PATH"
+
+  # Auto-detect Qt6: only disable if not available (e.g. Ubuntu 20.04, headless/Docker)
+  # On Ubuntu 22.04+ with Qt6 installed, OMNeT++ IDE will be built automatically
+  local qtenv_flag=""
+  if ! command -v qmake6 >/dev/null 2>&1 && ! command -v qmake >/dev/null 2>&1; then
+    info "Qt6 not found — configuring OMNeT++ for headless/cmdenv mode (no IDE)"
+    qtenv_flag="WITH_QTENV=no"
+  else
+    info "Qt6 found — OMNeT++ IDE (Qtenv) will be built"
+  fi
+
   # Configure
   info "Configuring OMNeT++ (this may take a minute)..."
   cat > configure.user << 'EOF'
@@ -258,13 +306,19 @@ WITH_NETBUILDER=yes
 WITH_OSG=no
 WITH_OSGEARTH=no
 EOF
-  
+
   export VIRTUAL_ENV="$INSTALL_DIR/venv"
+  export WITH_OSG=no
+  export WITH_OSGEARTH=no
+  # Pass WITH_QTENV as export if needed — OMNeT++ configure checks for qmake before reading configure.user
+  if [ -n "${qtenv_flag:-}" ]; then
+    export WITH_QTENV=no
+  fi
   ./configure || die "OMNeT++ configure failed"
   
-  # Build
+  # Build — release mode only, skip bundled samples (they are not needed for simulations)
   info "Building OMNeT++ (this may take 10-20 minutes)..."
-  make -j"$(nproc)" || die "OMNeT++ build failed"
+  make -j"$(nproc)" MODE=release base || die "OMNeT++ build failed"
   
   info "✓ OMNeT++ ${OMNET_VERSION} installed successfully"
 }
@@ -307,6 +361,8 @@ build_inet() {
     source setenv
     set -u
   fi
+  # INET setenv overwrites PATH — re-assert OMNeT++ tools
+  export PATH="$OMNET_DIR/bin:$PATH"
   
   # Build
   info "Building INET (this may take 15-30 minutes)..."
@@ -338,6 +394,8 @@ build_simu5g() {
   set +u
   source "$OMNET_DIR/setenv"
   set -u
+  # Explicitly ensure OMNeT++ tools are in PATH (setenv may not export reliably in all shells)
+  export PATH="$OMNET_DIR/bin:$PATH"
   
   mkdir -p "$OMNET_DIR/samples"
   cd "$OMNET_DIR/samples"
@@ -375,6 +433,8 @@ build_simu5g() {
     set -u
     info "✓ Simu5G environment sourced"
   fi
+  # All setenv scripts may overwrite PATH — re-assert OMNeT++ tools
+  export PATH="$OMNET_DIR/bin:$PATH"
   
   # Configure Simu5G features to use INET
   if [ ! -f ".oppfeaturestate" ]; then
@@ -449,6 +509,7 @@ main() {
   
   check_system_requirements
   install_system_packages
+  configure_compiler
   install_omnetpp
   build_inet
   build_simu5g
