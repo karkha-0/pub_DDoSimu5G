@@ -271,6 +271,9 @@ install_omnetpp() {
 
   # Install packages required by OMNeT++ IDE and analysis tools
   pip install -q numpy scipy pandas matplotlib posix_ipc dpkt || warn "Failed to install some Python packages"
+
+  # Install Jupyter stack for KPI analysis notebooks
+  pip install -q jupyter notebook ipykernel || warn "Failed to install Jupyter packages"
   
   # Install additional requirements if file exists
   if [ -f ./python/requirements.txt ]; then
