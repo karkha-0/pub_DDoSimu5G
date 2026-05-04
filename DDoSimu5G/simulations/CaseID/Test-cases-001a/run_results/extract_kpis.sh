@@ -37,7 +37,6 @@ else
     # Also check the storage path directly
     if [[ -z "$RUN_RESULTS" || ! -d "$RUN_RESULTS" ]]; then
         for p in \
-            #"/home/kkh/storage/ide/pub_DDoSimu5G/omnetpp-6.0.1/samples/DDoSimu5G/simulations/CaseID/Test-cases-001a/run_results" \
             "run_results" \
             "$TC_DIR/run_results"; do
             if [[ -d "$p" ]] && find "$p" -maxdepth 2 -name '*.vec' -print -quit 2>/dev/null | grep -q .; then
