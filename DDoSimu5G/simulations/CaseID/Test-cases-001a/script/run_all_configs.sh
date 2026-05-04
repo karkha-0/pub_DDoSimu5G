@@ -204,6 +204,7 @@ for seq in "${!SELECTED_INDICES[@]}"; do
     TIME_FILE=$(mktemp /tmp/ddosimu5g_time_XXXXXX)
 
     # Run simulation — working directory = TC-001a so relative paths in INI resolve correctly
+    cd "$TC_DIR"
     /usr/bin/time -f "%M %P" -o "$TIME_FILE" \
     opp_run -r "$RUN_INDEX" \
       -c "$CONFIG_NAME" \
