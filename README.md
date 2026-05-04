@@ -230,8 +230,7 @@ This uses `opp_scavetool` to export UPF incoming data rate vectors from each tes
 **Step 2 — Open the analysis notebook:**
 
 ```bash
-# Activate the project virtual environment
-cd omnetpp-6.0.1
+# Activate the project virtual environment while standing on the repo's base directory
 source venv/bin/activate
 
 cd samples/DDoSimu5G/results_analysis/5G_KPI_analysis/
