@@ -180,6 +180,59 @@ A successful run produces:
 > Runtimes measured on the authors' hardware (see above). Your times may vary.
 
 
+## Custom Experiments
+
+New experiments require only two steps: add a config block to an INI file, then run it.
+
+### Step 1 — Define a new configuration
+
+Open `DDoSimu5G/simulations/CaseID/Test-cases-001a/TC-Base-DDoS-infec-5RAN-002.ini` and append a block that `extends` any existing config:
+
+```ini
+[Config My-50UE-Experiment]
+description = "Quick experiment with 50 stationary UEs"
+extends = TC-Base-DDoS-infec-5RAN-002
+
+*.numCbrUe = 50
+*.numVidUe = 0
+*.cbrUe[*].mobility.typename = "StationaryMobility"
+```
+
+Key parameters you can override:
+
+| Parameter | Default (Baseline-TC) | Effect |
+|---|---|---|
+| `*.numCbrUe` | 100 | Number of CBR UEs |
+| `*.numVidUe` | 0 | Number of video-streaming UEs |
+| `**.cbrUe[*].app[0].PacketSize` | 100 (bytes) | Benign traffic packet size |
+| `**.cbrUe[*].app[0].sampling_time` | 1 s | Inter-packet interval |
+| `*.trafficController.enableTrafficMod` | false | Enable DDoS trigger |
+| `sim-time-limit` | 3600 s | Simulation duration |
+
+### Step 2 — Run the new configuration
+
+```bash
+cd omnetpp-6.0.1/samples/DDoSimu5G/simulations/CaseID/Test-cases-001a
+source ../../../../../setenv
+
+opp_run -r 0 -m -u Cmdenv -c My-50UE-Experiment \
+  -n "../networks:../../../src:../../../../../../inet*/src:../../../../../../Simu5G*/src" \
+  -l ../../../src/DDoSimu5G \
+  -l ../../../../../../inet*/src/INET \
+  -l ../../../../../../Simu5G*/src/simu5g \
+  TC-Base-DDoS-infec-5RAN-002.ini
+```
+
+Alternatively, add an entry to `script/run_all_configs.sh` under the `EXTRA_CONFIGS` array:
+
+```bash
+"My-Exp|My-50UE-Experiment|$BASE_INI|0|50 stationary UEs, benign CBR|extra"
+```
+
+then select it from the interactive menu.
+
+> The existing 9 Extra scenarios (`Extra-1` – `Extra-9`) in `run_all_configs.sh` already demonstrate further reuse: varying UE count (100/500), mobility model (stationary/slow/mixed), and DDoS flag, all within the same framework without changing any C++ code.
+
 ## Results Analysis 
 ### Convert D2D Model mobility traces from ONE to Simu5G
 
