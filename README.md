@@ -1,20 +1,35 @@
-# DDoSimu5G 
+# DDoSimu5G
 
-## General 
-This project provides a modular simulation framework combining Simu5G and The ONE Simulator to study the impact of malware-based DDoS attacks in 5G infrastructures. It includes:
+## Overview
 
-- Mobility and device-to-device infection modeling (via ONE)
-- Traffic orchestration and malware triggers
-- Realistic CBR and flooding traffic patterns (UDP-based)
-- KPI extraction (data rate, packet loss, propagation)
-- Configurable test cases for benign and adversarial scenarios
-- Jupyter-based result analysis
+DDoSimu5G is a modular simulation framework for studying DDoS attacks in 5G network infrastructures. Built on OMNeT++ 6.0.1, INET 4.5, and Simu5G 1.2.2, it enables researchers to generate labeled datasets for training ML/AI-based intrusion detection systems.
 
-DDoSimu5G is useful for researchers and practitioners studying IoT-borne malware, network resilience, and 5G traffic behavior under stress.
+### Key Features
+
+- **Dynamic multi-protocol traffic generation** — concurrent UDP, TCP, DNS, and HTTP handlers within single UE applications, configured via JSON profiles
+- **Adversarial application framework** — modular DDoS attacks (UDP Flood, TCP SYN Flood, DNS Amplification, HTTP Flood) with configurable intensity styles and behavior modes
+- **Infection dynamics** — malware propagation timelines from ONE Simulator D2D traces or standalone JSON schedules
+- **Ground-truth labeling** — automated out-of-band CSV traffic labels synchronized with dual-vantage PCAP captures (gNodeB + UPF)
+- **Realistic IoT device profiles** — smart meters, wearables, connected vehicles, drones, smartphones, and video streamers
+- **Configurable test cases** — benign baselines and adversarial scenarios across different mobility patterns
+
+### Test Case Suites
+
+The project includes two test case suites with different approaches:
+
+| Suite | Approach | Description |
+|-------|----------|-------------|
+| **[Test-cases-001](DDoSimu5G/simulations/CaseID/Test-cases-001/README.md)** | CBR parameter modification + ONE Simulator | Volumetric UDP flood attacks with mobility variants. Requires `modifiedExternalFiles/` patches to INET/Simu5G. Published at ACM SIGSIM PADS. |
+| **[Test-cases-002](DDoSimu5G/simulations/CaseID/Test-cases-002/README.md)** | Self-contained dynamic traffic + dedicated attack apps | Multi-protocol benign traffic with diverse DDoS attack types and styles. No external source modifications required. |
+
+Each test case suite has its own README with instructions for running simulations, configuration details, and output structure.
+
+For the software architecture and configuration reference, see [docs/TECHNICAL_REFERENCE.md](docs/TECHNICAL_REFERENCE.md).
 
 ## Quick Start
 
 ### Prerequisites
+
 - Ubuntu 20.04+ / Debian 11+ / Fedora 35+ / RHEL 8+
 - 20GB free disk space
 - 8GB RAM minimum (16GB recommended)
@@ -32,20 +47,20 @@ cd pub_DDoSimu5G
 ./setup.sh
 ```
 
-That's it! The script will:
+The script will:
 1. Install OMNeT++ 6.0.1, INET 4.5.0, and Simu5G 1.2.2
-2. Set up the pub_DDoSimu5G project
-3. Build all components
+2. Apply source modifications for Test-cases-001 compatibility
+3. Build the DDoSimu5G project library
+4. Compile the ONE Simulator (optional)
 
-### Running Your First Simulation
+### Running Simulations
 
-```bash
-# Navigate to simulation scripts
-cd omnetpp-6.0.1/samples/DDoSimu5G/simulations/CaseID/script
+After installation, each test case suite provides its own run scripts:
 
-# Run a test case
-./runSim_TC-Base-DDoS-infec-5RAN-002.sh
-```
+- **Test-cases-001:** `simulations/CaseID/script/runSim_TC-*.sh`
+- **Test-cases-002:** `simulations/CaseID/Test-cases-002/scripts/run_TC-002-*.sh`
+
+See the individual test case READMEs for detailed instructions.
 
 ## Installation Options
 
@@ -57,7 +72,7 @@ You can install components separately for more control:
 # Install just the environment (OMNeT++, INET, Simu5G)
 ./setup_environment.sh
 
-# Later, add the pub_DDoSimu5G project
+# Later, add the DDoSimu5G project
 ./setup_project.sh
 ```
 
@@ -116,11 +131,54 @@ After installation, you will have:
 - **OMNeT++ 6.0.1**: Network simulation framework (WITH_NETBUILDER enabled)
 - **INET 4.5.0**: Internet protocol suite for OMNeT++
 - **Simu5G 1.2.2**: 5G NR network simulation library
-- **pub_DDoSimu5G**: This project with DDoS simulation capabilities
+- **DDoSimu5G**: This project with DDoS simulation capabilities
 - **Python venv**: Virtual environment with `posix_ipc` for result analysis
 - **ONE Simulator 1.6.0**: Opportunistic Network Environment (optional)
 
-Component versions are defined in `env-requirements.json`.
+Component versions are defined in [docs/env-requirements.json](docs/env-requirements.json).
+
+## Project Structure
+
+```
+pub_DDoSimu5G/
+├── setup.sh                      # Master installation script
+├── setup_environment.sh          # Environment installer (OMNeT++, INET, Simu5G)
+├── setup_project.sh              # Project installer
+├── README.md
+├── LICENSE
+├── AUTHORS
+├── docs/
+│   ├── TECHNICAL_REFERENCE.md    # Software architecture and configuration guide
+│   ├── CHANGELOG.md
+│   ├── TROUBLESHOOTING.md
+│   └── env-requirements.json     # Version requirements
+├── DDoSimu5G/                    # Project source (installed into omnetpp samples/)
+│   ├── Makefile
+│   ├── src/
+│   │   └── ddosimu5g/
+│   │       ├── apps/
+│   │       │   ├── dynamic/              # DynamicTrafficSender/Receiver
+│   │       │   │   ├── protocols/        # UDP, TCP, DNS, HTTP handlers
+│   │       │   │   │   └── receiver/     # Server-side protocol handlers
+│   │       │   │   └── trafficlabel/     # Ground-truth labeling system
+│   │       │   └── adversarialApps/      # BaseAttackApp + attack subclasses
+│   │       │       └── ddos/             # UDP/TCP/DNS/HTTP flood attacks
+│   │       ├── trafficcontroller/        # DataTrafficController (orchestration)
+│   │       └── simcommands/              # Post-simulation commands
+│   ├── simulations/
+│   │   └── CaseID/
+│   │       ├── Test-cases-001/           # CBR + ONE Simulator scenarios
+│   │       ├── Test-cases-002/           # Dynamic traffic + attack scenarios
+│   │       ├── config/                   # Shared configuration files
+│   │       ├── networks/                 # NED network definitions
+│   │       └── script/                   # TC-001 run scripts
+│   ├── modifiedExternalFiles/            # INET/Simu5G source patches (TC-001)
+│   │   ├── inet4.5/
+│   │   └── Simu5G/
+│   └── ONE_Simulator/                    # D2D malware propagation simulator
+└── archive/
+    └── legacy-bootstrap/                 # Deprecated installation scripts
+```
 
 ## Troubleshooting
 
@@ -160,8 +218,6 @@ Component versions are defined in `env-requirements.json`.
 # Source the OMNeT++ environment
 cd omnetpp-6.0.1
 source setenv
-
-# The simulation scripts automatically handle this
 ```
 
 **Q: Python module import errors**
@@ -169,89 +225,9 @@ source setenv
 # Activate the virtual environment
 cd omnetpp-6.0.1
 source venv/bin/activate
-
-# Install additional packages if needed
-pip install jupyter pandas matplotlib numpy
 ```
 
-## Project Structure
-
-```
-pub_DDoSimu5G/
-├── setup.sh                    # Master installation script
-├── setup_environment.sh        # Environment-only installer
-├── setup_project.sh           # Project-only installer
-├── env-requirements.json      # Version requirements
-├── CHANGELOG.md               # Version history
-├── src/                       # Project source code
-├── simulations/               # Simulation scenarios
-│   └── CaseID/
-│       └── script/           # Simulation run scripts
-├── modifiedExternalFiles/    # Patches for INET/Simu5G
-├── ONE_Simulator/            # Mobility trace generator
-└── results/                  # Analysis notebooks and data
-```
-
-## Crediting
-  
-This project is licensed under the MIT License. You are free to use, modify, and distribute this software for academic and non-commercial purposes, provided proper credit is given to the original authors.
-
-If you use DDoSimu5G in your research, please cite the repository.
-
-
-The simulation run scripts are located in `simulations/CaseID/script/`:
-
-```bash
-cd omnetpp-6.0.1/samples/DDoSimu5G/simulations/CaseID/script
-
-# Run a DDoS infection scenario
-./runSim_TC-Base-DDoS-infec-5RAN-002.sh
-
-# Run a baseline scenario (no attack)
-./runSim_TC-Base-benign-5RAN-001.sh
-```
-
-The scripts automatically:
-- Source the OMNeT++ environment
-- Set up library paths
-- Run the simulation with proper parameters
-
-**Note**: Modified source files from `modifiedExternalFiles/` are automatically applied during installation by `setup_project.sh`.
-
-### Convert D2D Model mobility traces from ONE to Simu5G
-
-If you need to generate new mobility traces (existing traces are pre-generated):
-
-```bash
-cd omnetpp-6.0.1/samples/DDoSimu5G/simulations/CaseID/script/mob_tracesConversionPy/fromONEtoSimu5G/
-
-# Convert JSON mobility traces to .mobility format
-python3 convert_mob_traces.py <path-to-json-mobility> <output.movements>
-```
-
-### Results and Visualization
-  
-All plots are reproducible using the Jupyter notebooks in `results/Test-Cases-001/plotting/Test_cases_plots/`:
-
-```bash
-# Activate Python environment (automatically created during setup)
-cd omnetpp-6.0.1
-source venv/bin/activate
-
-# Install Jupyter if not already installed
-pip install jupyter pandas matplotlib numpy
-
-# Open Jupyter notebooks
-cd samples/DDoSimu5G/results/Test-Cases-001/plotting/Test_cases_plots/
-jupyter notebook
-```
-
-**Python packages installed by setup**:
-- `posix_ipc`: For inter-process communication and shared memory operations
-
-Use the pre-exported `.csv` files in `results/Test-Cases-001/plotting/raw_data/` or regenerate with OMNeT++ scavetool.
-
-### Opening Project in OMNeT++ IDE
+## Opening in OMNeT++ IDE
 
 ```bash
 # Launch OMNeT++ IDE
@@ -262,54 +238,44 @@ cd omnetpp-6.0.1
 # Select: omnetpp-6.0.1/samples/DDoSimu5G
 ```
 
-**Configure NED file locations** (if needed):
-- Right-click project → Properties → OMNeT++ → NED Source Folders
-- Ensure all source directories are included
-
-## Migration from bootstrap_install.sh
-
-If you previously used `bootstrap_install.sh`:
-
-1. The old script is now `bootstrap_install.old.sh` (deprecated)
-2. Use `setup.sh` for the same one-command installation
-3. Or use the modular scripts for more control
-4. See `CHANGELOG.md` for detailed migration guide
-
-## Development and Contributing
+## Development
 
 ### Building from Source
 
 ```bash
-# If you modify the project source
 cd omnetpp-6.0.1/samples/DDoSimu5G/src
 make clean
 make MODE=release
 ```
 
-### Running Tests
+### Migration from bootstrap_install.sh
 
-Test cases are defined as simulation configurations. See `simulations/CaseID/omnetpp.ini` for all scenarios.
+The old `bootstrap_install.sh` is deprecated. Use `setup.sh` for equivalent behavior, or the modular scripts for more control. See [docs/CHANGELOG.md](docs/CHANGELOG.md) for the migration guide.
 
-## Support and Documentation
+## Documentation
 
-- **Issues**: [GitHub Issues](https://github.com/karkha-0/pub_DDoSimu5G/issues)
-- **Documentation**: See inline comments and `CHANGELOG.md`
-- **OMNeT++ Manual**: `omnetpp-6.0.1/doc/manual/index.html`
-- **INET Documentation**: [INET Framework Docs](https://inet.omnetpp.org/)
-- **Simu5G Documentation**: [Simu5G Website](http://simu5g.org/)
+- **[Technical Reference](docs/TECHNICAL_REFERENCE.md)** — Software architecture, configuration, and extension guide
+- **[Changelog](docs/CHANGELOG.md)** — Version history and migration guide
+- **[OMNeT++ Manual](https://doc.omnetpp.org/)** — Simulation framework documentation
+- **[INET Framework](https://inet.omnetpp.org/)** — Network protocol documentation
+- **[Simu5G](http://simu5g.org/)** — 5G simulation library
 
 ## Version Information
 
-- **Current Version**: v1.0.0-prep (release candidate)
-- **OMNeT++**: 6.0.1
-- **INET**: 4.5.0
-- **Simu5G**: 1.2.2
-- **ONE Simulator**: 1.6.0
+| Component | Version |
+|-----------|---------|
+| DDoSimu5G | v1.0.0-prep |
+| OMNeT++ | 6.0.1 |
+| INET | 4.5.0 |
+| Simu5G | 1.2.2 |
+| ONE Simulator | 1.6.0 |
 
-See `env-requirements.json` for complete version specifications.
+## License
+
+This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
+
+If you use DDoSimu5G in your research, please cite the repository.
 
 ---
 
-For questions, issues, or contributions, please open an issue or contact the maintainers via GitHub.
-
-
+For questions, issues, or contributions, please open an issue at [GitHub](https://github.com/karkha-0/pub_DDoSimu5G/issues).
