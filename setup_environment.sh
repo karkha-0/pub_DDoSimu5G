@@ -196,19 +196,25 @@ install_system_packages() {
   info "✓ System packages installed"
 }
 
-# Force GCC 10 — Ubuntu 20.04 defaults to GCC 9 which fails to compile INET/OMNeT++ 6
+# # Force GCC 10 — Ubuntu 20.04 defaults to GCC 9 which fails to compile INET/OMNeT++ 6
+# configure_compiler() {
+#   if command -v gcc-10 >/dev/null 2>&1 && command -v g++-10 >/dev/null 2>&1; then
+#     info "Configuring GCC 10 as default compiler..."
+#     update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10 100 \
+#                         --slave /usr/bin/g++ g++ /usr/bin/g++-10 2>/dev/null || true
+#     update-alternatives --set gcc /usr/bin/gcc-10 2>/dev/null || true
+#     export CC=gcc-10
+#     export CXX=g++-10
+#     info "✓ Compiler: $(gcc --version | head -1)"
+#   else
+#     warn "gcc-10 not found — using system default (may fail on Ubuntu 20.04)"
+#   fi
+# }
+
 configure_compiler() {
-  if command -v gcc-10 >/dev/null 2>&1 && command -v g++-10 >/dev/null 2>&1; then
-    info "Configuring GCC 10 as default compiler..."
-    update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10 100 \
-                        --slave /usr/bin/g++ g++ /usr/bin/g++-10 2>/dev/null || true
-    update-alternatives --set gcc /usr/bin/gcc-10 2>/dev/null || true
-    export CC=gcc-10
-    export CXX=g++-10
-    info "✓ Compiler: $(gcc --version | head -1)"
-  else
-    warn "gcc-10 not found — using system default (may fail on Ubuntu 20.04)"
-  fi
+  export CC=gcc
+  export CXX=g++
+  info "✓ Compiler: $(gcc --version | head -1)"
 }
 
 # Install OMNeT++
